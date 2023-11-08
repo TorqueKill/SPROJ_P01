@@ -77,6 +77,11 @@
 		background: #c49eff;
 		border-radius: 12px;
 	}
+    .btn:active 
+    {
+        background-color: #C49EFF;
+        color: #000000;
+    }
 	#cancel {
 		width: 6rem;
 		background: #c70000;

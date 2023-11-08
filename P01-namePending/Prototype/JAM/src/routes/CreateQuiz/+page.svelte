@@ -64,5 +64,10 @@
 	.btn {
 		width: 20rem;
 		height: 6rem;
+		font-family: 'Jeju Gothic', sans-serif;
+	}
+	.btn:active {
+		background-color: #7801a8;
+		color: #f0e9e9;
 	}
 </style>
