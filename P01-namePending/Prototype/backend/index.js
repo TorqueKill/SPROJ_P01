@@ -2,7 +2,16 @@ const express = require("express");
 const app = express();
 const http = require("http");
 const server = http.createServer(app);
-const io = require("socket.io")(server); // < Interesting!
+const Server = require("socket.io").Server;
+// import {Server} from "socket.io";
+const io = new Server(server,{
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+        
+    }
+});
+// const io = require("socket.io")(server); // < Interesting!
 
 
 app.get("/", (req, res) => {
@@ -25,8 +34,8 @@ server.listen(3000, () => {
   console.log("listening on *:3000");
 });
 
-io.on("connection", (socket) => {
-  console.log("a user connected");
+io.on("connection", async (socket) => {
+  console.log("a user connected with id: " + socket.id);    
   socket.on("disconnect", () => {
     console.log("user disconnected");
   });
@@ -36,10 +45,22 @@ io.on("connection", (socket) => {
     
   });
 
-  socket.on("hello", (msg) => {
-    console.log("user sent hello message");
+  socket.on("createGame", (msg) => {
+
+    const room_id = socket.id;
+    socket.join(room_id);
+    console.log("user created game with room id: " + room_id);
+    socket.emit("gameCreated", room_id);
+
+
     
-  })
+  });
+
+  socket.on("joinGame", (room_id) => {
+    socket.join(room_id);
+    console.log("user joined game with room id: " + room_id);
+    socket.emit("gameJoined", room_id);
+  });
 });
 
 
