@@ -4,7 +4,7 @@
 	<body>
 		<div class="container">
 			<div class="container mt-4 mb-5 d-flex justify-content-center" id="inside-box">
-				<p id="joinText">Joining room...</p>
+				<p id="joinText">Choose display name</p>
 				<div class="form-group">
 					<input
 						type="text"
@@ -14,7 +14,7 @@
 					/>
 				</div>
 				<p>
-					<button type="button" class="btn btn-primary btn-block" id="joinQuiz">Join</button>
+					<button type="button" class="btn btn-primary btn-block" id="joinQuiz">Enter</button>
 				</p>
 			</div>
 		</div>
@@ -38,12 +38,12 @@
 	}
 	#joinText {
 		color: white;
-		font-size: 40px;
+		font-size: 35px;
 		font-family: JejuGothic;
 		font-weight: 400;
 		width: 200rem;
 		margin-top: -4rem;
-		margin-left: 4.75rem;
+		margin-left: 2.2rem;
 		margin-right: -50rem;
 	}
 	.btn {
