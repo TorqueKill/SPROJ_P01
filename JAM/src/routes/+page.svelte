@@ -5,16 +5,19 @@
     import {io} from 'socket.io-client';
     import {socket, socketEvents} from '$lib/socketStore.js';
     import {user} from '$lib/userStore.js';
-    import {quiz1} from '$lib/dummyQuiz.js';
+    import {quiz3} from '$lib/dummyQuiz.js';
     import {goto} from '$app/navigation';
 
     import {onMount} from 'svelte';
 
+    let isHost;
+    let userDecided;
 
     let roomid;
     let isRoomFull = false;
 
-    let dummyQuiz = quiz1;
+    let dummyQuiz = quiz3;
+    let maxPlayers;
 
     $: {
         const events = $socketEvents;
@@ -49,21 +52,24 @@
 
 
     onMount(() => {
+        userDecided = false;
         $user.id = socket.id;
+        maxPlayers = 2;
     });
     
 
 
-    const testButton = (soc) => {
-        
-        soc.emit('test', 'test');
-        // socket.emit('hello', 'hello world');
-        console.log("hello test");
-    };
 
 
-    const createRoom = (soc) => {
-        soc.emit('create-room', dummyQuiz);
+    const createRoom = (soc,maxPlayers) => {
+
+        if (maxPlayers < 2 || maxPlayers > 10) {
+            alert("max players must be between 2 and 10");
+            maxPlayers = 2;
+            return;
+        }
+
+        soc.emit('create-room', dummyQuiz,maxPlayers);
         console.log("createRoom");
         $user.isHost = true;
 
@@ -93,13 +99,22 @@
 
 <h1>HOMEPAGE</h1>
 
-<button on:click={()=>testButton(socket)}>test</button>
-<button on:click={()=>{goto("/waitLobby")}}>waitLobby</button>
-<button on:click={()=>createRoom(socket)}>createRoom</button>
+<!--ask if host or player-->
+<!--if host, show create room button else show joing room-->
 
-<input type="text" bind:value={roomid} />
-<button on:click={()=>joinRoom(socket, roomid)}>joinRoom</button>
 
+{#if !userDecided}
+    <button on:click={() => {isHost=true;$user.isHost=true;userDecided=true}}>Host</button>
+    <button on:click={() => {isHost=false;userDecided=true;}}>Join</button>
+{:else}
+    {#if isHost}
+        <input type="number" bind:value={maxPlayers} />
+        <button on:click={() => createRoom(socket,maxPlayers)}>Create Room</button>
+    {:else}
+        <input type="text" bind:value={roomid} />
+        <button on:click={() => joinRoom(socket, roomid)}>Join Room</button>
+    {/if}
+{/if}
 
 
 

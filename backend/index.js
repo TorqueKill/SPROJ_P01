@@ -12,9 +12,10 @@ const io = new Server(server, {
 
 //quiz is defined as an array of objects with the following properties: question, answer, choices
 //quiz = [{question: "question", answer: "answer", choices: ["choice1", "choice2", "choice3", "choice4"]}, ...]]
-let rooms = []; // {roomid: "roomid", users: [socketid, socketid, socketid...], host: socketid, quiz: quiz, answers:[], gameStarted: false, sessionLoaded: [], scores: []}
+let rooms = []; // {roomid: "roomid", users: [socketid, socketid, socketid...], host: socketid, quiz: quiz, answers:[], gameStarted: false, sessionLoaded: [], scores: [], maxPlayers: MIN_PLAYERS_PER_LOBBY}
 
-const GAME_START_QUORUM = 2;
+const MAX_PLAYERS_PER_LOBBY = 10;
+const MIN_PLAYERS_PER_LOBBY = 2;
 
 function getRoom(roomid) {
   return rooms.find((room) => room.roomid === roomid);
@@ -38,6 +39,7 @@ function addUserToRoom(roomid, socketid) {
       gameStarted: false,
       sessionLoaded: [],
       scores: [],
+      maxPlayers: MIN_PLAYERS_PER_LOBBY,
     });
   }
 }
@@ -112,6 +114,22 @@ function setRoomQuiz(roomid, quiz) {
   }
 }
 
+function setRoomMaxPlayers(roomid, maxPlayers) {
+  let room = getRoom(roomid);
+  if (room) {
+    room.maxPlayers = maxPlayers;
+  }
+}
+
+function getRoomMaxPlayers(roomid) {
+  let room = getRoom(roomid);
+  if (room) {
+    return room.maxPlayers;
+  } else {
+    return MIN_PLAYERS_PER_LOBBY;
+  }
+}
+
 function makeDummyStringList(length) {
   let result = [];
   for (let i = 0; i < length; i++) {
@@ -180,7 +198,7 @@ function getFinalScores(roomid, socketid) {
 }
 
 server.listen(process.env.PORT || 3001, () => {
-  console.log("listening on " + process.env.PORT || "3001");
+  console.log("listening on 3001");
 });
 
 //TODO LATER: add error handling for all functions
@@ -203,7 +221,7 @@ io.on("connection", async (socket) => {
     console.log("user sent test message");
   });
 
-  socket.on("create-room", (quiz) => {
+  socket.on("create-room", (quiz, maxPlayers) => {
     // create room and add user to it, check if room already exists then create new room and remove user from old room
     //first check if host already has a room
     let host = rooms.find((room) => room.host === socket.id);
@@ -217,6 +235,7 @@ io.on("connection", async (socket) => {
     socket.join(roomid);
     addUserToRoom(roomid, socket.id);
     setRoomQuiz(roomid, quiz);
+    setRoomMaxPlayers(roomid, maxPlayers);
     socket.emit("room-created", roomid);
     console.log("user created room: " + roomid);
     console.log("Quiz received, first question: " + quiz[0].question);
@@ -225,7 +244,7 @@ io.on("connection", async (socket) => {
   socket.on("join-room", (roomid) => {
     if (
       getRoom(roomid)?.gameStarted ||
-      getRoom(roomid)?.users.length - 1 >= GAME_START_QUORUM
+      getRoom(roomid)?.users.length - 1 >= getRoomMaxPlayers(roomid)
     ) {
       socket.emit("room-full");
       return;
@@ -238,7 +257,7 @@ io.on("connection", async (socket) => {
     let playernum = getPlayerNum(roomid);
     io.to(roomid).emit("user-joined", socket.id, playernum);
 
-    if (playernum >= GAME_START_QUORUM) {
+    if (playernum >= getRoomMaxPlayers(roomid)) {
       rooms[getRoomIndex(roomid)].gameStarted = true;
       io.to(roomid).emit("game-start", getRoomQuiz(roomid));
     }
