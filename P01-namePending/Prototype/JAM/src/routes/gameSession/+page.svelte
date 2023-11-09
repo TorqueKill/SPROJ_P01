@@ -77,4 +77,11 @@
     {/if}
 
 
+<button on:click={() => {
+    socket.disconnect();
+    socket.connect();
+    goto('/');
+}}>Leave Room</button>
+
+
 {/if}

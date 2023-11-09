@@ -3,6 +3,7 @@
     import {SCREENS} from '$lib/constants.js';
     import {user} from '$lib/userStore.js';
     import {socket, socketEvents} from '$lib/socketStore.js';
+    import {goto} from '$app/navigation';
 
     import {onMount} from 'svelte';
 
@@ -20,7 +21,6 @@
     }
 
     onMount(() => {
-        //playerScores = $user.score;
         //eg = [[1,0,1,0], [0,1,0,1]...] where of 1 list = questions
         socket.emit('session-loaded', $user.gameid, SCREENS.SCORE);
     });
@@ -48,4 +48,10 @@
     {#each playerScores as ps,idx}
     <p>Player {idx+1} score: {playerScore(ps)}/{playerScores[idx].length}</p>
     {/each}
+
+    <button on:click={() => {
+        socket.disconnect();
+        socket.connect();
+        goto('/');
+    }}>Leave Room</button>
 {/if}

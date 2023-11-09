@@ -14,6 +14,10 @@
         const events = $socketEvents;
         console.log(events);
 
+        if (events.roomCreated) {
+            $user.gameid = events.roomCreated;
+        }
+
         if (events.roomJoined) {
             playersReady = events.roomJoined.num
         }
@@ -31,15 +35,6 @@
 
 
 
-    const testButton = (soc) => {
-        
-        soc.emit('test', 'test');
-        // socket.emit('hello', 'hello world');
-        console.log("hello test");
-    };
-
-
-
 </script>
 
 
@@ -48,5 +43,11 @@
     <h4>Host id: {$user.gameid}</h4>
 {/if}
 
-<button on:click={()=>testButton(socket)}>test</button>
+<!--Go back to menu, disconnect-->
+
+<button on:click={() => {
+    socket.disconnect();
+    socket.connect();
+    goto('/');
+}}>Leave Room</button>
 

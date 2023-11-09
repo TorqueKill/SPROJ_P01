@@ -56,3 +56,56 @@ export const quiz2 = [
 		choices: ['Isaac Newton', 'Galileo Galilei', 'Marie Curie', 'Albert Einstein']
 	}
 ];
+
+export const quiz3 = [
+	{
+		question: 'What is the only mammal capable of sustained flight?',
+		answer: 'Bat',
+		choices: ['Bird', 'Butterfly', 'Bat', 'Flying Squirrel']
+	},
+	{
+		question: 'Which country is both an island and a continent?',
+		answer: 'Australia',
+		choices: ['Madagascar', 'Greenland', 'Australia', 'Iceland']
+	},
+	{
+		question: 'What is the collective noun for a group of flamingos?',
+		answer: 'Flamboyance',
+		choices: ['Flock', 'Gaggle', 'Flamenco', 'Flamboyance']
+	},
+	{
+		question: 'Which famous artist cut off his own ear?',
+		answer: 'Vincent van Gogh',
+		choices: ['Pablo Picasso', 'Leonardo da Vinci', 'Vincent van Gogh', 'Claude Monet']
+	},
+	{
+		question: 'In Norse mythology, who is the god of thunder?',
+		answer: 'Thor',
+		choices: ['Loki', 'Odin', 'Thor', 'Freyja']
+	},
+	{
+		question: 'What is the smallest prime number?',
+		answer: '2',
+		choices: ['1', '2', '3', '5']
+	},
+	{
+		question: "Which planet is known as the 'Morning Star'?",
+		answer: 'Venus',
+		choices: ['Mars', 'Jupiter', 'Venus', 'Mercury']
+	},
+	{
+		question: 'In which year did the first manned moon landing occur?',
+		answer: '1969',
+		choices: ['1955', '1969', '1977', '1984']
+	},
+	{
+		question: 'What is the main ingredient in guacamole?',
+		answer: 'Avocado',
+		choices: ['Tomato', 'Onion', 'Avocado', 'Cilantro']
+	},
+	{
+		question: "Which fictional wizard said, 'You're a wizard, Harry!'?",
+		answer: 'Hagrid',
+		choices: ['Dumbledore', 'Voldemort', 'Hagrid', 'Snape']
+	}
+];
