@@ -27,6 +27,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@sveltejs/adapter-vercel": "^3.0.3",
 		"express": "^4.18.2",
 		"socket.io": "^4.7.2",
 		"socket.io-client": "^4.7.2"
