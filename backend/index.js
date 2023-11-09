@@ -179,10 +179,9 @@ function getFinalScores(roomid, socketid) {
   return scores;
 }
 
-server.listen(3001, () => {
-  console.log("listening on :3001");
+server.listen(process.env.PORT || 3001, () => {
+  console.log("listening on " + process.env.PORT || "3001");
 });
-
 
 //TODO LATER: add error handling for all functions
 //TODO LATER: everytime a user is connected make sure they are sent to the home screen
