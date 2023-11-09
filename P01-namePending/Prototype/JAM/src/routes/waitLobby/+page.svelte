@@ -1,23 +1,20 @@
 <h1>Waiting for all Players to Join</h1>
 
 <script lang="js">
-	// import { page } from "$app/stores";
-    // import {socketStore} from './socketStore.js'
-    // import {state} from '$app/stores';
-	
-    // import {socket} from './routes/page.svelte';
+// @ts-nocheck
 
-    // const socket = history.state.socket;
-    // const room_id = history.state.room_id;
+    import {socket} from '$lib/socketStore.js';
 
-    // const socket = page.params.socket;
-    // const room_id = page.params.room_id;
+    const testButton = (soc) => {
+        
+        soc.emit('test', 'test');
+        // socket.emit('hello', 'hello world');
+        console.log("hello test");
+    };
 
-    // const socket = $page.params.socket;
-    // const room_id = $page.params.room_id;
 
-    // socket.on('playerJoined', (player) => {
-    //     console.log("player joined: ", player);
-    // });
 
 </script>
+
+
+<button on:click={testButton($socket)}>test</button>
