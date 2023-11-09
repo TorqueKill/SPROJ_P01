@@ -21,5 +21,25 @@ socket.on('user-left', (socketid, playerNum) => {
 	socketEvents.update(() => ({ roomLeft: { id: socketid, num: playerNum } }));
 });
 
+socket.on('room-full', () => {
+	socketEvents.update(() => ({ roomFull: true }));
+});
+
+socket.on('game-start', (quiz) => {
+	socketEvents.update(() => ({ gameStarted: quiz }));
+});
+
+socket.on('next-question', (question) => {
+	socketEvents.update(() => ({ nextQuestion: question }));
+});
+
+socket.on('final-scores', (scores) => {
+	socketEvents.update(() => ({ finalScores: scores }));
+});
+
+socket.on('game-end', () => {
+	socketEvents.update(() => ({ gameEnd: true }));
+});
+
 // Export the socket connection for reuse
 export { socket };

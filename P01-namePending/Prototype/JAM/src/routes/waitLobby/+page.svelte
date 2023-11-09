@@ -4,6 +4,9 @@
 // @ts-nocheck
 
     import {socket, socketEvents} from '$lib/socketStore.js';
+    import {user} from '$lib/userStore.js';
+
+    import {goto} from '$app/navigation';
 
     let playersReady = 0;
 
@@ -19,7 +22,11 @@
             playersReady = events.roomLeft.num
         }
 
-        
+        if (events.gameStarted) {
+            $user.quiz = events.gameStarted;
+            console.log($user.quiz);
+            goto('/gameSession');
+        }
     }
 
 
@@ -37,6 +44,9 @@
 
 
 <h3>Players Ready: {playersReady}</h3>
+{#if $user.isHost}
+    <h4>Host id: {$user.gameid}</h4>
+{/if}
 
 <button on:click={()=>testButton(socket)}>test</button>
 

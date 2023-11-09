@@ -4,25 +4,34 @@
 
     import {io} from 'socket.io-client';
     import {socket, socketEvents} from '$lib/socketStore.js';
+    import {user} from '$lib/userStore.js';
+    import {quiz1} from '$lib/dummyQuiz.js';
     import {goto} from '$app/navigation';
 
     import {onMount} from 'svelte';
 
 
-    let display = "test";
     let roomid;
+    let isRoomFull = false;
+
+    let dummyQuiz = quiz1;
 
     $: {
         const events = $socketEvents;
         if (events.roomCreated) {
-            display = events.roomCreated;
+            $user.gameid = events.roomCreated;
         }
 
-        if (events.roomJoined) {
-            goto("/waitLobby");
+        if (events.roomFull) {
+            //alert
+            alert("room full");
+            isRoomFull = true;
+            roomid = "";
         }
 
     }
+
+    
 
 
 
@@ -38,6 +47,10 @@
     //     display = roomid;
     // });
 
+
+    onMount(() => {
+        $user.id = socket.id;
+    });
     
 
 
@@ -50,8 +63,12 @@
 
 
     const createRoom = (soc) => {
-        soc.emit('create-room');
+        soc.emit('create-room', dummyQuiz);
         console.log("createRoom");
+        $user.isHost = true;
+
+        goto("/waitLobby");
+
     
     };
 
@@ -59,7 +76,10 @@
     const joinRoom = (soc, roomid) => {
         soc.emit('join-room', roomid);
         console.log("joinRoom");
-        goto("/waitLobby");
+        if (!isRoomFull) {
+            $user.gameid = roomid;
+            goto("/waitLobby");
+        }
     };
 
     
@@ -71,9 +91,7 @@
 
 <!-- check if socket is connected -->
 
-
-<h1>{display}</h1>
-
+<h1>HOMEPAGE</h1>
 
 <button on:click={()=>testButton(socket)}>test</button>
 <button on:click={()=>{goto("/waitLobby")}}>waitLobby</button>
