@@ -198,7 +198,7 @@ function getFinalScores(roomid, socketid) {
 }
 
 server.listen(process.env.PORT || 3001, () => {
-  console.log("listening on 3001");
+  console.log("listening on: " + process.env.PORT || 3001);
 });
 
 //TODO LATER: add error handling for all functions
