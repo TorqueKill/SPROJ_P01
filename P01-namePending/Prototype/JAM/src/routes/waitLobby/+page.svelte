@@ -3,7 +3,26 @@
 <script lang="js">
 // @ts-nocheck
 
-    import {socket} from '$lib/socketStore.js';
+    import {socket, socketEvents} from '$lib/socketStore.js';
+
+    let playersReady = 0;
+
+    $: {
+        const events = $socketEvents;
+        console.log(events);
+
+        if (events.roomJoined) {
+            playersReady = events.roomJoined.num
+        }
+
+        if (events.roomLeft) {
+            playersReady = events.roomLeft.num
+        }
+
+        
+    }
+
+
 
     const testButton = (soc) => {
         
@@ -17,4 +36,7 @@
 </script>
 
 
-<button on:click={testButton($socket)}>test</button>
+<h3>Players Ready: {playersReady}</h3>
+
+<button on:click={()=>testButton(socket)}>test</button>
+
