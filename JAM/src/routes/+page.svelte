@@ -111,7 +111,7 @@
           </p>
         {:else if $user.isHost}
           <div>
-            <h2>Number of participants:</h2>
+            <h2>Number of participants</h2>
             <input
               type="number"
               class="form-control"
@@ -205,10 +205,10 @@
     width: 10rem;
     background: #f0e9e9;
     border: None;
-    color: black;
+    color: white;
     font-family: JejuGothic, sans-serif;
     border-radius: 12px;
-    height: 4rem;
+    height: 3.5rem;
     font-size: 20px;
   }
   .btn:active {
@@ -216,7 +216,7 @@
     color: #f0e9e9;
   }
   .btn-secondary {
-    background: #f0e9e9;
+    background: #00a59b;
     border: None;
     margin-top: 1rem;
     margin-left: 7.5rem;
@@ -275,10 +275,13 @@
     margin-top: 0.75rem;
     width: 10rem;
     height: 3rem;
-    background: #f0e9e9;
-    color: black;
+    background: #00a59b;
+    color: white;
     font-size: 20px;
     font-family: JejuGothic;
     font-weight: 400;
+  }
+  .btn-primary {
+    background: #00a59b;
   }
 </style>
