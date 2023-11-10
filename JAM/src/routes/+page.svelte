@@ -10,17 +10,17 @@
 
     import {onMount} from 'svelte';
 
-    let isHost;
-    let userDecided;
-
     let roomid;
     let isRoomFull = false;
 
-    let dummyQuiz = quiz3;
     let maxPlayers;
+
+    let _userName;
 
     $: {
         const events = $socketEvents;
+        console.log(events)
+        
         if (events.roomCreated) {
             $user.gameid = events.roomCreated;
         }
@@ -32,29 +32,18 @@
             roomid = "";
         }
 
+
     }
 
     
 
 
 
-    // onMount(() => {
-
-    //     $socket = io('http://localhost:3001');
-
-    // });
-
-
-    // $socket.on('room-created', (roomid) => {
-    //     console.log("room created: " + roomid);
-    //     display = roomid;
-    // });
-
-
     onMount(() => {
-        userDecided = false;
         $user.id = socket.id;
         maxPlayers = 2;
+        _userName = $user.userName;
+
     });
     
 
@@ -69,7 +58,7 @@
             return;
         }
 
-        soc.emit('create-room', dummyQuiz,maxPlayers);
+        soc.emit('create-room', $user.hostQuiz ,maxPlayers);
         console.log("createRoom");
         $user.isHost = true;
 
@@ -79,14 +68,29 @@
     };
 
 
-    const joinRoom = (soc, roomid) => {
-        soc.emit('join-room', roomid);
-        console.log("joinRoom");
-        if (!isRoomFull) {
-            $user.gameid = roomid;
-            goto("/waitLobby");
+    const joinRoom = (soc, roomid, username) => {
+        if (roomid){
+            soc.emit('join-room', roomid, username);
+            console.log("joinRoom");
+
+            if (!isRoomFull) {
+                $user.gameid = roomid;
+                goto("/waitLobby");
+            }
+
+        } else {
+            alert("please enter a room id");
         }
     };
+
+
+    const setUserName = (userName) => {
+        if (userName) {
+            $user.userName = userName;
+        } else {
+            alert("please enter a username");
+        }
+    }
 
     
 
@@ -103,16 +107,20 @@
 <!--if host, show create room button else show joing room-->
 
 
-{#if !userDecided}
-    <button on:click={() => {isHost=true;$user.isHost=true;userDecided=true}}>Host</button>
-    <button on:click={() => {isHost=false;userDecided=true;}}>Join</button>
+{#if !$user.userDecided}
+    <button on:click={() => {$user.isHost=true;$user.userDecided=true}}>Host</button>
+    <button on:click={() => {$user.userDecided=true;}}>Join</button>
 {:else}
-    {#if isHost}
+    {#if $user.isHost}
         <input type="number" bind:value={maxPlayers} />
         <button on:click={() => createRoom(socket,maxPlayers)}>Create Room</button>
+        <button on:click={() => {goto("/createQuiz");}}>Create Quiz</button>
     {:else}
         <input type="text" bind:value={roomid} />
-        <button on:click={() => joinRoom(socket, roomid)}>Join Room</button>
+        <button on:click={() => joinRoom(socket, roomid, $user.userName)}>Join Room</button>
+        <input type="text" bind:value={_userName} />
+        <button on:click={() => {setUserName(_userName);}}>Set Username</button>
+        
     {/if}
 {/if}
 
