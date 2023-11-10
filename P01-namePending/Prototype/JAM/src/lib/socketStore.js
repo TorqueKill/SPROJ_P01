@@ -15,12 +15,12 @@ socket.on('room-created', (roomid) => {
 	socketEvents.update(() => ({ roomCreated: roomid }));
 });
 
-socket.on('user-joined', (socketid, playerNum) => {
-	socketEvents.update(() => ({ roomJoined: { id: socketid, num: playerNum } }));
+socket.on('user-joined', (socketid, playerNum, names) => {
+	socketEvents.update(() => ({ roomJoined: { id: socketid, num: playerNum, names: names } }));
 });
 
-socket.on('user-left', (socketid, playerNum) => {
-	socketEvents.update(() => ({ roomLeft: { id: socketid, num: playerNum } }));
+socket.on('user-left', (socketid, playerNum, names) => {
+	socketEvents.update(() => ({ roomLeft: { id: socketid, num: playerNum, names: names } }));
 });
 
 socket.on('room-full', () => {
