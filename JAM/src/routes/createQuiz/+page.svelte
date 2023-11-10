@@ -1,4 +1,4 @@
-<script>
+<script lang = "js">
   // @ts-nocheck
 
   import { goto } from "$app/navigation";
@@ -61,6 +61,7 @@
 
 <main>
   <body>
+    <h1 id="home">JAM</h1>
     <h2>Create Quiz</h2>
     <h5>Note: Quizzes on local storage</h5>
     <div id="quizChosen">
@@ -141,6 +142,13 @@
     margin-top: 6rem;
     margin-left: 17rem;
   }
+  #home {
+    color: #f0e9e9;
+    font-family: JejuGothic, sans-serif;
+    font-size: 36px;
+    margin-left: 5rem;
+    margin-top: 4rem;
+  }
   #inside-box {
     width: 20rem;
     height: 23rem;
@@ -148,7 +156,7 @@
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 51px;
     padding-top: 2rem;
-    margin-bottom: 12rem;
+    margin-bottom: 8rem;
   }
   .btn {
     /* margin-top: 5rem; */
@@ -196,7 +204,7 @@
     font-family: JejuGothic, sans-serif;
     font-size: 45px;
     margin-left: 36rem;
-    margin-top: 4rem;
+    margin-top: -2rem;
   }
   h5 {
     color: rgb(216, 53, 53);

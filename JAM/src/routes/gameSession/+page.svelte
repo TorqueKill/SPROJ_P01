@@ -1,4 +1,4 @@
-<script lang "js">
+<script lang = "js">
   // @ts-nocheck
 
   import { SCREENS } from "$lib/constants.js";
@@ -54,6 +54,7 @@
 
 <main>
   <body>
+    <h1 id="home">JAM</h1>
     <div class="container">
       {#if currentQuestion == -1}
         <h1 class="loading">Loading...</h1>
@@ -95,12 +96,19 @@
   body {
     background: #7801a8;
   }
+  #home {
+    color: #f0e9e9;
+    font-family: JejuGothic, sans-serif;
+    font-size: 36px;
+    margin-left: 5rem;
+    margin-top: 4rem;
+  }
   #host-question {
     color: black;
     font-family: JejuGothic, sans-serif;
     font-weight: bolder;
     margin-left: 19rem;
-    margin-top: 12rem;
+    margin-top: 7rem;
     padding-left: 8rem;
   }
   .inside-box {
@@ -139,7 +147,7 @@
     font-family: JejuGothic, sans-serif;
     font-size: 36px;
     margin-left: 18rem;
-    margin-top: 11rem;
+    margin-top: 7rem;
   }
   .inside-option {
     width: 45rem;

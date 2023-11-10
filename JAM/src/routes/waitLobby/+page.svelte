@@ -37,6 +37,7 @@
 
 <main>
   <body>
+    <h1 id="home">JAM</h1>
     <h1>Waiting for the players to join...</h1>
     <div class="container">
       <div
@@ -86,8 +87,15 @@
     background: #7801a8;
   }
   .container {
-    margin-top: 8rem;
+    margin-top: 4rem;
     margin-left: 17rem;
+  }
+  #home {
+    color: #f0e9e9;
+    font-family: JejuGothic, sans-serif;
+    font-size: 36px;
+    margin-left: 5rem;
+    margin-top: 4rem;
   }
   #inside-box {
     width: 20rem;
@@ -164,7 +172,8 @@
     font-family: JejuGothic;
     font-weight: 400;
     margin-left: 30rem;
-    margin-top: 5rem;
+    margin-top: 2rem;
+    font-weight: bold;
   }
   #listPlayers {
     margin-left: 8rem;
