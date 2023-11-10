@@ -1,4 +1,4 @@
-<script lang = "js">
+<script lang="js">
   // @ts-nocheck
 
   import { goto } from "$app/navigation";
@@ -88,7 +88,7 @@
           class="btn btn-tertiary btn-block"
           id="createNew"
           on:click={() => {
-            goto("/waitLobby");
+            goto("/CreateQuestion");
           }}>Create new Quiz</button
         >
 

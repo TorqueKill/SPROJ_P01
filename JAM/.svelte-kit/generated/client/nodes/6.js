@@ -1,1 +1,1 @@
-export { default as component } from "../../../../src/routes/waitLobby/+page.svelte";
+export { default as component } from "../../../../src/routes/gameSession/+page.svelte";
