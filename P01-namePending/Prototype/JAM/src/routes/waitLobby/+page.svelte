@@ -9,6 +9,7 @@
     import {goto} from '$app/navigation';
 
     let playersReady = 0;
+    let playerNames = [];
 
     $: {
         const events = $socketEvents;
@@ -20,10 +21,13 @@
 
         if (events.roomJoined) {
             playersReady = events.roomJoined.num
+            playerNames = events.roomJoined.names;
+        
         }
 
         if (events.roomLeft) {
             playersReady = events.roomLeft.num
+            playerNames = events.roomLeft.names;
         }
 
         if (events.gameStarted) {
@@ -42,6 +46,16 @@
 {#if $user.isHost}
     <h4>Host id: {$user.gameid}</h4>
 {/if}
+
+{#if playerNames.length >= 1}
+    {#each playerNames as name}
+        <h4>{name}</h4>
+    {/each}
+{/if}
+
+
+
+
 
 <!--Go back to menu, disconnect-->
 
