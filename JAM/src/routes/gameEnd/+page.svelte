@@ -1,4 +1,4 @@
-<script lang  = "js">
+<script lang = "js">
   // @ts-nocheck
   import { SCREENS } from "$lib/constants.js";
   import { user } from "$lib/userStore.js";
@@ -35,21 +35,92 @@
   };
 </script>
 
-<h1>Game End</h1>
-<!--Display all scores, scores are sent via [0,1,0,1] where length = questions-->
+<main>
+  <body>
+    <h1 id="home">JAM</h1>
+    <div class="container" id="inside-box">
+      <h1>Game End</h1>
+      <!--Display all scores, scores are sent via [0,1,0,1] where length = questions-->
+      {#if playerScores.length == 0}
+        <p>Waiting for scores...</p>
+      {:else}
+        {#each playerScores as ps, idx}
+          <p>
+            Player {idx + 1} score: {playerScore(ps)}/{playerScores[idx].length}
+          </p>
+        {/each}
 
-{#if playerScores.length == 0}
-  <p>Waiting for scores...</p>
-{:else}
-  {#each playerScores as ps, idx}
-    <p>Player {idx + 1} score: {playerScore(ps)}/{playerScores[idx].length}</p>
-  {/each}
+        <button
+          class="btn btn-secondary btn-block"
+          id="createQuiz"
+          on:click={() => {
+            socket.disconnect();
+            socket.connect();
+            goto("/");
+          }}>Leave Room</button
+        >
+      {/if}
+    </div>
+  </body>
+</main>
 
-  <button
-    on:click={() => {
-      socket.disconnect();
-      socket.connect();
-      goto("/");
-    }}>Leave Room</button
-  >
-{/if}
+<style>
+  body {
+    background: #7801a8;
+  }
+  #home {
+    color: #f0e9e9;
+    font-family: JejuGothic, sans-serif;
+    font-size: 36px;
+    margin-left: 5rem;
+    margin-top: 4rem;
+  }
+  .container {
+    margin-top: 5rem;
+    margin-left: 34rem;
+  }
+  #inside-box {
+    width: 20rem;
+    height: 30rem;
+    background: #c49eff;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 51px;
+    padding-top: 3rem;
+  }
+  h1 {
+    color: white;
+    margin-left: 5rem;
+    margin-top: -0.75rem;
+    font-family: JejuGothic, sans-serif;
+  }
+  .btn-secondary {
+    background: #c70000;
+    border: None;
+    margin-top: 8rem;
+    margin-left: 5rem;
+    font-size: 20px;
+    color: white;
+    font-family: JejuGothic, sans-serif;
+  }
+  .btn {
+    margin-top: 15rem;
+    margin-right: 6rem;
+    width: 10rem;
+    border: None;
+    font-family: JejuGothic, sans-serif;
+    border-radius: 12px;
+    height: 3rem;
+    font-size: 20px;
+  }
+  .btn:active {
+    background-color: #8b0000;
+    color: #f0e9e9;
+    font-family: JejuGothic, sans-serif;
+  }
+  p {
+    color: #02625c;
+    margin-left: 5.3rem;
+    font-family: JejuGothic, sans-serif;
+    font-size: 18px;
+  }
+</style>
