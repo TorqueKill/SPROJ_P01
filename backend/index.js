@@ -3,7 +3,7 @@ const app = express();
 const http = require("http");
 const server = http.createServer(app);
 const Server = require("socket.io").Server;
-// import {Server} from "socket.io";
+
 const io = new Server(server, {
   cors: {
     origin: "*",
@@ -12,11 +12,19 @@ const io = new Server(server, {
 
 //quiz is defined as an array of objects with the following properties: question, answer, choices
 //quiz = [{question: "question", answer: "answer", choices: ["choice1", "choice2", "choice3", "choice4"]}, ...]]
-let rooms = []; // {roomid: "roomid", users: [socketid, socketid, socketid...], host: socketid, quiz: quiz, answers:[], gameStarted: false, sessionLoaded: [], scores: [], maxPlayers: MIN_PLAYERS_PER_LOBBY}
+
+//rooms = [{roomid: "roomid", users: [socketid, socketid, socketid...], host: socketid, quiz: quiz, answers:[], gameStarted: false, sessionLoaded: [], scores: [], maxPlayers: MIN_PLAYERS_PER_LOBBY, usersNames: [name, name, name...]}]}]
+let rooms = [];
+
+//users = [{socketid: socketid, name: name, roomid: roomid}]
+let users = [];
 
 const MAX_PLAYERS_PER_LOBBY = 10;
 const MIN_PLAYERS_PER_LOBBY = 2;
 
+//<-------------------------SERVER FUNCTIONS------------------------->
+
+//TODO LATER: add error handling for all functions
 function getRoom(roomid) {
   return rooms.find((room) => room.roomid === roomid);
 }
@@ -26,34 +34,43 @@ function getRoomIndex(roomid) {
 }
 
 function addUserToRoom(roomid, socketid) {
-  let room = getRoom(roomid);
-  if (room) {
-    room.users.push(socketid);
-  } else {
-    rooms.push({
-      roomid: roomid,
-      users: [socketid],
-      host: socketid,
-      quiz: [],
-      answers: {},
-      gameStarted: false,
-      sessionLoaded: [],
-      scores: [],
-      maxPlayers: MIN_PLAYERS_PER_LOBBY,
-    });
+  try {
+    let room = getRoom(roomid);
+    if (room) {
+      room.users.push(socketid);
+    } else {
+      rooms.push({
+        roomid: roomid,
+        users: [socketid],
+        host: socketid,
+        quiz: [],
+        answers: {},
+        gameStarted: false,
+        sessionLoaded: [],
+        scores: [],
+        maxPlayers: MIN_PLAYERS_PER_LOBBY,
+        usersNames: [],
+      });
+    }
+  } catch (e) {
+    console.log(e);
   }
 }
 
 function getPlayerNum(roomid) {
-  let room = getRoom(roomid);
-  if (room) {
-    if (room.host) {
-      return room.users.length - 1;
+  try {
+    let room = getRoom(roomid);
+    if (room) {
+      if (room.host) {
+        return room.users.length - 1;
+      } else {
+        return room.users.length;
+      }
     } else {
-      return room.users.length;
+      return 0;
     }
-  } else {
-    return 0;
+  } catch (e) {
+    console.log(e);
   }
 }
 
@@ -65,25 +82,33 @@ function setScores(roomid, scores) {
 }
 
 function removeUserFromRoom(roomid, socketid) {
-  let room = getRoom(roomid);
-  if (room) {
-    let index = room.users.findIndex((id) => id === socketid);
-    if (index !== -1) {
-      room.users.splice(index, 1);
+  try {
+    let room = getRoom(roomid);
+    if (room) {
+      let index = room.users.findIndex((id) => id === socketid);
+      if (index !== -1) {
+        room.users.splice(index, 1);
+      }
     }
+  } catch (e) {
+    console.log(e);
   }
 }
 
 function removeRoom(roomid) {
-  let index = getRoomIndex(roomid);
-  if (index !== -1) {
-    rooms.splice(index, 1);
+  try {
+    let index = getRoomIndex(roomid);
+    if (index !== -1) {
+      rooms.splice(index, 1);
+    }
+  } catch (e) {
+    console.log(e);
   }
 }
 
 //make sure id is unique
 function makeid(length) {
-  unique = false;
+  let unique = false;
   let result = "";
   let characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -139,109 +164,174 @@ function makeDummyStringList(length) {
 }
 
 function handleAnswer(roomid, socketid, answer, questionIndex) {
-  let room = getRoom(roomid);
-  let choicesIdx = answer;
-  //answers are stored in a list of dictionaries which is the same length as the quiz
-  //check if dictionary for socketid exists, if not create it
-  //answer is sent as an index of the choices array, translate to the actual answer
+  try {
+    let room = getRoom(roomid);
+    let choicesIdx = answer;
 
-  if (room) {
-    if (!room.answers[socketid]) {
-      room.answers[socketid] = makeDummyStringList(room.quiz.length);
-    }
-    let answer = room?.quiz[questionIndex]?.choices[choicesIdx];
+    if (room) {
+      if (!room.answers[socketid]) {
+        room.answers[socketid] = makeDummyStringList(room.quiz.length);
+      }
+      let answer = room?.quiz[questionIndex]?.choices[choicesIdx];
 
-    //console.log("choices : ", room.quiz[questionIndex].choices)
-    //if answer is undefined, set answer to first choice
-    if (!answer) {
-      answer = room.quiz[questionIndex].choices[0];
+      //if answer is undefined, set answer to first choice
+      if (!answer) {
+        answer = room.quiz[questionIndex].choices[0];
+      }
+      room.answers[socketid][questionIndex] = answer;
     }
-    room.answers[socketid][questionIndex] = answer;
+  } catch (e) {
+    console.log(e);
   }
 }
 
 function checkAllAnswered(roomid, questionIndex) {
-  let room = getRoom(roomid);
-  if (room) {
-    let numAnswers = 0;
-    console.log(room.answers);
-    for (let key in room.answers) {
-      if (room.answers[key][questionIndex]) {
-        numAnswers++;
+  try {
+    let room = getRoom(roomid);
+    if (room) {
+      let numAnswers = 0;
+      console.log(room.answers);
+      for (let key in room.answers) {
+        if (room.answers[key][questionIndex]) {
+          numAnswers++;
+        }
+      }
+      if (numAnswers === room.users.length - 1) {
+        return true;
       }
     }
-    if (numAnswers === room.users.length - 1) {
-      return true;
-    }
+    return false;
+  } catch (e) {
+    console.log(e);
   }
-  return false;
 }
 
 //for each id, get the number of correct answers in the form of a list of 1s and 0s = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1] where length = number of questions
 function getFinalScores(roomid, socketid) {
-  let room = getRoom(roomid);
-  let scores = [];
-  if (room) {
-    if (room.answers[socketid]) {
-      let quiz = room.quiz;
-      let answers = room.answers[socketid];
-      for (let i = 0; i < quiz.length; i++) {
-        if (quiz[i].answer === answers[i]) {
-          scores.push(1);
-        } else {
-          scores.push(0);
+  try {
+    let room = getRoom(roomid);
+    let scores = [];
+    if (room) {
+      if (room.answers[socketid]) {
+        let quiz = room.quiz;
+        let answers = room.answers[socketid];
+        for (let i = 0; i < quiz.length; i++) {
+          if (quiz[i].answer === answers[i]) {
+            scores.push(1);
+          } else {
+            scores.push(0);
+          }
         }
       }
     }
+    return scores;
+  } catch (e) {
+    console.log(e);
   }
-  return scores;
 }
 
+function setName(socketid, roomid, name) {
+  let room = getRoom(roomid);
+  if (room) {
+    room.usersNames.push(name);
+    users.push({ socketid: socketid, name: name, roomid: roomid });
+  }
+}
+
+function removeName(socketid, roomid) {
+  try {
+    let room = getRoom(roomid);
+    let _name = users.find((user) => user.socketid === socketid).name;
+    if (room) {
+      //find matching name in room.usersNames and remove it
+      let index = room.usersNames.findIndex((name) => name === _name);
+      if (index !== -1) {
+        room.usersNames.splice(index, 1);
+      }
+    }
+    //remove user from users
+    let index = users.findIndex((user) => user.socketid === socketid);
+    if (index !== -1) {
+      users.splice(index, 1);
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+function getAllNames(roomid, includeHost) {
+  let room = getRoom(roomid);
+  let names = [];
+  if (room) {
+    if (includeHost) {
+      names.push(room.usersNames[0]);
+    }
+    for (let i = 1; i < room.usersNames.length; i++) {
+      names.push(room.usersNames[i]);
+    }
+  }
+  return names;
+}
+
+//<-------------------------SERVER EVENTS ------------------------->
+
 server.listen(process.env.PORT || 3001, () => {
-  console.log("listening on: " + process.env.PORT || 3001);
+  if (process.env.PORT) {
+    console.log("listening on port " + process.env.PORT);
+  } else {
+    console.log("listening on port 3001");
+  }
 });
 
-//TODO LATER: add error handling for all functions
 //TODO LATER: everytime a user is connected make sure they are sent to the home screen
 
 io.on("connection", async (socket) => {
   console.log("a user connected with id: " + socket.id);
+
   socket.on("disconnect", () => {
     console.log("user disconnected");
+
     //emit to all users in room that user left and remove user from room
     let room = rooms.find((room) => room.users.includes(socket.id));
+
     if (room) {
+      //remove user from users
+      removeName(socket.id, room.roomid);
       removeUserFromRoom(room.roomid, socket.id);
+
+      //broadcast to all users in room that user left
       let playernum = getPlayerNum(room.roomid);
-      io.to(room.roomid).emit("user-left", socket.id, playernum);
+      let names = getAllNames(room.roomid, false);
+      io.to(room.roomid).emit("user-left", socket.id, playernum, names);
     }
   });
 
-  socket.on("test", (msg) => {
-    console.log("user sent test message");
-  });
-
-  socket.on("create-room", (quiz, maxPlayers) => {
+  socket.on("create-room", (quiz, maxPlayers, name) => {
     // create room and add user to it, check if room already exists then create new room and remove user from old room
+
     //first check if host already has a room
     let host = rooms.find((room) => room.host === socket.id);
+
     //if host already has a room, remove host from that room
     if (host) {
       removeRoom(host.roomid);
       console.log("removed host from room: " + host.roomid);
     }
+
     //create new room
     let roomid = makeid(6);
     socket.join(roomid);
     addUserToRoom(roomid, socket.id);
     setRoomQuiz(roomid, quiz);
     setRoomMaxPlayers(roomid, maxPlayers);
+    setName(socket.id, roomid, name);
     socket.emit("room-created", roomid);
     console.log("user created room: " + roomid);
     console.log("Quiz received, first question: " + quiz[0].question);
   });
 
-  socket.on("join-room", (roomid) => {
+  socket.on("join-room", (roomid, name) => {
+    //check if room is full or game has started, if so emit error
     if (
       getRoom(roomid)?.gameStarted ||
       getRoom(roomid)?.users.length - 1 >= getRoomMaxPlayers(roomid)
@@ -250,13 +340,24 @@ io.on("connection", async (socket) => {
       return;
     }
 
+    //check if room exists, return
+    if (!getRoom(roomid)) {
+      return;
+    }
+
+    setName(socket.id, roomid, name);
+
+    //add user to room and emit to all users in room that user joined
     console.log("user joined room: " + roomid);
     socket.join(roomid);
     addUserToRoom(roomid, socket.id);
 
+    //emit to all users in room that user joined
     let playernum = getPlayerNum(roomid);
-    io.to(roomid).emit("user-joined", socket.id, playernum);
+    let names = getAllNames(roomid, false);
+    io.to(roomid).emit("user-joined", socket.id, playernum, names);
 
+    //if room is full, emit game start
     if (playernum >= getRoomMaxPlayers(roomid)) {
       rooms[getRoomIndex(roomid)].gameStarted = true;
       io.to(roomid).emit("game-start", getRoomQuiz(roomid));
