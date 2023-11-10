@@ -62,7 +62,7 @@
 
         {#if playerNames.length >= 1}
           {#each playerNames as name}
-            <h4>{name}</h4>
+            <p id="listPlayers">{name}</p>
           {/each}
         {/if}
 
@@ -91,11 +91,11 @@
   }
   #inside-box {
     width: 20rem;
-    height: 20rem;
+    height: 25rem;
     background: #c49eff;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 51px;
-    padding-top: 5rem;
+    padding-top: 3rem;
   }
   #players-ready {
     color: white;
@@ -137,7 +137,7 @@
   .btn-secondary {
     background: #c70000;
     border: None;
-    margin-top: 4rem;
+    margin-top: 8rem;
     margin-left: 5rem;
     font-size: 20px;
     color: white;
@@ -165,5 +165,9 @@
     font-weight: 400;
     margin-left: 30rem;
     margin-top: 5rem;
+  }
+  #listPlayers {
+    margin-left: 8rem;
+    color: #7801a8;
   }
 </style>

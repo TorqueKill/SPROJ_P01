@@ -26,7 +26,7 @@
 
     if (events.roomFull) {
       //alert
-      alert("room full");
+      alert("Room Full");
       isRoomFull = true;
       roomid = "";
     }
@@ -145,14 +145,14 @@
             type="text"
             class="form-control"
             id="roomId"
-            placeholder="Enter roomID"
-            {roomid}
+            placeholder="Enter room ID"
+            bind:value={roomid}
           />
           <input
             type="text"
             class="form-control"
-            placeholder="Enter username"
             id="username"
+            placeholder="Enter username"
             bind:value={_userName}
           />
           <button

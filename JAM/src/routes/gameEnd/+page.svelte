@@ -1,57 +1,55 @@
-<script lang = "js">
-// @ts-nocheck
-    import {SCREENS} from '$lib/constants.js';
-    import {user} from '$lib/userStore.js';
-    import {socket, socketEvents} from '$lib/socketStore.js';
-    import {goto} from '$app/navigation';
+<script lang  = "js">
+  // @ts-nocheck
+  import { SCREENS } from "$lib/constants.js";
+  import { user } from "$lib/userStore.js";
+  import { socket, socketEvents } from "$lib/socketStore.js";
+  import { goto } from "$app/navigation";
 
-    import {onMount} from 'svelte';
+  import { onMount } from "svelte";
 
+  let playerScores = [];
 
-    let playerScores = [];
+  $: {
+    const events = $socketEvents;
+    console.log(events);
 
-    $: {
-        const events = $socketEvents;
-        console.log(events);
-
-        if (events.finalScores) {
-            $user.score = events.finalScores;
-            playerScores = $user.score;
-        }
+    if (events.finalScores) {
+      $user.score = events.finalScores;
+      playerScores = $user.score;
     }
+  }
 
-    onMount(() => {
-        //eg = [[1,0,1,0], [0,1,0,1]...] where of 1 list = questions
-        socket.emit('session-loaded', $user.gameid, SCREENS.SCORE);
-    });
+  onMount(() => {
+    //eg = [[1,0,1,0], [0,1,0,1]...] where of 1 list = questions
+    socket.emit("session-loaded", $user.gameid, SCREENS.SCORE);
+  });
 
-
-    const playerScore = (scoreList) =>{
-        let score = 0;
-        for (let i = 0; i < scoreList.length; i++){
-            if (scoreList[i] == 1){
-                score++;
-            }
-        }
-        return score;
+  const playerScore = (scoreList) => {
+    let score = 0;
+    for (let i = 0; i < scoreList.length; i++) {
+      if (scoreList[i] == 1) {
+        score++;
+      }
     }
-
-
+    return score;
+  };
 </script>
 
 <h1>Game End</h1>
 <!--Display all scores, scores are sent via [0,1,0,1] where length = questions-->
 
 {#if playerScores.length == 0}
-    <p>Waiting for scores...</p>
+  <p>Waiting for scores...</p>
 {:else}
-    {#each playerScores as ps,idx}
-    <p>Player {idx+1} score: {playerScore(ps)}/{playerScores[idx].length}</p>
-    {/each}
+  {#each playerScores as ps, idx}
+    <p>Player {idx + 1} score: {playerScore(ps)}/{playerScores[idx].length}</p>
+  {/each}
 
-    <button on:click={() => {
-        socket.disconnect();
-        socket.connect();
-        goto('/');
-    }}>Leave Room</button>
+  <button
+    on:click={() => {
+      socket.disconnect();
+      socket.connect();
+      goto("/");
+    }}>Leave Room</button
+  >
 {/if}
