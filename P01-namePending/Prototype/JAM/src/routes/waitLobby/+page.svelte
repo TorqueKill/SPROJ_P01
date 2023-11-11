@@ -145,7 +145,7 @@
   .btn-secondary {
     background: #c70000;
     border: None;
-    margin-top: 8rem;
+    margin-top: 8.75rem;
     margin-left: 5rem;
     font-size: 20px;
     color: white;

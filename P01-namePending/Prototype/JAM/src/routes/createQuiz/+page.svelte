@@ -160,7 +160,7 @@
   }
   #inside-box {
     width: 20rem;
-    height: 23rem;
+    height: 26rem;
     background: #c49eff;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 51px;
@@ -196,7 +196,7 @@
   .btn-secondary {
     background: #c70000;
     border: None;
-    margin-top: 2rem;
+    margin-top: 3rem;
     margin-left: 6.75rem;
     font-size: 20px;
     color: white;
