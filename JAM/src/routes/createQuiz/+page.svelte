@@ -15,7 +15,9 @@
 
   onMount(() => {
     //append more from local storage if any
-    const savedQuizzes = JSON.parse(localStorage.getItem("savedQuiz")) || [];
+    const savedQuizzes = JSON.parse(localStorage.getItem("Quiz")) || [];
+    console.log(savedQuizzes);
+
     quizzes = [quiz1, quiz2, quiz3, ...savedQuizzes];
     displayQuizCheck = false;
     console.log(quizzes);
@@ -64,7 +66,13 @@
   <body>
     <h1 id="home">JAM</h1>
     <h2>Create Quiz</h2>
-    <h5>Note: Quizzes on local storage</h5>
+    {#if displayQuizCheck}
+      <h5>SCROLL DOWN TO VIEW</h5>
+    {:else}
+      <h5>Note: Only saves 1 quiz (quiz 4)</h5>
+      <h5>Quiz 1,2,3 are dummy quizzes</h5>
+    {/if}
+
     <div id="quizChosen">
       {#if quizChosen}
         <p>You choose quiz: {quizIdx + 1}</p>

@@ -1,9 +1,10 @@
 <script>
-  import { goto } from "$app/navigation";
+// @ts-nocheck
 
-  /**
-   * @type {any[]}
-   */
+  import { goto } from "$app/navigation";
+  import { user } from "$lib/userStore.js";
+
+
   let quiz1 = [
     {
       question: "",
@@ -18,35 +19,42 @@
       answer: "",
       choices: ["", "", "", ""],
     });
+    quiz1 = quiz1;
   }
 
-  /**
-   * @param {number} questionIndex
-   * @param {string} choiceText
-   */
   function updateAnswer(questionIndex, choiceText) {
     quiz1[questionIndex].answer = choiceText;
-    saveQuiz();
+ 
   }
 
-  /**
-   * @param {number} questionIndex
-   * @param {Event & { currentTarget: EventTarget & HTMLInputElement; }} event
-   */
+
   function updateQuestionText(questionIndex, event) {
     const target = event.currentTarget;
     quiz1[questionIndex].question = target.value;
-    saveQuiz();
+
   }
-  /**
-   * @param {number} questionIndex
-   * @param {number} optionIndex
-   * @param {Event & { currentTarget: EventTarget & HTMLInputElement; }} event
-   */
+
   function updateOptionText(questionIndex, optionIndex, event) {
     const target = event.currentTarget;
     quiz1[questionIndex].choices[optionIndex] = target.value;
-    saveQuiz();
+    
+  }
+
+  function populateIfBlank(quiz){
+    for(let i = 0; i < quiz.length; i++){
+      if(quiz[i].question == ""){
+        quiz[i].question = "Question " + (i+1);
+      }
+      for(let j = 0; j < quiz[i].choices.length; j++){
+        if(quiz[i].choices[j] == ""){
+          quiz[i].choices[j] = "Option " + (j+1);
+        }
+      }
+      if(quiz[i].answer == ""){
+        quiz[i].answer = quiz[i].choices[0];
+      }
+    }
+    return quiz;
   }
 
   // function increaseTime() {
@@ -54,7 +62,11 @@
   // }
 
   function saveQuiz() {
-    localStorage.setItem("savedQuiz", JSON.stringify(quiz1));
+    let saveingQuiz = quiz1;
+    populateIfBlank(saveingQuiz);
+    console.log(saveingQuiz);
+    localStorage.setItem("Quiz", JSON.stringify([quiz1]));
+    goto("/createQuiz");
   }
 </script>
 
@@ -119,7 +131,7 @@
           </div>
           <div class="col-auto" id="saveBtn">
             <button
-              on:click={saveQuiz}
+              on:click|once={()=>{saveQuiz();}}
               class="btn btn-secondary btn-block btn-space ml-auto"
             >
               Save
@@ -129,7 +141,7 @@
             <button
               class="btn btn-quaternary"
               on:click={() => {
-                goto("/");
+                goto("/createQuiz");
               }}>Back</button
             >
           </div>
