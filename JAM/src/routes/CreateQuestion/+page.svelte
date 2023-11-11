@@ -1,6 +1,9 @@
 <script>
   import { goto } from "$app/navigation";
 
+  /**
+   * @type {any[]}
+   */
   let quiz1 = [
     {
       question: "",
@@ -23,6 +26,7 @@
    */
   function updateAnswer(questionIndex, choiceText) {
     quiz1[questionIndex].answer = choiceText;
+    saveQuiz();
   }
 
   /**
@@ -32,6 +36,7 @@
   function updateQuestionText(questionIndex, event) {
     const target = event.currentTarget;
     quiz1[questionIndex].question = target.value;
+    saveQuiz();
   }
   /**
    * @param {number} questionIndex
@@ -41,11 +46,16 @@
   function updateOptionText(questionIndex, optionIndex, event) {
     const target = event.currentTarget;
     quiz1[questionIndex].choices[optionIndex] = target.value;
+    saveQuiz();
   }
 
   // function increaseTime() {
   //     timeLimit += 1; // increase time by 1 second
   // }
+
+  function saveQuiz() {
+    localStorage.setItem("savedQuiz", JSON.stringify(quiz1));
+  }
 </script>
 
 <main>
@@ -72,7 +82,9 @@
               id={`question-${qIndex}`}
               class="form-control quizz"
               placeholder="Type your question here"
-              on:input={(event) => updateQuestionText(qIndex, event)}
+              on:input={(
+                /** @type {Event & { currentTarget: EventTarget & HTMLInputElement; }} */ event
+              ) => updateQuestionText(qIndex, event)}
             />
           </div>
           {#each question.choices as choice, oIndex}
@@ -82,11 +94,14 @@
                 class="form-control options"
                 placeholder="Enter option"
                 on:input={(event) => updateOptionText(qIndex, oIndex, event)}
+                bind:value={question.choices[oIndex]}
               />
               <input
                 type="radio"
                 class="form-check-input"
                 checked={choice === question.answer}
+                bind:group={question.answer}
+                value={choice}
                 on:change={() => updateAnswer(qIndex, choice)}
                 name={`option-${qIndex}`}
               />
@@ -103,7 +118,10 @@
             <!-- <button class="btn btn-tertiary btn-block btn-space ml-auto"> Add question </button>  -->
           </div>
           <div class="col-auto" id="saveBtn">
-            <button class="btn btn-secondary btn-block btn-space ml-auto">
+            <button
+              on:click={saveQuiz}
+              class="btn btn-secondary btn-block btn-space ml-auto"
+            >
               Save
             </button>
           </div>

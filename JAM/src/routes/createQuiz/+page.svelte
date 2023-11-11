@@ -15,7 +15,8 @@
 
   onMount(() => {
     //append more from local storage if any
-    quizzes = [quiz1, quiz2, quiz3];
+    const savedQuizzes = JSON.parse(localStorage.getItem("savedQuiz")) || [];
+    quizzes = [quiz1, quiz2, quiz3, ...savedQuizzes];
     displayQuizCheck = false;
     console.log(quizzes);
   });
