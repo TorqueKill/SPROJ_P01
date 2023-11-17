@@ -21,6 +21,7 @@ let users = [];
 
 const MAX_PLAYERS_PER_LOBBY = 10;
 const MIN_PLAYERS_PER_LOBBY = 2;
+const TIME_PER_QUESTION = 60; //seconds
 
 //<-------------------------SERVER FUNCTIONS------------------------->
 
@@ -178,6 +179,15 @@ function handleAnswer(roomid, socketid, answer, questionIndex) {
       if (!answer) {
         answer = room.quiz[questionIndex].choices[0];
       }
+
+      // if questionIndex -1 then that means time ran out for that user
+      // so answer is set to emtpy string
+
+      if (questionIndex === -1) {
+        answer = '';
+      }
+
+
       room.answers[socketid][questionIndex] = answer;
     }
   } catch (e) {
