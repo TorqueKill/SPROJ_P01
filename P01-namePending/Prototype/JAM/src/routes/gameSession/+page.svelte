@@ -38,7 +38,10 @@
   }
   
   // This function handles all the timer logic
-  setInterval(() => {
+
+  if (!$user.isHost) {
+
+    setInterval(() => {
       
       // timer is reset when new question is loaded
       if (resetTimer) {
@@ -57,17 +60,25 @@
         $timeLeft--;
 
       // Time ran out for this question
-      } else if ($timeLeft == 0) {
-        $timeLeft = -1; // set to -1 so that send answer doesn't get called repeatedly
+      } else if ($timeLeft <= 0 && $timeLeft > -100) {
+         
         timeRanOut = true;
         sendAnswer(-1, currentQuestion); // question Index is -1 if time runs out
+        // set to -100 so that send answer doesn't get called repeatedly
+        $timeLeft = -100; 
       }
       // } else {
       //   $timeLeft = 60;
       // }
     }, 1000);
 
+    
+  }
+
   $: secondsLeft = Math.floor($timeLeft) // important for reactive state
+
+
+ 
 
   //quiz format:
   //quiz = [{question: "question", answer: "answer", choices: ["choice1", "choice2", "choice3", "choice4"]}, ...]]
@@ -90,8 +101,14 @@
     if (isAnswerSubmitted) {
       return;
     }
-    answerSubmitted = quiz[currentQuestion].choices[answerIdx];
+    if (answerIdx === -1) {
+      answerSubmitted = "Time ran out";
+    } else {
+      answerSubmitted = quiz[currentQuestion].choices[answerIdx];
+    }
+    // answerSubmitted = quiz[currentQuestion].choices[answerIdx];
     isAnswerSubmitted = true;
+    console.log("Sent answer: ",answerIdx);
     socket.emit("handle-answer", $user.gameid, answerIdx, questionIdx);
   };
 </script>
@@ -116,7 +133,7 @@
               }}>Leave Room</button
             >
           </h1>
-        {:else if $timeLeft > 0}
+        {:else if $timeLeft >= 0}
           <h1>Time Left: {secondsLeft}</h1>
           <!-- <p>Time Left: {timeLeft}</p> -->
           <h2 id="chooseOpt" class="inside-option">
@@ -132,10 +149,10 @@
             <p id="answer">You chose:</p>
             <p id="real-answer">{answerSubmitted}</p>
           </h2>
-        {:else}
+        {:else if $timeLeft == -100}
           <h1>You ran out of time for this question</h1>
           <!-- {sendAnswer(-1, currentQuestion)} -->
-          <h2 id="chooseOpt" class="inside-option">
+          <!-- <h2 id="chooseOpt" class="inside-option">
             <p id="choose">Choose one</p>
             {#each quiz[currentQuestion].choices as choice, idx}
               <button
@@ -148,7 +165,7 @@
             <p id="answer">You chose:</p>
             <p id="real-answer">{answerSubmitted}</p>
           
-          </h2>
+          </h2> -->
         {/if}
       {/if}
     </div>

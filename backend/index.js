@@ -175,17 +175,18 @@ function handleAnswer(roomid, socketid, answer, questionIndex) {
       }
       let answer = room?.quiz[questionIndex]?.choices[choicesIdx];
 
-      //if answer is undefined, set answer to first choice
+      //if answer is undefined, set answer to a default value
       if (!answer) {
-        answer = room.quiz[questionIndex].choices[0];
+        // answer = room.quiz[questionIndex].choices[0];
+        answer = "default_value_time_ran_out";
       }
 
-      // if questionIndex -1 then that means time ran out for that user
+      // if answerIndex -1 then that means time ran out for that user
       // so answer is set to emtpy string
 
-      if (questionIndex === -1) {
-        answer = '';
-      }
+      // if (answerIndex === -1) {
+      //   answer = 'default_value_time_ran_out';
+      // }
 
 
       room.answers[socketid][questionIndex] = answer;
