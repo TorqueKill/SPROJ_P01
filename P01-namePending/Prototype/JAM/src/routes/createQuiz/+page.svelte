@@ -38,6 +38,7 @@
         question: quiz[x].question,
         answer: quiz[x].answer,
         options: newChoices,
+        timeLimit: quiz[x].timeLimit,
       });
     }
     return newQuiz;
@@ -121,6 +122,7 @@
           {#each question.options as option}
             <p id="option">{option}</p>
           {/each}
+          <p>Time limit: {question.timeLimit}</p>
         {/each}
         <div class="btn-group">
           <button

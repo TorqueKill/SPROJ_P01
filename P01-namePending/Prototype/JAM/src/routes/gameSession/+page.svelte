@@ -45,7 +45,7 @@
       
       // timer is reset when new question is loaded
       if (resetTimer) {
-        $timeLeft = originalTimer;
+        $timeLeft = quiz[currentQuestion].timeLimit;
         resetTimer = false;
         return;
       }
