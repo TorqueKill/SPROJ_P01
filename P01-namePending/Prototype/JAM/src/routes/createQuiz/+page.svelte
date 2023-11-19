@@ -122,7 +122,7 @@
           {#each question.options as option}
             <p id="option">{option}</p>
           {/each}
-          <p>Time limit: {question.timeLimit}</p>
+          <p id="time-limit">Time limit: {question.timeLimit}</p>
         {/each}
         <div class="btn-group">
           <button
@@ -220,7 +220,7 @@
   h5 {
     color: rgb(216, 53, 53);
     font-family: JejuGothic, sans-serif;
-    margin-left: 38rem;
+    margin-left: 38.7rem;
   }
   .btn-tertiary {
     background: #00a59b;
@@ -283,5 +283,10 @@
   }
   #goBack1 {
     margin-left: 31rem;
+  }
+  #time-limit {
+    color: red;
+    margin-left: 2rem;
+    font-family: JejuGothic, sans-serif;
   }
 </style>

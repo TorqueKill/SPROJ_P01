@@ -1,4 +1,4 @@
-<script lang = "js">
+<script lang "js">
   // @ts-nocheck
 
   import { SCREENS } from "$lib/constants.js";
@@ -6,8 +6,8 @@
   import { socket, socketEvents } from "$lib/socketStore.js";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
-  import { tweened } from 'svelte/motion';
-    // import { send } from "vite";
+  import { tweened } from "svelte/motion";
+  // import { send } from "vite";
 
   let isHost;
   let quiz;
@@ -36,49 +36,41 @@
       goto("/gameEnd");
     }
   }
-  
+
   // This function handles all the timer logic
 
   if (!$user.isHost) {
-
     setInterval(() => {
-      
       // timer is reset when new question is loaded
       if (resetTimer) {
         $timeLeft = quiz[currentQuestion].timeLimit;
         resetTimer = false;
         return;
       }
-      
+
       // Timer is paused when answer is submitted until next question is loaded
       if (isAnswerSubmitted) {
-          return;
+        return;
       }
 
       // timer decrement by 1 second every second
       if ($timeLeft > 0) {
         $timeLeft--;
 
-      // Time ran out for this question
+        // Time ran out for this question
       } else if ($timeLeft <= 0 && $timeLeft > -100) {
-         
         timeRanOut = true;
         sendAnswer(-1, currentQuestion); // question Index is -1 if time runs out
         // set to -100 so that send answer doesn't get called repeatedly
-        $timeLeft = -100; 
+        $timeLeft = -100;
       }
       // } else {
       //   $timeLeft = 60;
       // }
     }, 1000);
-
-    
   }
 
-  $: secondsLeft = Math.floor($timeLeft) // important for reactive state
-
-
- 
+  $: secondsLeft = Math.floor($timeLeft); // important for reactive state
 
   //quiz format:
   //quiz = [{question: "question", answer: "answer", choices: ["choice1", "choice2", "choice3", "choice4"]}, ...]]
@@ -90,11 +82,7 @@
     isAnswerSubmitted = false;
     answerSubmitted = "";
 
-   
-
     socket.emit("session-loaded", $user.gameid, SCREENS.GAME);
-
-    
   });
 
   const sendAnswer = (answerIdx, questionIdx) => {
@@ -108,7 +96,7 @@
     }
     // answerSubmitted = quiz[currentQuestion].choices[answerIdx];
     isAnswerSubmitted = true;
-    console.log("Sent answer: ",answerIdx);
+    console.log("Sent answer: ", answerIdx);
     socket.emit("handle-answer", $user.gameid, answerIdx, questionIdx);
   };
 </script>
@@ -150,7 +138,7 @@
             <p id="real-answer">{answerSubmitted}</p>
           </h2>
         {:else if $timeLeft == -100}
-          <h1>You ran out of time for this question</h1>
+          <h2>You ran out of time for this question</h2>
           <!-- {sendAnswer(-1, currentQuestion)} -->
           <!-- <h2 id="chooseOpt" class="inside-option">
             <p id="choose">Choose one</p>
@@ -271,5 +259,11 @@
     color: #00a59b;
     font-family: JejuGothic, sans-serif;
     transform: translate(40%, -32%);
+  }
+  h1 {
+    margin-left: 38rem;
+    font-family: JejuGothic, sans-serif;
+    margin-top: -3rem;
+    color: red;
   }
 </style>
