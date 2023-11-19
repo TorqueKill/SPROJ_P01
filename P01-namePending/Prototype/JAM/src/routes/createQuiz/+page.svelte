@@ -38,6 +38,7 @@
         question: quiz[x].question,
         answer: quiz[x].answer,
         options: newChoices,
+        timeLimit: quiz[x].timeLimit,
       });
     }
     return newQuiz;
@@ -121,6 +122,7 @@
           {#each question.options as option}
             <p id="option">{option}</p>
           {/each}
+          <p id="time-limit">Time limit: {question.timeLimit}</p>
         {/each}
         <div class="btn-group">
           <button
@@ -160,7 +162,7 @@
   }
   #inside-box {
     width: 20rem;
-    height: 23rem;
+    height: 26rem;
     background: #c49eff;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 51px;
@@ -196,7 +198,7 @@
   .btn-secondary {
     background: #c70000;
     border: None;
-    margin-top: 2rem;
+    margin-top: 3rem;
     margin-left: 6.75rem;
     font-size: 20px;
     color: white;
@@ -218,7 +220,7 @@
   h5 {
     color: rgb(216, 53, 53);
     font-family: JejuGothic, sans-serif;
-    margin-left: 38rem;
+    margin-left: 38.7rem;
   }
   .btn-tertiary {
     background: #00a59b;
@@ -281,5 +283,10 @@
   }
   #goBack1 {
     margin-left: 31rem;
+  }
+  #time-limit {
+    color: red;
+    margin-left: 2rem;
+    font-family: JejuGothic, sans-serif;
   }
 </style>

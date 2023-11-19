@@ -6,10 +6,12 @@ import { io } from "socket.io-client";
 const socket = io(
   process.env.SERVER_LINK ||
     "https://boiling-beyond-93888-265de2b70712.herokuapp.com/"
+  //"http://localhost:3001"
 );
 
 // Create a writable store for handling events
 export const socketEvents = writable({});
+export const socketEvents2 = writable({});
 
 // Listen for events and update the store
 socket.on("room-created", (roomid) => {
@@ -47,6 +49,8 @@ socket.on("final-scores", (scores) => {
 socket.on("game-end", () => {
   socketEvents.update(() => ({ gameEnd: true }));
 });
+
+// socket.on
 
 // Export the socket connection for reuse
 export { socket };
