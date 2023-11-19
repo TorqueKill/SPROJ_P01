@@ -4,9 +4,9 @@ import { writable } from "svelte/store";
 import { io } from "socket.io-client";
 
 const socket = io(
-  // process.env.SERVER_LINK ||
-    // "https://boiling-beyond-93888-265de2b70712.herokuapp.com/"
-    "http://localhost:3001"
+  process.env.SERVER_LINK ||
+    "https://boiling-beyond-93888-265de2b70712.herokuapp.com/"
+  //"http://localhost:3001"
 );
 
 // Create a writable store for handling events
