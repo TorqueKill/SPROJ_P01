@@ -4,12 +4,14 @@
   import { goto } from "$app/navigation";
   import { user } from "$lib/userStore.js";
 
+  const MAX_TIME_LIMIT = 60;
 
   let quiz1 = [
     {
       question: "",
       answer: "",
       choices: ["", "", "", ""],
+      timeLimit: 30,
     },
   ];
 
@@ -18,6 +20,7 @@
       question: "",
       answer: "",
       choices: ["", "", "", ""],
+      timeLimit: 30,
     });
     quiz1 = quiz1;
   }
@@ -57,9 +60,11 @@
     return quiz;
   }
 
-  // function increaseTime() {
-  //     timeLimit += 1; // increase time by 1 second
-  // }
+  function increaseTime(questionIndex) {
+    if (quiz1[questionIndex].timeLimit < MAX_TIME_LIMIT) {
+      quiz1[questionIndex].timeLimit += 5;
+    }
+  }
 
   function saveQuiz() {
     let saveingQuiz = quiz1;
@@ -119,6 +124,11 @@
               />
             </div>
           {/each}
+        </div>
+        <div class="col-auto">
+          <button on:click={()=>{increaseTime(qIndex)}} class="btn btn-primary btn-block btn-space ml-auto">
+              Set time limit: {question.timeLimit} seconds
+          </button>
         </div>
       {/each}
       <div class="container-md">

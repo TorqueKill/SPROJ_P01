@@ -21,6 +21,7 @@ let users = [];
 
 const MAX_PLAYERS_PER_LOBBY = 10;
 const MIN_PLAYERS_PER_LOBBY = 2;
+const TIME_PER_QUESTION = 60; //seconds
 
 //<-------------------------SERVER FUNCTIONS------------------------->
 
@@ -174,10 +175,20 @@ function handleAnswer(roomid, socketid, answer, questionIndex) {
       }
       let answer = room?.quiz[questionIndex]?.choices[choicesIdx];
 
-      //if answer is undefined, set answer to first choice
+      //if answer is undefined, set answer to a default value
       if (!answer) {
-        answer = room.quiz[questionIndex].choices[0];
+        // answer = room.quiz[questionIndex].choices[0];
+        answer = "default_value_time_ran_out";
       }
+
+      // if answerIndex -1 then that means time ran out for that user
+      // so answer is set to emtpy string
+
+      // if (answerIndex === -1) {
+      //   answer = 'default_value_time_ran_out';
+      // }
+
+
       room.answers[socketid][questionIndex] = answer;
     }
   } catch (e) {

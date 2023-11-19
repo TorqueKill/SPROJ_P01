@@ -6,12 +6,18 @@
   import { socket, socketEvents } from "$lib/socketStore.js";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
+  import { tweened } from "svelte/motion";
+  // import { send } from "vite";
 
   let isHost;
   let quiz;
   let currentQuestion;
   let isAnswerSubmitted;
   let answerSubmitted;
+  let originalTimer = 30; // seconds. Change this to change the timer for every question
+  let timeLeft = tweened(originalTimer); // important for reactive state and smooth transition
+  let resetTimer = false; // true when next question is loaded
+  let timeRanOut = false; // true when time runs out for a question
 
   $: {
     const events = $socketEvents;
@@ -22,12 +28,49 @@
       console.log("next question: " + currentQuestion);
       isAnswerSubmitted = false;
       answerSubmitted = "";
+      resetTimer = true;
+      timeRanOut = false;
     }
 
     if (events.gameEnd) {
       goto("/gameEnd");
     }
   }
+
+  // This function handles all the timer logic
+
+  if (!$user.isHost) {
+    setInterval(() => {
+      // timer is reset when new question is loaded
+      if (resetTimer) {
+        $timeLeft = quiz[currentQuestion].timeLimit;
+        resetTimer = false;
+        return;
+      }
+
+      // Timer is paused when answer is submitted until next question is loaded
+      if (isAnswerSubmitted) {
+        return;
+      }
+
+      // timer decrement by 1 second every second
+      if ($timeLeft > 0) {
+        $timeLeft--;
+
+        // Time ran out for this question
+      } else if ($timeLeft <= 0 && $timeLeft > -100) {
+        timeRanOut = true;
+        sendAnswer(-1, currentQuestion); // question Index is -1 if time runs out
+        // set to -100 so that send answer doesn't get called repeatedly
+        $timeLeft = -100;
+      }
+      // } else {
+      //   $timeLeft = 60;
+      // }
+    }, 1000);
+  }
+
+  $: secondsLeft = Math.floor($timeLeft); // important for reactive state
 
   //quiz format:
   //quiz = [{question: "question", answer: "answer", choices: ["choice1", "choice2", "choice3", "choice4"]}, ...]]
@@ -46,8 +89,14 @@
     if (isAnswerSubmitted) {
       return;
     }
-    answerSubmitted = quiz[currentQuestion].choices[answerIdx];
+    if (answerIdx === -1) {
+      answerSubmitted = "Time ran out";
+    } else {
+      answerSubmitted = quiz[currentQuestion].choices[answerIdx];
+    }
+    // answerSubmitted = quiz[currentQuestion].choices[answerIdx];
     isAnswerSubmitted = true;
+    console.log("Sent answer: ", answerIdx);
     socket.emit("handle-answer", $user.gameid, answerIdx, questionIdx);
   };
 </script>
@@ -72,7 +121,9 @@
               }}>Leave Room</button
             >
           </h1>
-        {:else}
+        {:else if $timeLeft >= 0}
+          <h1>Time Left: {secondsLeft}</h1>
+          <!-- <p>Time Left: {timeLeft}</p> -->
           <h2 id="chooseOpt" class="inside-option">
             <p id="choose">Choose one</p>
             {#each quiz[currentQuestion].choices as choice, idx}
@@ -86,6 +137,23 @@
             <p id="answer">You chose:</p>
             <p id="real-answer">{answerSubmitted}</p>
           </h2>
+        {:else if $timeLeft == -100}
+          <h2>You ran out of time for this question</h2>
+          <!-- {sendAnswer(-1, currentQuestion)} -->
+          <!-- <h2 id="chooseOpt" class="inside-option">
+            <p id="choose">Choose one</p>
+            {#each quiz[currentQuestion].choices as choice, idx}
+              <button
+                class="btn1 btn-tertiary btn-block"
+                id="chooseAnswer"
+                on:click={() => sendAnswer(idx, currentQuestion)}
+                >{choice}</button
+              >
+            {/each}
+            <p id="answer">You chose:</p>
+            <p id="real-answer">{answerSubmitted}</p>
+          
+          </h2> -->
         {/if}
       {/if}
     </div>
@@ -191,5 +259,11 @@
     color: #00a59b;
     font-family: JejuGothic, sans-serif;
     transform: translate(40%, -32%);
+  }
+  h1 {
+    margin-left: 38rem;
+    font-family: JejuGothic, sans-serif;
+    margin-top: -3rem;
+    color: red;
   }
 </style>
