@@ -1,4 +1,4 @@
-<script lang = "js">
+<script>
   // @ts-nocheck
 
   import { SCREENS } from "$lib/constants.js";
