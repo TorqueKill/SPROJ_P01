@@ -6,19 +6,19 @@ export const quiz1 = [
     question: "What is the capital of France?",
     answer: "Paris",
     choices: ["London", "Berlin", "Madrid", "Paris"],
-    timeLimit: 30,
+    timeLimit: 10,
   },
   {
     question: "Which planet is known as the Red Planet?",
     answer: "Mars",
     choices: ["Venus", "Mars", "Jupiter", "Saturn"],
-    timeLimit: 30,
+    timeLimit: 10,
   },
   {
     question: "What is the largest mammal in the world?",
     answer: "Blue Whale",
     choices: ["Elephant", "Blue Whale", "Giraffe", "Hippopotamus"],
-    timeLimit: 30,
+    timeLimit: 10,
   },
   {
     question: "In which year did the Titanic sink?",

@@ -1,4 +1,4 @@
-<script lang = "js">
+<script >
   // @ts-nocheck
 
   import { SCREENS } from "$lib/constants.js";
@@ -25,11 +25,36 @@
 
     if (events.nextQuestion == 0 || events.nextQuestion) {
       currentQuestion = events.nextQuestion;
-      console.log("next question: " + currentQuestion);
+      console.log(events);
       isAnswerSubmitted = false;
       answerSubmitted = "";
       resetTimer = true;
       timeRanOut = false;
+
+      //set the event to null so that it doesn't get called repeatedly
+      events.nextQuestion = null;
+    }
+
+    //check for 'timeout' event
+    if (events.timeout) {
+      //check if answer was submitted, if not, then send answer
+
+      if (!isAnswerSubmitted) {
+        let _currentQuestion = currentQuestion;
+        currentQuestion = events.timeout;
+        console.log(events);
+        isAnswerSubmitted = false;
+        answerSubmitted = "";
+        resetTimer = true;
+        timeRanOut = false;
+
+        console.log("timeout");
+        sendAnswer(-1, _currentQuestion); // Index is -1 if time runs out
+      }
+
+      //set the event to null so that it doesn't get called repeatedly
+      events.timeout = null;
+
     }
 
     if (events.gameEnd) {
@@ -60,7 +85,7 @@
         // Time ran out for this question
       } else if ($timeLeft <= 0 && $timeLeft > -100) {
         timeRanOut = true;
-        sendAnswer(-1, currentQuestion); // question Index is -1 if time runs out
+        //sendAnswer(-1, currentQuestion); // question Index is -1 if time runs out
         // set to -100 so that send answer doesn't get called repeatedly
         $timeLeft = -100;
       }
@@ -121,22 +146,22 @@
               }}>Leave Room</button
             >
           </h1>
-        {:else if $timeLeft >= 0}
-          <h1>Time Left: {secondsLeft}</h1>
-          <!-- <p>Time Left: {timeLeft}</p> -->
-          <h2 id="chooseOpt" class="inside-option">
-            <p id="choose">Choose one</p>
-            {#each quiz[currentQuestion].choices as choice, idx}
-              <button
-                class="btn1 btn-tertiary btn-block"
-                id="chooseAnswer"
-                on:click={() => sendAnswer(idx, currentQuestion)}
-                >{choice}</button
-              >
-            {/each}
-            <p id="answer">You chose:</p>
-            <p id="real-answer">{answerSubmitted}</p>
-          </h2>
+      {:else if $timeLeft >= 0}
+        <h1>Time Left: {secondsLeft}</h1>
+        <!-- <p>Time Left: {timeLeft}</p> -->
+        <h2 id="chooseOpt" class="inside-option">
+          <p id="choose">Choose one</p>
+          {#each quiz[currentQuestion].choices as choice, idx}
+            <button
+              class="btn1 btn-tertiary btn-block"
+              id="chooseAnswer"
+              on:click={() => sendAnswer(idx, currentQuestion)}
+              >{choice}</button
+            >
+          {/each}
+          <p id="answer">You chose:</p>
+          <p id="real-answer">{answerSubmitted}</p>
+        </h2>
         {:else if $timeLeft == -100}
           <h2>You ran out of time for this question</h2>
           <!-- {sendAnswer(-1, currentQuestion)} -->

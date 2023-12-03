@@ -11,7 +11,7 @@ const io = new Server(server, {
 });
 
 //quiz is defined as an array of objects with the following properties: question, answer, choices
-//quiz = [{question: "question", answer: "answer", choices: ["choice1", "choice2", "choice3", "choice4"]}, ...]]
+//quiz = [{question: "question", answer: "answer", choices: ["choice1", "choice2", "choice3", "choice4"]}, ...], timeLimit: 30]
 
 //rooms = [{roomid: "roomid", users: [socketid, socketid, socketid...], host: socketid, quiz: quiz, answers:[], gameStarted: false, sessionLoaded: [], scores: [], maxPlayers: MIN_PLAYERS_PER_LOBBY, usersNames: [name, name, name...]}]}]
 let rooms = [];
@@ -21,7 +21,8 @@ let users = [];
 
 const MAX_PLAYERS_PER_LOBBY = 10;
 const MIN_PLAYERS_PER_LOBBY = 2;
-const TIME_PER_QUESTION = 60; //seconds
+const TIME_PER_QUESTION = 30; //seconds
+const LAG_BIAS = 3; //seconds
 
 //<-------------------------SERVER FUNCTIONS------------------------->
 
@@ -51,6 +52,7 @@ function addUserToRoom(roomid, socketid) {
         scores: [],
         maxPlayers: MIN_PLAYERS_PER_LOBBY,
         usersNames: [],
+        timeOutIds: [],
       });
     }
   } catch (e) {
@@ -140,6 +142,13 @@ function setRoomQuiz(roomid, quiz) {
   }
 }
 
+function setQuestionTimeOut(roomid, timeoutId) {
+  let room = getRoom(roomid);
+  if (room) {
+    room.timeOutIds.push(timeoutId);
+  }
+}
+
 function setRoomMaxPlayers(roomid, maxPlayers) {
   let room = getRoom(roomid);
   if (room) {
@@ -171,6 +180,7 @@ function handleAnswer(roomid, socketid, answer, questionIndex) {
 
     if (room) {
       if (!room.answers[socketid]) {
+        //
         room.answers[socketid] = makeDummyStringList(room.quiz.length);
       }
       let answer = room?.quiz[questionIndex]?.choices[choicesIdx];
@@ -187,7 +197,6 @@ function handleAnswer(roomid, socketid, answer, questionIndex) {
       // if (answerIndex === -1) {
       //   answer = 'default_value_time_ran_out';
       // }
-
 
       room.answers[socketid][questionIndex] = answer;
     }
@@ -212,6 +221,45 @@ function checkAllAnswered(roomid, questionIndex) {
       }
     }
     return false;
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+//returns true if for a given question, they are the first to answer
+function checkFirstToAnswer(roomid, questionIndex) {
+  try {
+    let room = getRoom(roomid);
+    if (room) {
+      let numAnswers = 0;
+      for (let key in room.answers) {
+        if (room.answers[key][questionIndex]) {
+          numAnswers++;
+        }
+      }
+      if (numAnswers === 1) {
+        return true;
+      }
+    }
+    return false;
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+//returns a list of socketids of people who answered a given question
+function getPeopleWhoAnswered(roomid, questionIndex) {
+  try {
+    let room = getRoom(roomid);
+    if (room) {
+      let people = [];
+      for (let key in room.answers) {
+        if (room.answers[key][questionIndex]) {
+          people.push(key);
+        }
+      }
+      return people;
+    }
   } catch (e) {
     console.log(e);
   }
@@ -283,6 +331,29 @@ function getAllNames(roomid, includeHost) {
   }
   return names;
 }
+
+//make a recursive function that emits timeout event for each question, make sure the next question is not emitted until timeout event is received
+// function excuteQuestionTimeoutSequentially(roomid, questionIndex, timeLimit) {
+//   let room = getRoom(roomid);
+//   if (room) {
+//     if (questionIndex < room.quiz.length) {
+//       let timeoutId = setTimeout(() => {
+//         console.log("timeout for question: " + questionIndex);
+//         io.to(roomid).emit("timeout", questionIndex);
+
+//         //only emit next question if there is a next question
+//         if (questionIndex < room.quiz.length - 1) {
+//           excuteQuestionTimeoutSequentially(
+//             roomid,
+//             questionIndex + 1,
+//             room.quiz[questionIndex + 1].timeLimit + 1
+//           );
+//         }
+//       }, timeLimit * 1000);
+//       setQuestionTimeOut(roomid, timeoutId);
+//     }
+//   }
+// }
 
 //<-------------------------SERVER EVENTS ------------------------->
 
@@ -388,6 +459,20 @@ io.on("connection", async (socket) => {
         //screen = 4 is game screen
         if (screenid == 4) {
           io.to(roomid).emit("next-question", 0);
+
+          //get room quiz and timeLimit for first question
+          let quiz = getRoomQuiz(roomid);
+          let timeLimit = quiz[0].timeLimit;
+
+          //timeout for the first question
+          let timeoutId = setTimeout(() => {
+            console.log("timeout for question: " + 0);
+            io.to(roomid).emit("timeout", 1);
+          }, (timeLimit + LAG_BIAS) * 1000);
+
+          //set timeout id
+          setQuestionTimeOut(roomid, timeoutId);
+
           //reset session loaded
           room.sessionLoaded = [];
         }
@@ -434,6 +519,21 @@ io.on("connection", async (socket) => {
         io.to(roomid).emit("game-end");
       } else {
         io.to(roomid).emit("next-question", questionIndex + 1);
+
+        //clear timeout for previous question
+        clearTimeout(room.timeOutIds[questionIndex]);
+
+        //handle timeout for next question here
+        let quiz = getRoomQuiz(roomid);
+        let timeLimit = quiz[questionIndex + 1].timeLimit;
+
+        let timeoutId = setTimeout(() => {
+          console.log("timeout for question: " + (questionIndex + 1));
+          io.to(roomid).emit("timeout", questionIndex + 1);
+        }, (timeLimit + LAG_BIAS) * 1000);
+
+        //set timeout id
+        setQuestionTimeOut(roomid, timeoutId);
       }
     }
   });

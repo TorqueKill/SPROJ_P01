@@ -15,21 +15,32 @@
 
     if (events.roomCreated) {
       $user.gameid = events.roomCreated;
+
+      //set the event to null 
+      events.roomCreated = null;
     }
 
     if (events.roomJoined) {
       playersReady = events.roomJoined.num;
       playerNames = events.roomJoined.names;
+
+      //set the event to null
+      events.roomJoined = null;
     }
 
     if (events.roomLeft) {
       playersReady = events.roomLeft.num;
       playerNames = events.roomLeft.names;
+
+      //set the event to null
+      events.roomLeft = null;
     }
 
     if (events.gameStarted) {
       $user.quiz = events.gameStarted;
       console.log($user.quiz);
+
+      events.gameStarted = null;
       goto("/gameSession");
     }
   }
