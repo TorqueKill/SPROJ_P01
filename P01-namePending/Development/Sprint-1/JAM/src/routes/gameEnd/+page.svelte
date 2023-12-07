@@ -1,4 +1,4 @@
-<script lang = "js">
+<script >
   // @ts-nocheck
   import { SCREENS } from "$lib/constants.js";
   import { user } from "$lib/userStore.js";
@@ -8,6 +8,7 @@
   import { onMount } from "svelte";
 
   let playerScores = [];
+  let totalQuestions = 0;
 
   $: {
     const events = $socketEvents;
@@ -16,6 +17,7 @@
     if (events.finalScores) {
       $user.score = events.finalScores;
       playerScores = $user.score;
+      totalQuestions = playerScores[0].scores.length;
     }
   }
 
@@ -44,9 +46,9 @@
       {#if playerScores.length == 0}
         <p>Waiting for scores...</p>
       {:else}
-        {#each playerScores as ps, idx}
+        {#each Object.entries(playerScores) as [idx, ps]}
           <p>
-            Player {idx + 1} score: {playerScore(ps)}/{playerScores[idx].length}
+            {ps.name} score: {playerScore(ps.scores)}/{totalQuestions}
           </p>
         {/each}
 

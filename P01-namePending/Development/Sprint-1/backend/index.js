@@ -23,6 +23,8 @@ const MAX_PLAYERS_PER_LOBBY = 10;
 const MIN_PLAYERS_PER_LOBBY = 2;
 const TIME_PER_QUESTION = 30; //seconds
 const LAG_BIAS = 3; //seconds
+const DEFAUL_PLAYER_NAME = "Player";
+const REPORT_DISPLAY_TIME = 10;
 
 //<-------------------------SERVER FUNCTIONS------------------------->
 
@@ -53,6 +55,8 @@ function addUserToRoom(roomid, socketid) {
         maxPlayers: MIN_PLAYERS_PER_LOBBY,
         usersNames: [],
         timeOutIds: [],
+        questionsPerReport: -1,
+        ROOM_LAG_BIAS: 0,
       });
     }
   } catch (e) {
@@ -153,6 +157,13 @@ function setRoomMaxPlayers(roomid, maxPlayers) {
   let room = getRoom(roomid);
   if (room) {
     room.maxPlayers = maxPlayers;
+  }
+}
+
+function setQuestionsPerReport(roomid, questionsPerReport) {
+  let room = getRoom(roomid);
+  if (room) {
+    room.questionsPerReport = questionsPerReport;
   }
 }
 
@@ -265,6 +276,27 @@ function getPeopleWhoAnswered(roomid, questionIndex) {
   }
 }
 
+function getScoresTillQuestion(roomid, questionIndex) {
+  try {
+    let room = getRoom(roomid);
+    if (room) {
+      let scores = [];
+      for (let key in room.answers) {
+        let score = 0;
+        for (let i = 0; i < questionIndex; i++) {
+          if (room.quiz[i].answer === room.answers[key][i]) {
+            score++;
+          }
+        }
+        scores.push(score);
+      }
+      return scores;
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
+
 //for each id, get the number of correct answers in the form of a list of 1s and 0s = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1] where length = number of questions
 function getFinalScores(roomid, socketid) {
   try {
@@ -315,6 +347,15 @@ function removeName(socketid, roomid) {
     }
   } catch (e) {
     console.log(e);
+  }
+}
+
+function getName(socketid) {
+  let user = users.find((user) => user.socketid === socketid);
+  if (user) {
+    return user.name;
+  } else {
+    return DEFAUL_PLAYER_NAME;
   }
 }
 
@@ -388,7 +429,7 @@ io.on("connection", async (socket) => {
     }
   });
 
-  socket.on("create-room", (quiz, maxPlayers, name) => {
+  socket.on("create-room", (quiz, roomSettings, name) => {
     // create room and add user to it, check if room already exists then create new room and remove user from old room
 
     //first check if host already has a room
@@ -405,7 +446,8 @@ io.on("connection", async (socket) => {
     socket.join(roomid);
     addUserToRoom(roomid, socket.id);
     setRoomQuiz(roomid, quiz);
-    setRoomMaxPlayers(roomid, maxPlayers);
+    setRoomMaxPlayers(roomid, roomSettings.maxPlayers);
+    setQuestionsPerReport(roomid, roomSettings.reportScores);
     setName(socket.id, roomid, name);
     socket.emit("room-created", roomid);
     console.log("user created room: " + roomid);
@@ -442,6 +484,10 @@ io.on("connection", async (socket) => {
     //if room is full, emit game start
     if (playernum >= getRoomMaxPlayers(roomid)) {
       rooms[getRoomIndex(roomid)].gameStarted = true;
+
+      //start measuring lag bias as send this to all users
+      rooms[getRoomIndex(roomid)].ROOM_LAG_BIAS = Date.now();
+
       io.to(roomid).emit("game-start", getRoomQuiz(roomid));
     }
   });
@@ -460,6 +506,14 @@ io.on("connection", async (socket) => {
         if (screenid == 4) {
           io.to(roomid).emit("next-question", 0);
 
+          //time difference between when game started and now in seconds
+          let timeDiff = (Date.now() - room.ROOM_LAG_BIAS) / 1000;
+          console.log("Time diff: " + timeDiff);
+
+          //set lag bias which is the time difference between when game started and now
+          //and now represents the time it took for all users to load the session
+          rooms[getRoomIndex(roomid)].ROOM_LAG_BIAS = timeDiff;
+
           //get room quiz and timeLimit for first question
           let quiz = getRoomQuiz(roomid);
           let timeLimit = quiz[0].timeLimit;
@@ -468,7 +522,7 @@ io.on("connection", async (socket) => {
           let timeoutId = setTimeout(() => {
             console.log("timeout for question: " + 0);
             io.to(roomid).emit("timeout", 1);
-          }, (timeLimit + LAG_BIAS) * 1000);
+          }, (timeLimit + LAG_BIAS + timeDiff) * 1000);
 
           //set timeout id
           setQuestionTimeOut(roomid, timeoutId);
@@ -493,6 +547,7 @@ io.on("connection", async (socket) => {
       "roomid: " + roomid
     );
 
+    //check if answer is undefined or questionIndex is undefined
     if (answer === undefined || questionIndex === undefined) {
       return;
     }
@@ -501,22 +556,71 @@ io.on("connection", async (socket) => {
     if (room) {
       handleAnswer(roomid, socket.id, answer, questionIndex);
     }
+
     //check if all players have answered, emit next question
     //if last question, emit final scores
+    //if questionPerReport is not -1, check if questionIndex is a multiple of questionPerReport, if so emit scores till question
 
     if (checkAllAnswered(roomid, questionIndex)) {
       let scores = [];
+
+      //<------------------------------------FINAL SCORES------------------------------------>
+
       if (questionIndex === getRoomQuiz(roomid).length - 1) {
         //emit final scores for each player (not host)
         for (let i = 0; i < room.users.length; i++) {
           if (room.users[i] !== room.host) {
-            scores.push(getFinalScores(roomid, room.users[i]));
+            scores.push({
+              name: getName(room.users[i]),
+              scores: getFinalScores(roomid, room.users[i]),
+            });
           }
         }
 
         //set scores
         setScores(roomid, scores);
         io.to(roomid).emit("game-end");
+
+        //<------------------------------------REPORTING------------------------------------>
+      } else if (
+        room.questionsPerReport !== -1 &&
+        (questionIndex + 1) % room.questionsPerReport === 0
+      ) {
+        //emit scores till question
+        for (let i = 0; i < room.users.length; i++) {
+          if (room.users[i] !== room.host) {
+            scores.push({
+              name: getName(room.users[i]),
+              scores: getScoresTillQuestion(roomid, questionIndex),
+            });
+          }
+        }
+
+        console.log("scores till question: " + questionIndex);
+
+        io.to(roomid).emit("scores-till-question", scores, REPORT_DISPLAY_TIME);
+
+        //set timeout for next question
+        setTimeout(() => {
+          io.to(roomid).emit("next-question", questionIndex + 1);
+
+          //clear timeout for previous question
+          clearTimeout(room.timeOutIds[questionIndex]);
+
+          //handle timeout for next question here
+          let quiz = getRoomQuiz(roomid);
+          let timeLimit = quiz[questionIndex + 1].timeLimit;
+
+          let timeoutId = setTimeout(() => {
+            console.log("timeout for question: " + (questionIndex + 1));
+            io.to(roomid).emit("timeout", questionIndex + 1);
+          }, (timeLimit + LAG_BIAS + room.ROOM_LAG_BIAS) * 1000);
+
+          //set timeout id
+          setQuestionTimeOut(roomid, timeoutId);
+        }, (REPORT_DISPLAY_TIME + LAG_BIAS + room.ROOM_LAG_BIAS) * 1000);
+
+        //<------------------------------------NEXT QUESTION------------------------------------>
       } else {
         io.to(roomid).emit("next-question", questionIndex + 1);
 
@@ -530,7 +634,7 @@ io.on("connection", async (socket) => {
         let timeoutId = setTimeout(() => {
           console.log("timeout for question: " + (questionIndex + 1));
           io.to(roomid).emit("timeout", questionIndex + 1);
-        }, (timeLimit + LAG_BIAS) * 1000);
+        }, (timeLimit + LAG_BIAS + room.ROOM_LAG_BIAS) * 1000);
 
         //set timeout id
         setQuestionTimeOut(roomid, timeoutId);

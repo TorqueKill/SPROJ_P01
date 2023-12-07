@@ -1,7 +1,7 @@
 <script >
   // @ts-nocheck
 
-  import { SCREENS } from "$lib/constants.js";
+  import { SCREENS,GAME_SETTINGS } from "$lib/constants.js";
   import { user } from "$lib/userStore.js";
   import { socket, socketEvents } from "$lib/socketStore.js";
   import { onMount } from "svelte";
@@ -18,6 +18,9 @@
   let timeLeft = tweened(originalTimer); // important for reactive state and smooth transition
   let resetTimer = false; // true when next question is loaded
   let timeRanOut = false; // true when time runs out for a question
+  let sessionScores = [];
+  let scoreDisplayCheck = false;
+  let scoreDisplayTimer = GAME_SETTINGS.SCORE_DISPLAY_TIME;
 
   $: {
     const events = $socketEvents;
@@ -30,6 +33,8 @@
       answerSubmitted = "";
       resetTimer = true;
       timeRanOut = false;
+
+      scoreDisplayCheck = false; // reset score display check to start timer
 
       //set the event to null so that it doesn't get called repeatedly
       events.nextQuestion = null;
@@ -57,6 +62,13 @@
 
     }
 
+    if (events.scoresTillQuestion){
+      sessionScores = events.scoresTillQuestion;
+      scoreDisplayCheck = true;
+      scoreDisplayTimer = events.display_time;
+      events.scoresTillQuestion = null;
+    }
+
     if (events.gameEnd) {
       goto("/gameEnd");
     }
@@ -64,8 +76,16 @@
 
   // This function handles all the timer logic
 
-  if (!$user.isHost) {
+  if (!$user.isHost || scoreDisplayCheck) { // timer is only for non-hosts unless score is being displayed
     setInterval(() => {
+      if (scoreDisplayCheck){
+        if (scoreDisplayTimer > 0){
+          scoreDisplayTimer--;
+        } 
+        return; // don't run the timer if score is being displayed
+      }
+
+
       // timer is reset when new question is loaded
       if (resetTimer) {
         $timeLeft = quiz[currentQuestion].timeLimit;
@@ -124,14 +144,38 @@
     console.log("Sent answer: ", answerIdx);
     socket.emit("handle-answer", $user.gameid, answerIdx, questionIdx);
   };
+
+
+  const playerScore = (scoreList) => {
+    let score = 0;
+    for (let i = 0; i < scoreList.length; i++) {
+      if (scoreList[i] == 1) {
+        score++;
+      }
+    }
+    return score;
+  };
 </script>
 
 <main>
   <body>
     <h1 id="home">JAM</h1>
     <div class="container">
+      <!------------------------------- LOADING ------------------------------------------>
       {#if currentQuestion == -1}
         <h1 class="loading">Loading...</h1>
+      
+      <!------------------------------- SCORE DISPLAY ------------------------------------>
+      {:else if scoreDisplayCheck}
+        <h1>Score Display</h1>
+        {#each Object.entries(sessionScores) as [idx, ps]}
+          <p>
+            {ps.name} score: {playerScore(ps.scores)}
+          </p>
+        {/each}
+        <h1>Next Question in {scoreDisplayTimer} seconds</h1>
+
+      <!------------------------------- QUESTION DISPLAY (HOST)--------------------------------->
       {:else if quiz}
         {#if isHost}
           <h1 id="host-question" class="inside-box">
@@ -146,6 +190,8 @@
               }}>Leave Room</button
             >
           </h1>
+      
+      <!------------------------------- ANSWER DISPLAY (PLAYER)--------------------------------->
       {:else if $timeLeft >= 0}
         <h1>Time Left: {secondsLeft}</h1>
         <!-- <p>Time Left: {timeLeft}</p> -->
@@ -162,6 +208,8 @@
           <p id="answer">You chose:</p>
           <p id="real-answer">{answerSubmitted}</p>
         </h2>
+
+        <!------------------------------- TIMEOUT DISPLAY --------------------------------->
         {:else if $timeLeft == -100}
           <h2>You ran out of time for this question</h2>
           <!-- {sendAnswer(-1, currentQuestion)} -->

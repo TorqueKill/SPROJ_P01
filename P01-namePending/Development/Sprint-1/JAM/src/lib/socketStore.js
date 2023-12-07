@@ -56,6 +56,14 @@ socket.on("timeout", (question) => {
   socketEvents.update(() => ({ timeout: question }));
 });
 
+socket.on("scores-till-question", (scores, display_time) => {
+  console.log("scores-till-question");
+  socketEvents.update(() => ({
+    scoresTillQuestion: scores,
+    display_time: display_time,
+  }));
+});
+
 // socket.on
 
 // Export the socket connection for reuse

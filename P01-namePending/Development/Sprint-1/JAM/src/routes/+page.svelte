@@ -9,10 +9,16 @@
 
   import { onMount } from "svelte";
 
+  const MIN_PLAYERS = 2;
+
   let roomid;
   let isRoomFull = false;
 
   let maxPlayers;
+  let roomSettings = {
+    maxPlayers: MIN_PLAYERS,
+    reportScores: -1, //means report scores at the end
+  };
 
   let _userName;
 
@@ -38,15 +44,21 @@
     _userName = $user.userName;
   });
 
-  const createRoom = (soc, maxPlayers) => {
-    if (maxPlayers < 2 || maxPlayers > 10) {
+  const createRoom = (soc, roomsettings) => {
+    if (roomsettings.maxPlayers < 2 || roomsettings.maxPlayers > 10) {
       alert("max players must be between 2 and 10");
-      maxPlayers = 2;
+      maxPlayers = MIN_PLAYERS;
       return;
     }
 
-    soc.emit("create-room", $user.hostQuiz, maxPlayers);
-    console.log("createRoom");
+    if (roomsettings.reportScores < -1 || roomsettings.reportScores > 5) {
+      alert("report scores must be between -1 and 5");
+      roomsettings.reportScores = -1;
+      return;
+    }
+
+    soc.emit("create-room", $user.hostQuiz, roomSettings);
+    console.log("createRoom", roomSettings);
     $user.isHost = true;
 
     goto("/waitLobby");
@@ -117,15 +129,26 @@
               class="form-control"
               id="participants"
               placeholder="Enter total number of participants"
-              bind:value={maxPlayers}
+              bind:value={roomSettings.maxPlayers}
             />
+          </div>
+          <div>
+            <h2>Report scores in between</h2>
+            <input
+              type="number"
+              class="form-control"
+              id="participants"
+              placeholder="Enter total number of participants"
+              bind:value={roomSettings.reportScores}
+            />
+            <p>(-1 will report at the end)</p>
           </div>
           <p>
             <button
               type="button"
               class="btn btn-secondary btn-block"
               id="createRoom"
-              on:click={() => createRoom(socket, maxPlayers)}
+              on:click={() => createRoom(socket, roomSettings)}
               >Create Room</button
             >
           </p>
