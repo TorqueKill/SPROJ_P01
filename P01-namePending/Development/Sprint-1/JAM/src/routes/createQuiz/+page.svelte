@@ -8,9 +8,8 @@
 
   let quizzes;
   let displayQuizCheck;
-  let quizToDisplay;
+  let quizToDisplay = [];
   let quizChosen;
-
   let quizIdx;
 
   onMount(() => {
@@ -44,12 +43,11 @@
     return newQuiz;
   };
 
-  const displayQuiz = (quiz, idx) => {
+  function displayQuiz(quiz, idx) {
     quizToDisplay = sugarQuiz(quiz);
-    console.log(quizToDisplay);
     displayQuizCheck = true;
     quizIdx = idx;
-  };
+  }
 
   const closeQuiz = () => {
     displayQuizCheck = false;
@@ -61,6 +59,30 @@
     quizChosen = true;
     displayQuizCheck = false;
   };
+
+  // update questions, answers, options, and time limits
+  function updateField(questionIdx, field, value, optionIdx = null) {
+    let updatedQuiz = [...quizToDisplay];
+
+    if (field === "options" && optionIdx !== null) {
+      let updatedOptions = [...updatedQuiz[questionIdx].options];
+      updatedOptions[optionIdx] = value;
+      updatedQuiz[questionIdx].options = updatedOptions;
+    } else {
+      updatedQuiz[questionIdx][field] =
+        field === "timeLimit" ? parseInt(value, 10) : value;
+    }
+
+    quizToDisplay = updatedQuiz;
+    quizzes[quizIdx] = updatedQuiz;
+  }
+
+  // save updated quiz
+  function saveUpdatedQuiz() {
+    quizzes = quizzes;
+    localStorage.setItem("Quiz", JSON.stringify(quizzes));
+    displayQuizCheck = false;
+  }
 </script>
 
 <main>
@@ -113,18 +135,47 @@
     </div>
     <div class="quiz-load">
       {#if displayQuizCheck}
-        <h2 id="chooseQuizHead">Choose the quiz</h2>
-        {#each quizToDisplay as question, idx}
-          <p id="question" class="card-header">
-            Question {idx + 1}: {question.question}
-          </p>
-          <p id="answer">Answer: {question.answer}</p>
-          {#each question.options as option}
-            <p id="option">{option}</p>
+        <div class="quiz-load">
+          <h2 id="chooseQuizHead">Edit the quiz</h2>
+          {#each quizToDisplay as question, qIdx}
+            <div>
+              <label for={`question-${qIdx}`}>Question {qIdx + 1}:</label>
+              <input
+                id={`question-${qIdx}`}
+                type="text"
+                bind:value={question.question}
+                on:input={(e) => updateField(qIdx, "question", e.target.value)}
+              />
+
+              <label for={`answer-${qIdx}`}>Answer:</label>
+              <input
+                id={`answer-${qIdx}`}
+                type="text"
+                bind:value={question.answer}
+                on:input={(e) => updateField(qIdx, "answer", e.target.value)}
+              />
+
+              {#each question.options as option, oIdx}
+                <label for={`option-${qIdx}-${oIdx}`}>Option {oIdx + 1}:</label>
+                <input
+                  id={`option-${qIdx}-${oIdx}`}
+                  type="text"
+                  bind:value={option}
+                  on:input={(e) =>
+                    updateField(qIdx, "options", e.target.value, oIdx)}
+                />
+              {/each}
+
+              <label for={`timeLimit-${qIdx}`}>Time Limit:</label>
+              <input
+                id={`timeLimit-${qIdx}`}
+                type="number"
+                bind:value={question.timeLimit}
+                on:input={(e) => updateField(qIdx, "timeLimit", e.target.value)}
+              />
+            </div>
           {/each}
-          <p id="time-limit">Time limit: {question.timeLimit}</p>
-        {/each}
-        <div class="btn-group">
+          <button on:click={saveUpdatedQuiz}>Save Changes</button>
           <button
             class="btn btn-secondary btn-block"
             id="choose"
@@ -140,6 +191,18 @@
             }}>Close</button
           >
         </div>
+        <!-- {#if displayQuizCheck}
+        <h2 id="chooseQuizHead">Choose the quiz</h2>
+        {#each quizToDisplay as question, idx}
+          <p id="question" class="card-header">
+            Question {idx + 1}: {question.question}
+          </p>
+          <p id="answer">Answer: {question.answer}</p>
+          {#each question.options as option}
+            <p id="option">{option}</p>
+          {/each}
+          <p id="time-limit">Time limit: {question.timeLimit}</p>
+        {/each} -->
       {/if}
     </div>
   </body>
