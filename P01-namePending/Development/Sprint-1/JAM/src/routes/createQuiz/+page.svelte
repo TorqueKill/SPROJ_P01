@@ -12,12 +12,23 @@
   let quizChosen;
   let quizIdx;
 
+  // onMount(() => {
+  //   let savedQuizzes = JSON.parse(localStorage.getItem("Quiz")) || [];
+  //   if (savedQuizzes.length > 5) {
+  //     savedQuizzes = savedQuizzes.slice(0, 3);
+  //     localStorage.setItem("Quiz", JSON.stringify(savedQuizzes));
+  //   }
+  //   quizzes = [...savedQuizzes];
+  //   displayQuizCheck = false;
+  //   console.log("Loaded quizzes:", quizzes);
+  // });
+
   onMount(() => {
     //append more from local storage if any
     const savedQuizzes = JSON.parse(localStorage.getItem("Quiz")) || [];
     console.log(savedQuizzes);
 
-    quizzes = [quiz1, quiz2, quiz3, ...savedQuizzes];
+    quizzes = [...savedQuizzes];
     displayQuizCheck = false;
     console.log(quizzes);
   });
@@ -78,7 +89,7 @@
 <main>
   <body>
     <h1 id="home">JAM</h1>
-    <h2>Create Quiz</h2>
+    <h2 class="create-quiz">Create Quiz</h2>
     {#if displayQuizCheck}
       <h5>SCROLL DOWN TO VIEW</h5>
     {:else}
@@ -267,6 +278,13 @@
     margin-left: 29rem;
     margin-top: -2rem;
   }
+  .create-quiz {
+    color: white;
+    font-family: JejuGothic, sans-serif;
+    font-size: 45px;
+    margin-left: 36rem;
+    margin-top: -2rem;
+  }
   h5 {
     color: rgb(216, 53, 53);
     font-family: JejuGothic, sans-serif;
@@ -287,7 +305,6 @@
     font-family: JejuGothic, sans-serif;
     margin-left: 39.5rem;
   }
-
 
   .question-block {
     margin-bottom: 20px;
@@ -353,7 +370,6 @@
     margin-top: 10px;
     padding-top: 0.5rem;
     font-family: JejuGothic, sans-serif;
-
   }
   .option-label,
   .time-limit-label {
@@ -362,6 +378,5 @@
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
     font-family: JejuGothic, sans-serif;
-
   }
 </style>
