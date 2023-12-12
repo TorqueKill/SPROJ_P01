@@ -61,27 +61,17 @@
   };
 
   // update questions, answers, options, and time limits
-  function updateField(questionIdx, field, value, optionIdx = null) {
-    let updatedQuiz = [...quizToDisplay];
-
-    if (field === "options" && optionIdx !== null) {
-      let updatedOptions = [...updatedQuiz[questionIdx].options];
-      updatedOptions[optionIdx] = value;
-      updatedQuiz[questionIdx].options = updatedOptions;
-    } else {
-      updatedQuiz[questionIdx][field] =
-        field === "timeLimit" ? parseInt(value, 10) : value;
+  function updateQuizDetails(quizIdx, questionIdx, field, value, optionIdx) {
+    if (field === "question") {
+      quizzes[quizIdx][questionIdx].question = value;
+    } else if (field === "answer") {
+      quizzes[quizIdx][questionIdx].answer = value;
+    } else if (field === "options") {
+      quizzes[quizIdx][questionIdx].choices[optionIdx] = value;
+    } else if (field === "timeLimit") {
+      quizzes[quizIdx][questionIdx].timeLimit = parseInt(value, 10);
     }
-
-    quizToDisplay = updatedQuiz;
-    quizzes[quizIdx] = updatedQuiz;
-  }
-
-  // save updated quiz
-  function saveUpdatedQuiz() {
-    quizzes = quizzes;
-    localStorage.setItem("Quiz", JSON.stringify(quizzes));
-    displayQuizCheck = false;
+    // quizzes = [...quizzes];
   }
 </script>
 
@@ -144,7 +134,8 @@
                 id={`question-${qIdx}`}
                 type="text"
                 bind:value={question.question}
-                on:input={(e) => updateField(qIdx, "question", e.target.value)}
+                on:input={(e) =>
+                  updateQuizDetails(quizIdx, qIdx, "question", e.target.value)}
               />
 
               <label for={`answer-${qIdx}`}>Answer:</label>
@@ -152,7 +143,8 @@
                 id={`answer-${qIdx}`}
                 type="text"
                 bind:value={question.answer}
-                on:input={(e) => updateField(qIdx, "answer", e.target.value)}
+                on:input={(e) =>
+                  updateQuizDetails(quizIdx, qIdx, "answer", e.target.value)}
               />
 
               {#each question.options as option, oIdx}
@@ -162,7 +154,13 @@
                   type="text"
                   bind:value={option}
                   on:input={(e) =>
-                    updateField(qIdx, "options", e.target.value, oIdx)}
+                    updateQuizDetails(
+                      quizIdx,
+                      qIdx,
+                      "options",
+                      e.target.value,
+                      oIdx
+                    )}
                 />
               {/each}
 
@@ -171,11 +169,12 @@
                 id={`timeLimit-${qIdx}`}
                 type="number"
                 bind:value={question.timeLimit}
-                on:input={(e) => updateField(qIdx, "timeLimit", e.target.value)}
+                on:input={(e) =>
+                  updateQuizDetails(quizIdx, qIdx, "timeLimit", e.target.value)}
               />
             </div>
           {/each}
-          <button on:click={saveUpdatedQuiz}>Save Changes</button>
+          <!-- <button on:click={saveUpdatedQuiz}>Save Changes</button> -->
           <button
             class="btn btn-secondary btn-block"
             id="choose"
