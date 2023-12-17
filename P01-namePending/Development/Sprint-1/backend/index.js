@@ -4,6 +4,30 @@ const http = require("http");
 const server = http.createServer(app);
 const Server = require("socket.io").Server;
 
+// creating supabase client
+const { createClient } = require('@supabase/supabase-js');
+const cors = require('cors');
+const userAuth = require('./userAuth');
+
+const supabaseUrl = 'https://wikvasjknjglndxhtjnk.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indpa3Zhc2prbmpnbG5keGh0am5rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDE2MjA1MTUsImV4cCI6MjAxNzE5NjUxNX0.L6-OCZNNI0d6xE0bbwsjvX5KPvzv-RdVagKF-QZO7ss';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+let corsOptions = {
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Accept', 'x-auth-token', ],
+  
+}
+
+app.use(cors(corsOptions));
+
+const bodyParser = require('body-parser');
+
+app.use(bodyParser.json());
+
+app.use('/auth', userAuth(supabase), cors(corsOptions));
+
 const io = new Server(server, {
   cors: {
     origin: "*",
