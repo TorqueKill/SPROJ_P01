@@ -30,6 +30,10 @@
     <div class="buttons">
       <button on:click={toggleSignup}>Sign Up</button>
       <button on:click={toggleSignin}>Sign In</button>
+      <button on:click={()=>{goto("/hostOrPlayer")}}>Annonymous</button>
+      <button on:click={()=>{goto("/dummyLogin")}}>Dummy Login</button>
+      <button on:click={()=>{goto("/dummyLogin")}}>Dummy view history</button>
+
     </div>
 
     {#if signupVisible}

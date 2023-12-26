@@ -5,28 +5,35 @@ const server = http.createServer(app);
 const Server = require("socket.io").Server;
 
 // creating supabase client
-const { createClient } = require('@supabase/supabase-js');
-const cors = require('cors');
-const userAuth = require('./userAuth');
+const { createClient } = require("@supabase/supabase-js");
+const cors = require("cors");
+const userAuth = require("./userAuth");
 
-const supabaseUrl = 'https://wikvasjknjglndxhtjnk.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indpa3Zhc2prbmpnbG5keGh0am5rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDE2MjA1MTUsImV4cCI6MjAxNzE5NjUxNX0.L6-OCZNNI0d6xE0bbwsjvX5KPvzv-RdVagKF-QZO7ss';
+const supabaseUrl = "https://wikvasjknjglndxhtjnk.supabase.co";
+const supabaseKey =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indpa3Zhc2prbmpnbG5keGh0am5rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDE2MjA1MTUsImV4cCI6MjAxNzE5NjUxNX0.L6-OCZNNI0d6xE0bbwsjvX5KPvzv-RdVagKF-QZO7ss";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 let corsOptions = {
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Accept', 'x-auth-token', ],
-  
-}
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "Origin",
+    "X-Requested-With",
+    "Accept",
+    "x-auth-token",
+  ],
+};
 
 app.use(cors(corsOptions));
 
-const bodyParser = require('body-parser');
+const bodyParser = require("body-parser");
 
 app.use(bodyParser.json());
 
-app.use('/auth', userAuth(supabase), cors(corsOptions));
+app.use("/auth", userAuth(supabase), cors(corsOptions));
 
 const io = new Server(server, {
   cors: {
@@ -40,7 +47,7 @@ const io = new Server(server, {
 //rooms = [{roomid: "roomid", users: [socketid, socketid, socketid...], host: socketid, quiz: quiz, answers:[], gameStarted: false, sessionLoaded: [], scores: [], maxPlayers: MIN_PLAYERS_PER_LOBBY, usersNames: [name, name, name...]}]}]
 let rooms = [];
 
-//users = [{socketid: socketid, name: name, roomid: roomid}]
+//users = [{socketid: socketid, name: name, roomid: roomid, email: email, vegetativeState: true/false}]
 let users = [];
 
 const MAX_PLAYERS_PER_LOBBY = 10;
@@ -77,10 +84,11 @@ function addUserToRoom(roomid, socketid) {
         sessionLoaded: [],
         scores: [],
         maxPlayers: MIN_PLAYERS_PER_LOBBY,
-        usersNames: [],
+        usersNames: {},
         timeOutIds: [],
         questionsPerReport: -1,
         ROOM_LAG_BIAS: 0,
+        currentQuestion: -1,
       });
     }
   } catch (e) {
@@ -200,6 +208,13 @@ function getRoomMaxPlayers(roomid) {
   }
 }
 
+function setRoomCurrentQuestion(roomid, questionIndex) {
+  let room = getRoom(roomid);
+  if (room) {
+    room.currentQuestion = questionIndex;
+  }
+}
+
 function makeDummyStringList(length) {
   let result = [];
   for (let i = 0; i < length; i++) {
@@ -252,6 +267,24 @@ function checkAllAnswered(roomid, questionIndex) {
         }
       }
       if (numAnswers === room.users.length - 1) {
+        return true;
+      }
+
+      //check users in vegetative state
+      console.log(users);
+      console.log(room.users);
+
+      let numVegetative = 0;
+      for (let i = 0; i < room.users.length; i++) {
+        if (
+          users.find((user) => user.socketid === room.users[i])?.vegetativeState
+        ) {
+          numVegetative++;
+        }
+      }
+
+      //combine numAnswers and vegetative state
+      if (numAnswers + numVegetative === room.users.length - 1) {
         return true;
       }
     }
@@ -345,11 +378,17 @@ function getFinalScores(roomid, socketid) {
   }
 }
 
-function setName(socketid, roomid, name) {
+function setName(socketid, roomid, name, email) {
   let room = getRoom(roomid);
   if (room) {
-    room.usersNames.push(name);
-    users.push({ socketid: socketid, name: name, roomid: roomid });
+    room.usersNames[socketid] = name;
+    users.push({
+      socketid: socketid,
+      name: name,
+      roomid: roomid,
+      email: email,
+      vegetativeState: false,
+    });
   }
 }
 
@@ -359,9 +398,11 @@ function removeName(socketid, roomid) {
     let _name = users.find((user) => user.socketid === socketid).name;
     if (room) {
       //find matching name in room.usersNames and remove it
-      let index = room.usersNames.findIndex((name) => name === _name);
-      if (index !== -1) {
-        room.usersNames.splice(index, 1);
+      for (let key in room.usersNames) {
+        if (room.usersNames[key] === _name) {
+          delete room.usersNames[key];
+          break;
+        }
       }
     }
     //remove user from users
@@ -387,38 +428,108 @@ function getAllNames(roomid, includeHost) {
   let room = getRoom(roomid);
   let names = [];
   if (room) {
-    if (includeHost) {
-      names.push(room.usersNames[0]);
-    }
-    for (let i = 1; i < room.usersNames.length; i++) {
-      names.push(room.usersNames[i]);
+    for (let key in room.usersNames) {
+      if (includeHost || key !== room.host) {
+        names.push(room.usersNames[key]);
+      }
     }
   }
   return names;
 }
 
-//make a recursive function that emits timeout event for each question, make sure the next question is not emitted until timeout event is received
-// function excuteQuestionTimeoutSequentially(roomid, questionIndex, timeLimit) {
-//   let room = getRoom(roomid);
-//   if (room) {
-//     if (questionIndex < room.quiz.length) {
-//       let timeoutId = setTimeout(() => {
-//         console.log("timeout for question: " + questionIndex);
-//         io.to(roomid).emit("timeout", questionIndex);
+function reconnectionInit(roomid, socketid, email) {
+  try {
+    if (email === undefined || email === "") {
+      return false;
+    }
 
-//         //only emit next question if there is a next question
-//         if (questionIndex < room.quiz.length - 1) {
-//           excuteQuestionTimeoutSequentially(
-//             roomid,
-//             questionIndex + 1,
-//             room.quiz[questionIndex + 1].timeLimit + 1
-//           );
-//         }
-//       }, timeLimit * 1000);
-//       setQuestionTimeOut(roomid, timeoutId);
-//     }
-//   }
-// }
+    //check if user was in room before
+    let user = users.find(
+      (user) => user.email === email && user.roomid === roomid
+    );
+    if (user) {
+      //note that user.socketid is the old socketid
+
+      //update socketid in room
+      let room = getRoom(roomid);
+      if (room) {
+        let index = room.users.findIndex((id) => id === user.socketid);
+        if (index !== -1) {
+          room.users[index] = socketid;
+        }
+      }
+
+      //update socketid in usernames so new id maps to old name, delete old key
+      let name = getName(user.socketid);
+      room.usersNames[socketid] = name;
+      delete room.usersNames[user.socketid];
+
+      //update socketid in answers
+      let answers = room.answers[user.socketid];
+      room.answers[socketid] = answers;
+      delete room.answers[user.socketid];
+
+      //update socketid in users
+      user.socketid = socketid;
+    } else {
+      return false;
+    }
+
+    return true;
+  } catch (e) {
+    console.log(e);
+    return false;
+  }
+}
+
+function checkSessionLoaded(roomid) {
+  //check if all users have loaded session
+  //treat users in vegetative state as loaded
+  try {
+    let room = getRoom(roomid);
+    if (room) {
+      if (room.sessionLoaded.length === room.users.length) {
+        return true;
+      }
+
+      //check users in vegetative state
+      let numVegetative = 0;
+      for (let i = 0; i < room.users.length; i++) {
+        if (
+          users.find((user) => user.socketid === room.users[i])?.vegetativeState
+        ) {
+          numVegetative++;
+        }
+      }
+
+      //combine sessionLoaded and vegetative state
+      if (room.sessionLoaded.length + numVegetative === room.users.length) {
+        return true;
+      }
+    }
+    return false;
+  } catch (e) {
+    console.log(e);
+    return false;
+  }
+}
+
+function removeAllUsers(roomid) {
+  //remove all users from users who are in roomid
+  try {
+    let room = getRoom(roomid);
+    if (room) {
+      for (let i = 0; i < room.users.length; i++) {
+        let index = users.findIndex((user) => user.socketid === room.users[i]);
+        if (index !== -1) {
+          users.splice(index, 1);
+        }
+      }
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
 
 //<-------------------------SERVER EVENTS ------------------------->
 
@@ -439,9 +550,40 @@ io.on("connection", async (socket) => {
     console.log("user disconnected");
 
     //emit to all users in room that user left and remove user from room
+
+    //------------------------------------PERSISTANCE------------------------------------
+    //if user emits disconnect, it means connection was lost, so do not remove user from room put the user in a vegetative state
+    //user MUST emit a seperate leave room event to leave room so remove below code and put it in a seperate event
+
+    //user is put in a vegetative state
+
+    //TODO LATER: if host disconnects, everyone is kicked out of the room and the room is deleted
+
+    //check if user is host
+    let host = rooms.find((room) => room.host === socket.id);
+    //clear all timeouts
+    if (host) {
+      for (let i = 0; i < host.timeOutIds.length; i++) {
+        clearTimeout(host.timeOutIds[i]);
+      }
+      //delete room, emit to all users in room that room was deleted
+      removeAllUsers(host.roomid);
+      io.to(host.roomid).emit("room-deleted");
+      removeRoom(host.roomid);
+      console.log("removed host from room: " + host.roomid);
+    }
+
     let room = rooms.find((room) => room.users.includes(socket.id));
 
     if (room) {
+      //find user in users and set vegetative state to true
+      let user = users.find((user) => user.socketid === socket.id);
+      if (user) {
+        user.vegetativeState = true;
+      }
+
+      return;
+
       //remove user from users
       removeName(socket.id, room.roomid);
       removeUserFromRoom(room.roomid, socket.id);
@@ -453,7 +595,7 @@ io.on("connection", async (socket) => {
     }
   });
 
-  socket.on("create-room", (quiz, roomSettings, name) => {
+  socket.on("create-room", (quiz, roomSettings, userData) => {
     // create room and add user to it, check if room already exists then create new room and remove user from old room
 
     //first check if host already has a room
@@ -465,6 +607,9 @@ io.on("connection", async (socket) => {
       console.log("removed host from room: " + host.roomid);
     }
 
+    let name = userData.username;
+    let email = userData.email;
+
     //create new room
     let roomid = makeid(6);
     socket.join(roomid);
@@ -472,28 +617,70 @@ io.on("connection", async (socket) => {
     setRoomQuiz(roomid, quiz);
     setRoomMaxPlayers(roomid, roomSettings.maxPlayers);
     setQuestionsPerReport(roomid, roomSettings.reportScores);
-    setName(socket.id, roomid, name);
+    setName(socket.id, roomid, name, email);
     socket.emit("room-created", roomid);
     console.log("user created room: " + roomid);
     console.log("Quiz received, first question: " + quiz[0].question);
   });
 
-  socket.on("join-room", (roomid, name) => {
+  socket.on("join-room", (roomid, userData) => {
     //check if room is full or game has started, if so emit error
-    if (
-      getRoom(roomid)?.gameStarted ||
-      getRoom(roomid)?.users.length - 1 >= getRoomMaxPlayers(roomid)
-    ) {
-      socket.emit("room-full");
-      return;
-    }
 
-    //check if room exists, return
+    //------------------------------------PERSISTANCE------------------------------------
+    //if room is full, emit error and do not join room/ game started and is not logged in do same
+
+    //DO FOLLOWING IF USER HAS LOGGED IN AND WAS IN A ROOM BEFORE:
+    //if game has started, check if the user is was in the room before and if so, start user reconnection process
+    //user reconnection process: reconnect-> next-question (current question)
+    //make a function that gets the current question index given a roomid
+    //when a previous user joins, they will have different socketid, so make sure to update the socketid in the room
+
+    //NOTE dead/non responsive users in lobby are treated normal users, they are not removed from the room
+    //TODO LATER: possibly remove them based on certain conditions/ timeout
+
+    //check if room exists
     if (!getRoom(roomid)) {
       return;
     }
 
-    setName(socket.id, roomid, name);
+    let name = userData.username;
+    let email = userData.email;
+
+    if (!name) {
+      name = DEFAUL_PLAYER_NAME;
+    }
+
+    //check if user logged in
+    if (email === undefined || email === "") {
+      //if game started, return
+      if (getRoom(roomid).gameStarted) {
+        socket.emit("room-full");
+        return;
+      }
+    }
+
+    if (reconnectionInit(roomid, socket.id, email)) {
+      //begin reconnection process
+      console.log("reconnection process started: " + socket.id);
+      socket.join(roomid);
+      //get room quiz
+      let quiz = getRoomQuiz(roomid);
+      let data = {
+        quiz: quiz,
+        currentQuestion: getRoom(roomid).currentQuestion,
+      };
+
+      socket.emit("reconnect", data);
+      return;
+    }
+
+    //check if room is full
+    if (getRoom(roomid)?.users.length - 1 >= getRoomMaxPlayers(roomid)) {
+      socket.emit("room-full");
+      return;
+    }
+
+    setName(socket.id, roomid, name, email);
 
     //add user to room and emit to all users in room that user joined
     console.log("user joined room: " + roomid);
@@ -521,14 +708,20 @@ io.on("connection", async (socket) => {
     let room = getRoom(roomid);
     if (room) {
       //count number of users that have loaded session, if all users have loaded session, emit next question
-      //TODO LATER: implement dictionary of users that have loaded session and it is true or false
+
+      //------------------------------------PERSISTANCE------------------------------------
+      //TODO LATER: given a certain number of users have loaded, start a countdown timer and if all users have not loaded by the end of the timer, emit next question
+      //TODO LATER: users not loaded will be in a vegetative state, new check should mark these users as loaded
+
       room.sessionLoaded.push(socket.id);
-      if (room.sessionLoaded.length === room.users.length) {
+      if (checkSessionLoaded(roomid)) {
         console.log("all users have loaded session: " + screenid);
 
         //screen = 4 is game screen
         if (screenid == 4) {
           io.to(roomid).emit("next-question", 0);
+
+          setRoomCurrentQuestion(roomid, 0);
 
           //time difference between when game started and now in seconds
           let timeDiff = (Date.now() - room.ROOM_LAG_BIAS) / 1000;
@@ -564,7 +757,6 @@ io.on("connection", async (socket) => {
     }
   });
 
-  //TODO LATER : answers must be within a certain time limit
   socket.on("handle-answer", (roomid, answer, questionIndex) => {
     console.log(
       "answer received: " + answer + " questionIndex: " + questionIndex,
@@ -585,6 +777,9 @@ io.on("connection", async (socket) => {
     //if last question, emit final scores
     //if questionPerReport is not -1, check if questionIndex is a multiple of questionPerReport, if so emit scores till question
 
+    //------------------------------------PERSISTANCE------------------------------------
+    //if user is in a vegetative state, count their answer as an empty string
+
     if (checkAllAnswered(roomid, questionIndex)) {
       let scores = [];
 
@@ -602,6 +797,7 @@ io.on("connection", async (socket) => {
         }
 
         //set scores
+        console.log("final scores: " + scores);
         setScores(roomid, scores);
         io.to(roomid).emit("game-end");
 
@@ -628,6 +824,8 @@ io.on("connection", async (socket) => {
         setTimeout(() => {
           io.to(roomid).emit("next-question", questionIndex + 1);
 
+          setRoomCurrentQuestion(roomid, questionIndex + 1);
+
           //clear timeout for previous question
           clearTimeout(room.timeOutIds[questionIndex]);
 
@@ -648,6 +846,8 @@ io.on("connection", async (socket) => {
       } else {
         io.to(roomid).emit("next-question", questionIndex + 1);
 
+        setRoomCurrentQuestion(roomid, questionIndex + 1);
+
         //clear timeout for previous question
         clearTimeout(room.timeOutIds[questionIndex]);
 
@@ -663,6 +863,38 @@ io.on("connection", async (socket) => {
         //set timeout id
         setQuestionTimeOut(roomid, timeoutId);
       }
+    }
+  });
+
+  socket.on("leave-room", (roomid) => {
+    //remove user from room and emit to all users in room that user left
+    console.log("user left room: " + roomid);
+    removeName(socket.id, roomid);
+    removeUserFromRoom(roomid, socket.id);
+
+    //broadcast to all users in room that user left
+    let playernum = getPlayerNum(roomid);
+    let names = getAllNames(roomid, false);
+    io.to(roomid).emit("user-left", socket.id, playernum, names);
+
+    //if host left, delete room
+    let room = getRoom(roomid);
+    if (room) {
+      if (room.host === socket.id) {
+        removeRoom(roomid);
+      }
+    }
+  });
+
+  socket.on("reconnected", (roomid) => {
+    //user reconnected and now is in game screen, remove user from vegetative state
+
+    //find user in users using socketid and roomid
+    let user = users.find(
+      (user) => user.socketid === socket.id && user.roomid === roomid
+    );
+    if (user) {
+      user.vegetativeState = false;
     }
   });
 });

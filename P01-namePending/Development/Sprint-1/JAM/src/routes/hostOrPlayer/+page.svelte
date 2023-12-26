@@ -2,14 +2,17 @@
   // @ts-nocheck
 
   import { io } from "socket.io-client";
-  import { socket, socketEvents } from "$lib/socketStore.js";
+  import { socket, roomEvents } from "$lib/socketStore.js";
+  import { ROOM_SETTINGS } from "$lib/constants"
   import { user } from "$lib/userStore.js";
   import { quiz3 } from "$lib/dummyQuiz.js";
   import { goto } from "$app/navigation";
 
   import { onMount } from "svelte";
 
-  const MIN_PLAYERS = 2;
+  const MIN_PLAYERS = ROOM_SETTINGS.MIN_PLAYERS;
+  const MAX_PLAYERS = ROOM_SETTINGS.MAX_PLAYERS
+  const MAX_REPORT_SCORES = ROOM_SETTINGS.MAX_QUESTIONS_PER_REPORT
 
   let roomid;
   let isRoomFull = false;
@@ -22,12 +25,25 @@
 
   let _userName;
 
+
+  onMount(() => {
+    $user.id = socket.id;
+    maxPlayers = 2;
+    _userName = $user.userName;
+
+    console.log($user);
+  });
+
+  //----------------------------REACTIVE CHANGES-------------------------
+
   $: {
-    const events = $socketEvents;
+    const events = $roomEvents;
     console.log(events);
 
     if (events.roomCreated) {
       $user.gameid = events.roomCreated;
+
+      events.roomCreated = null
     }
 
     if (events.roomFull) {
@@ -35,29 +51,32 @@
       alert("Room Full");
       isRoomFull = true;
       roomid = "";
+
+      events.roomFull = null
     }
   }
 
-  onMount(() => {
-    $user.id = socket.id;
-    maxPlayers = 2;
-    _userName = $user.userName;
-  });
+  //-------------------------------FUNCTIONS---------------------------------
 
   const createRoom = (soc, roomsettings) => {
-    if (roomsettings.maxPlayers < 2 || roomsettings.maxPlayers > 10) {
+    if (roomsettings.maxPlayers < MIN_PLAYERS || roomsettings.maxPlayers > MAX_PLAYERS) {
       alert("max players must be between 2 and 10");
       maxPlayers = MIN_PLAYERS;
       return;
     }
 
-    if (roomsettings.reportScores < -1 || roomsettings.reportScores > 5) {
+    if (roomsettings.reportScores < -1 || roomsettings.reportScores > MAX_REPORT_SCORES) {
       alert("report scores must be between -1 and 5");
       roomsettings.reportScores = -1;
       return;
     }
 
-    soc.emit("create-room", $user.hostQuiz, roomSettings);
+    let userData = {
+        username: $user.userName,
+        email: $user.email,
+    };
+
+    soc.emit("create-room", $user.hostQuiz, roomSettings, userData);
     console.log("createRoom", roomSettings);
     $user.isHost = true;
 
@@ -66,7 +85,18 @@
 
   const joinRoom = (soc, roomid, username) => {
     if (roomid) {
-      soc.emit("join-room", roomid, username);
+
+      let userData = {
+        username: username,
+        email: $user.email,
+      };
+
+      if ($user.email != "") {
+        soc.emit("join-room", roomid, userData);
+      } else {
+        soc.emit("join-room", roomid, userData);
+      }
+
       console.log("joinRoom");
 
       if (!isRoomFull) {
@@ -87,7 +117,6 @@
   };
 </script>
 
-<!-- check if socket is connected -->
 
 <main>
   <body>

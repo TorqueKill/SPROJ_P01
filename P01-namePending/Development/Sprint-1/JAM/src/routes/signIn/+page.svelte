@@ -1,4 +1,6 @@
-<script lang="js">
+<script>
+// @ts-nocheck
+
 
     import { goto } from "$app/navigation";
     // importing userStore.js
@@ -54,7 +56,8 @@
             // console.log(data.token);
             
             $user.email = email;
-            $user.password = password;
+            $user.password = password; //why tf are we storing the password?
+            //save user to session storage but incoorporate timestamps to determine staleness/ timeout for session
             sessionStorage.setItem("user", JSON.stringify($user));
             goto("/hostOrPlayer");
           }

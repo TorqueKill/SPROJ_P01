@@ -1,29 +1,51 @@
 <script >
   // @ts-nocheck
 
+
+  //------------------------------------PRESISTANCE------------------------------------
+  // navigate to main menu if user is disconnected, if user is not logged in, goto login/signup
+
   import { SCREENS,GAME_SETTINGS } from "$lib/constants.js";
   import { user } from "$lib/userStore.js";
-  import { socket, socketEvents } from "$lib/socketStore.js";
+  import { socket, roomEvents, gameEvents } from "$lib/socketStore.js";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { tweened } from "svelte/motion";
-  // import { send } from "vite";
+
 
   let isHost;
   let quiz;
   let currentQuestion;
   let isAnswerSubmitted;
   let answerSubmitted;
-  let originalTimer = 30; // seconds. Change this to change the timer for every question
-  let timeLeft = tweened(originalTimer); // important for reactive state and smooth transition
+  let originalTimer = GAME_SETTINGS.MAX_TIME_PER_QUESTION;
+  let timeLeft = tweened(originalTimer);
   let resetTimer = false; // true when next question is loaded
   let timeRanOut = false; // true when time runs out for a question
   let sessionScores = [];
   let scoreDisplayCheck = false;
   let scoreDisplayTimer = GAME_SETTINGS.SCORE_DISPLAY_TIME;
 
+
+  
+  onMount(() => {
+    quiz = $user.quiz;
+    isHost = $user.isHost; //hosts will display the question
+    currentQuestion = -1;
+    isAnswerSubmitted = false;
+    answerSubmitted = "";
+
+    if ($user.currentSession!=SCREENS.GAME){
+      $user.currentSession = SCREENS.GAME;
+      socket.emit("session-loaded", $user.gameid, SCREENS.GAME);
+    }
+
+  });
+
+  //----------------------------REACTIVE CHANGES-------------------------
+
   $: {
-    const events = $socketEvents;
+    const events = $gameEvents;
     console.log(events);
 
     if (events.nextQuestion == 0 || events.nextQuestion) {
@@ -34,7 +56,8 @@
       resetTimer = true;
       timeRanOut = false;
 
-      scoreDisplayCheck = false; // reset score display check to start timer
+      // reset score display check to start timer
+      scoreDisplayCheck = false; 
 
       //set the event to null so that it doesn't get called repeatedly
       events.nextQuestion = null;
@@ -54,7 +77,11 @@
         timeRanOut = false;
 
         console.log("timeout");
-        sendAnswer(-1, _currentQuestion); // Index is -1 if time runs out
+        if ($user.reconnected){
+          sendAnswer(-1, currentQuestion-1); //reconnected user waits till timeout
+        }else{
+          sendAnswer(-1, _currentQuestion); // Index is -1 if time runs out
+        }
       }
 
       //set the event to null so that it doesn't get called repeatedly
@@ -69,12 +96,25 @@
       events.scoresTillQuestion = null;
     }
 
+  }
+
+  $:{
+    const events = $roomEvents;
+    console.log(events);
+
+
+    if (events.roomDeleted) {
+      socket.disconnect();
+      socket.connect();
+      goto("/");
+    }
+
     if (events.gameEnd) {
       goto("/gameEnd");
     }
   }
 
-  // This function handles all the timer logic
+  //---------------------------CLIENT TIMER-----------------------------------
 
   if (!$user.isHost || scoreDisplayCheck) { // timer is only for non-hosts unless score is being displayed
     setInterval(() => {
@@ -84,7 +124,6 @@
         } 
         return; // don't run the timer if score is being displayed
       }
-
 
       // timer is reset when new question is loaded
       if (resetTimer) {
@@ -102,33 +141,22 @@
       if ($timeLeft > 0) {
         $timeLeft--;
 
-        // Time ran out for this question
+      // Time ran out for this question
       } else if ($timeLeft <= 0 && $timeLeft > -100) {
         timeRanOut = true;
-        //sendAnswer(-1, currentQuestion); // question Index is -1 if time runs out
+
         // set to -100 so that send answer doesn't get called repeatedly
         $timeLeft = -100;
       }
-      // } else {
-      //   $timeLeft = 60;
-      // }
+
     }, 1000);
   }
 
   $: secondsLeft = Math.floor($timeLeft); // important for reactive state
 
-  //quiz format:
-  //quiz = [{question: "question", answer: "answer", choices: ["choice1", "choice2", "choice3", "choice4"]}, ...]]
+  //-------------------------------FUNCTIONS---------------------------------
 
-  onMount(() => {
-    quiz = $user.quiz;
-    isHost = $user.isHost; //hosts will display the question
-    currentQuestion = -1;
-    isAnswerSubmitted = false;
-    answerSubmitted = "";
-
-    socket.emit("session-loaded", $user.gameid, SCREENS.GAME);
-  });
+  //quiz format: refer to dummyQuiz.js in lib folder
 
   const sendAnswer = (answerIdx, questionIdx) => {
     if (isAnswerSubmitted) {
@@ -163,7 +191,7 @@
     <div class="container">
       <!------------------------------- LOADING ------------------------------------------>
       {#if currentQuestion == -1}
-        <h1 class="loading">Loading...</h1>
+        <h1 class="loading">Waiting for Server...</h1>
       
       <!------------------------------- SCORE DISPLAY ------------------------------------>
       {:else if scoreDisplayCheck}
@@ -212,21 +240,6 @@
         <!------------------------------- TIMEOUT DISPLAY --------------------------------->
         {:else if $timeLeft == -100}
           <h2>You ran out of time for this question</h2>
-          <!-- {sendAnswer(-1, currentQuestion)} -->
-          <!-- <h2 id="chooseOpt" class="inside-option">
-            <p id="choose">Choose one</p>
-            {#each quiz[currentQuestion].choices as choice, idx}
-              <button
-                class="btn1 btn-tertiary btn-block"
-                id="chooseAnswer"
-                on:click={() => sendAnswer(idx, currentQuestion)}
-                >{choice}</button
-              >
-            {/each}
-            <p id="answer">You chose:</p>
-            <p id="real-answer">{answerSubmitted}</p>
-          
-          </h2> -->
         {/if}
       {/if}
     </div>

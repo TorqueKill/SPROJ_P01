@@ -10,55 +10,64 @@ const socket = io(
 );
 
 // Create a writable store for handling events
-export const socketEvents = writable({});
-export const socketEvents2 = writable({});
+export const roomEvents = writable({});
+export const gameEvents = writable({});
 
 // Listen for events and update the store
 socket.on("room-created", (roomid) => {
-  socketEvents.update(() => ({ roomCreated: roomid }));
+  roomEvents.update(() => ({ roomCreated: roomid }));
 });
 
 socket.on("user-joined", (socketid, playerNum, names) => {
-  socketEvents.update(() => ({
+  roomEvents.update(() => ({
     roomJoined: { id: socketid, num: playerNum, names: names },
   }));
 });
 
 socket.on("user-left", (socketid, playerNum, names) => {
-  socketEvents.update(() => ({
+  roomEvents.update(() => ({
     roomLeft: { id: socketid, num: playerNum, names: names },
   }));
 });
 
 socket.on("room-full", () => {
-  socketEvents.update(() => ({ roomFull: true }));
+  roomEvents.update(() => ({ roomFull: true }));
 });
 
 socket.on("game-start", (quiz) => {
-  socketEvents.update(() => ({ gameStarted: quiz }));
+  roomEvents.update(() => ({ gameStarted: quiz }));
 });
 
 socket.on("next-question", (question) => {
   console.log("next question");
-  socketEvents.update(() => ({ nextQuestion: question }));
+  gameEvents.update(() => ({ nextQuestion: question }));
 });
 
 socket.on("final-scores", (scores) => {
-  socketEvents.update(() => ({ finalScores: scores }));
+  roomEvents.update(() => ({ finalScores: scores }));
 });
 
 socket.on("game-end", () => {
-  socketEvents.update(() => ({ gameEnd: true }));
+  roomEvents.update(() => ({ gameEnd: true }));
+});
+
+socket.on("reconnect", (data) => {
+  console.log("reconnect");
+  roomEvents.update(() => ({ reconnect: data }));
+});
+
+socket.on("room-deleted", () => {
+  roomEvents.update(() => ({ roomDeleted: true }));
 });
 
 socket.on("timeout", (question) => {
   console.log("timeout");
-  socketEvents.update(() => ({ timeout: question }));
+  gameEvents.update(() => ({ timeout: question }));
 });
 
 socket.on("scores-till-question", (scores, display_time) => {
   console.log("scores-till-question");
-  socketEvents.update(() => ({
+  gameEvents.update(() => ({
     scoresTillQuestion: scores,
     display_time: display_time,
   }));

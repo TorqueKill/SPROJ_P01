@@ -1,17 +1,27 @@
 <script lang="js">
   // @ts-nocheck
 
-  import { socket, socketEvents } from "$lib/socketStore.js";
-  import { user } from "$lib/userStore.js";
+  //------------------------------------PRESISTANCE------------------------------------
+  // navigate to main menu if user is disconnected, if user is not logged in, goto login/signup
 
+  import { socket, roomEvents } from "$lib/socketStore.js";
+  import { user } from "$lib/userStore.js";
+  import { SCREENS } from "$lib/constants";
   import { goto } from "$app/navigation";
+
 
   let playersReady = 0;
   let playerNames = [];
 
   $: {
-    const events = $socketEvents;
+    const events = $roomEvents;
     console.log(events);
+
+    if (events.roomDeleted) {
+      socket.disconnect();
+      socket.connect();
+      goto("/");
+    }
 
     if (events.roomCreated) {
       $user.gameid = events.roomCreated;
@@ -38,9 +48,20 @@
 
     if (events.gameStarted) {
       $user.quiz = events.gameStarted;
-      console.log($user.quiz);
 
       events.gameStarted = null;
+      goto("/gameSession");
+    }
+
+    if (events.reconnect) {
+      let data = events.reconnect;
+      $user.quiz = data.quiz;
+      $user.currentSession = SCREENS.GAME;
+      $user.reconnected = true;
+
+      //will use data.currentQuestion in the future
+
+      socket.emit("reconnected", $user.gameid);
       goto("/gameSession");
     }
   }
@@ -49,7 +70,7 @@
 <main>
   <body>
     <h1 id="home">JAM</h1>
-    <h1>Waiting for the players to join...</h1>
+    <h1>Loading...</h1>
     <div class="container">
       <div
         class="container mt-4 mb-5 d-flex justify-content-center"

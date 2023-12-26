@@ -2,7 +2,7 @@
   // @ts-nocheck
   import { SCREENS } from "$lib/constants.js";
   import { user } from "$lib/userStore.js";
-  import { socket, socketEvents } from "$lib/socketStore.js";
+  import { socket, roomEvents } from "$lib/socketStore.js";
   import { goto } from "$app/navigation";
 
   import { onMount } from "svelte";
@@ -10,9 +10,19 @@
   let playerScores = [];
   let totalQuestions = 0;
 
+  onMount(() => {
+    socket.emit("session-loaded", $user.gameid, SCREENS.SCORE);
+  });
+
   $: {
-    const events = $socketEvents;
+    const events = $roomEvents;
     console.log(events);
+
+    if (events.roomDeleted) {
+      socket.disconnect();
+      socket.connect();
+      goto("/");
+    }
 
     if (events.finalScores) {
       $user.score = events.finalScores;
@@ -20,11 +30,6 @@
       totalQuestions = playerScores[0].scores.length;
     }
   }
-
-  onMount(() => {
-    //eg = [[1,0,1,0], [0,1,0,1]...] where of 1 list = questions
-    socket.emit("session-loaded", $user.gameid, SCREENS.SCORE);
-  });
 
   const playerScore = (scoreList) => {
     let score = 0;
