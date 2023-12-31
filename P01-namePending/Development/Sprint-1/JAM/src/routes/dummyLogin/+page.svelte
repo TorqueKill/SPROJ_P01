@@ -1,33 +1,30 @@
 <script>
-// @ts-nocheck
+  // @ts-nocheck
 
-    import {goto} from "$app/navigation";
-    import {user} from "$lib/userStore.js";
+  import { goto } from "$app/navigation";
+  import { user } from "$lib/userStore.js";
 
-    function makeid(length) {
-        let result = "";
-        let characters = "abcdefghijklmnopqrstuvwxyz";
-        for (let i = 0; i < length; i++) {
-            result += characters.charAt(Math.floor(Math.random() * characters.length));
-        }
-        return result;
+  function makeid(length) {
+    let result = "";
+    let characters = "abcdefghijklmnopqrstuvwxyz";
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(
+        Math.floor(Math.random() * characters.length)
+      );
     }
+    return result;
+  }
 
-    function handleSignIn() {
-        $user.email = email;
-        goto("/hostOrPlayer");
-    }
+  function handleSignIn() {
+    $user.email = email;
+    goto("/dummyViewHistory");
+  }
 
-    let email = makeid(5) + "@gmail.com";
-
+  let email = makeid(5) + "@gmail.com";
 </script>
 
 <main>
-    <h1>
-        Dummy Login
-    </h1>
-    <input type="text" bind:value={email} placeholder="email">
-    <button on:click={handleSignIn}>Sign In</button>
-    
+  <h1>Dummy Login</h1>
+  <input type="text" bind:value={email} placeholder="email" />
+  <button on:click={handleSignIn}>Sign In</button>
 </main>
-
