@@ -35,7 +35,7 @@ export const gameHistory = [
   ],
   [
     { name: "Player5", scores: [1, 0, 1, 0, 1, 1, 1, 0, 1, 1] }, //quiz5
-    { name: "Player1", scores: [1, 1, 0, 0, 1, 0, 1, 1, 1, 1] },
+    { name: "Player1", scores: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
     { name: "Player3", scores: [1, 1, 1, 1, 1, 1, 0, 1, 1, 1] },
     { name: "Player2", scores: [0, 1, 1, 0, 1, 0, 1, 1, 0, 1] },
     { name: "Player4", scores: [1, 0, 1, 1, 0, 1, 0, 0, 1, 0] },

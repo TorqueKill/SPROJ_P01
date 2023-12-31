@@ -23,6 +23,7 @@
 <script>
   import { writable } from "svelte/store";
   import { gameHistory } from "$lib/dummyGames";
+  import { quiz1, quiz2, quiz3, quiz4, quiz5 } from "$lib/dummyQuiz";
 
   // @ts-ignore
   const detailedPlayerHistory = writable([]);
@@ -32,25 +33,41 @@
   let showHostHistory = false;
   let playerUsername = "Player1";
 
-  // @ts-ignore
+  /**
+   * @param {string} username
+   */
   function togglePlayerHistory(username) {
     showPlayerHistory = !showPlayerHistory;
     if (showPlayerHistory) {
-      // @ts-ignore
+      /**
+     * @type {{ quiz: string; details: ({ question: string; providedAnswer: string; 
+    correctAnswer: string; wasCorrect: boolean; } | null)[]; }[]}
+     */
       let playerHistory = [];
       gameHistory.forEach((quizHistory, index) => {
         let playerRecord = quizHistory.find(
           (player) => player.name === username
         );
-        if (playerRecord) {
-          let quizDetails = playerRecord.scores.map((score, questionIndex) => ({
-            question: `Question ${questionIndex + 1}`,
-            wasCorrect: score === 1,
-            answer: score === 1 ? "Correct" : "Incorrect",
-          }));
+        let currentQuiz = [quiz1, quiz2, quiz3, quiz4, quiz5][index];
+        console.log("currentQuiz:", currentQuiz);
+        if (playerRecord && currentQuiz) {
+          let quizDetails = playerRecord.scores.map((score, questionIndex) => {
+            let questionItem = currentQuiz[questionIndex];
+            console.log("questionItem:", questionItem);
+            if (questionItem) {
+              return {
+                question: questionItem.question,
+                providedAnswer: questionItem.choices[score],
+                correctAnswer: questionItem.answer,
+                wasCorrect: score == 1,
+              };
+            }
+            return null;
+          });
+          console.log("quizDetails:", quizDetails);
           playerHistory.push({
             quiz: `Quiz ${index + 1}`,
-            details: quizDetails,
+            details: quizDetails.filter((detail) => detail !== null),
           });
         }
       });
@@ -108,7 +125,10 @@
     <h3>{quiz.quiz}</h3>
     <ul>
       {#each quiz.details as detail}
-        <li>{detail.question}: {detail.answer}</li>
+        <li>
+          {detail.question}: {detail.correctAnswer}
+          ({detail.wasCorrect ? "Correct" : "Incorrect"})
+        </li>
       {/each}
     </ul>
   {/each}
