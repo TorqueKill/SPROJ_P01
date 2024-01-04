@@ -178,7 +178,7 @@
 
 <main>
   <body>
-    <h1 id="home">JAM</h1>
+    <h1 id="home" style="color: #c49eff">JAM</h1>
     <div class="container">
       <!------------------------------- LOADING ------------------------------------------>
       {#if currentQuestion == -1}
