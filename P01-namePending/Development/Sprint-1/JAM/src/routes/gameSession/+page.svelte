@@ -11,6 +11,7 @@
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { tweened } from "svelte/motion";
+  
 
 
   let isHost;
@@ -40,6 +41,13 @@
       socket.emit("session-loaded", $user.gameid, SCREENS.GAME);
     }
 
+    // If user is reconnected, then store the current question from user store in the local variable
+
+    // if ($user.reconnected){
+    //   currentQuestion = $user.currentQuestion;
+    //   // $user.reconnected = false;
+    // }
+
   });
 
   //----------------------------REACTIVE CHANGES-------------------------
@@ -49,6 +57,9 @@
     console.log(events);
 
     if (events.nextQuestion == 0 || events.nextQuestion) {
+      
+      
+
       currentQuestion = events.nextQuestion;
       console.log(events);
       isAnswerSubmitted = false;
@@ -78,7 +89,8 @@
 
         console.log("timeout");
         if ($user.reconnected){
-          sendAnswer(-1, currentQuestion-1); //reconnected user waits till timeout
+          // sendAnswer(-1, currentQuestion-1); //reconnected user waits till timeout
+          sendAnswer(-1, _currentQuestion); //reconnected user waits till timeout
         }else{
           sendAnswer(-1, _currentQuestion); // Index is -1 if time runs out
         }
@@ -162,6 +174,10 @@
     if (isAnswerSubmitted) {
       return;
     }
+    // if (questionIdx < 0) {
+    //   return;
+    // }
+
     if (answerIdx === -1) {
       answerSubmitted = "Time ran out";
     } else {

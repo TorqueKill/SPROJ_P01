@@ -215,6 +215,16 @@ function setRoomCurrentQuestion(roomid, questionIndex) {
   }
 }
 
+function getRoomCurrentQuestion(roomid) {
+  let room = getRoom(roomid);
+  if (room) {
+    return room.currentQuestion;  
+
+  } else {
+    return -1;
+  }
+}
+
 function makeDummyStringList(length) {
   let result = [];
   for (let i = 0; i < length; i++) {
@@ -225,6 +235,14 @@ function makeDummyStringList(length) {
 
 function handleAnswer(roomid, socketid, answer, questionIndex) {
   try {
+
+    // if questionIndex is -1, that means user has re-connected so get the current question index
+
+    // if (questionIndex === -1) {
+    //   questionIndex = getRoomCurrentQuestion(roomid);
+    // }
+
+
     let room = getRoom(roomid);
     let choicesIdx = answer;
 
@@ -388,6 +406,7 @@ function setName(socketid, roomid, name, email) {
       roomid: roomid,
       email: email,
       vegetativeState: false,
+      justReconnected: false,
     });
   }
 }
@@ -465,6 +484,7 @@ function reconnectionInit(roomid, socketid, email) {
       delete room.usersNames[user.socketid];
 
       //update socketid in answers
+      console.log("Deleting old socketid from answers");
       let answers = room.answers[user.socketid];
       room.answers[socketid] = answers;
       delete room.answers[user.socketid];
@@ -661,7 +681,7 @@ io.on("connection", async (socket) => {
 
     if (reconnectionInit(roomid, socket.id, email)) {
       //begin reconnection process
-      console.log("reconnection process started: " + socket.id);
+      console.log("reconnection process started: " + socket.id + email);
       socket.join(roomid);
       //get room quiz
       let quiz = getRoomQuiz(roomid);

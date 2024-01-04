@@ -58,6 +58,7 @@
       $user.quiz = data.quiz;
       $user.currentSession = SCREENS.GAME;
       $user.reconnected = true;
+      $user.currentQuestion = data.currentQuestion;
 
       //will use data.currentQuestion in the future
 

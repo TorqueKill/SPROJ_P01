@@ -5,6 +5,7 @@
     import { goto } from "$app/navigation";
     // importing userStore.js
     import { user } from "$lib/userStore.js";
+    import { onMount } from "svelte";
     
     let email = "";
     let password = "";
@@ -56,9 +57,11 @@
             // console.log(data.token);
             
             $user.email = email;
-            $user.password = password; //why tf are we storing the password?
+            $user.password = password; //why tf are we storing the password? idk, co-pilot suggested it so though it was good coding pratice
             //save user to session storage but incoorporate timestamps to determine staleness/ timeout for session
             sessionStorage.setItem("user", JSON.stringify($user));
+            // saving time stamp to sessionStorage
+            sessionStorage.setItem("timestamp", Date.now());
             goto("/hostOrPlayer");
           }
           
@@ -77,6 +80,15 @@
         // console.log("Sign in successful!");
       }
     }
+
+    onMount(() => {
+      // check if user is already logged in and time stamp us under three days
+      // if so, redirect to home page
+      if (sessionStorage.getItem("user") && (Date.now() - sessionStorage.getItem("timestamp") < 259200000)) {
+        $user.email = JSON.parse(sessionStorage.getItem("user")).email;
+        goto("/hostOrPlayer");
+      }
+    });
 
   </script>
   
