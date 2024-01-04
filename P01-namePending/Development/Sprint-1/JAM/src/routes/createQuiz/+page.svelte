@@ -12,26 +12,27 @@
   let quizChosen;
   let quizIdx;
 
+  onMount(() => {
+    let savedQuizzes = JSON.parse(localStorage.getItem("Quiz")) || [];
+    if (savedQuizzes.length > 5) {
+      savedQuizzes = savedQuizzes.slice(0, 3);
+      localStorage.setItem("Quiz", JSON.stringify(savedQuizzes));
+    }
+    quizzes = [quiz1, quiz2, quiz3, ...savedQuizzes];
+    displayQuizCheck = false;
+    console.log("Loaded quizzes:", quizzes);
+  });
+
   // onMount(() => {
-  //   let savedQuizzes = JSON.parse(localStorage.getItem("Quiz")) || [];
-  //   if (savedQuizzes.length > 5) {
-  //     savedQuizzes = savedQuizzes.slice(0, 3);
-  //     localStorage.setItem("Quiz", JSON.stringify(savedQuizzes));
-  //   }
+  //   //append more from local storage if any
+  //   const savedQuizzes = JSON.parse(localStorage.getItem("Quiz")) || [];
+  //   console.log(savedQuizzes);
+  //   // localStorage.setItem("Quiz", JSON.stringify(savedQuizzes));
+
   //   quizzes = [...savedQuizzes];
   //   displayQuizCheck = false;
-  //   console.log("Loaded quizzes:", quizzes);
+  //   console.log(quizzes);
   // });
-
-  onMount(() => {
-    //append more from local storage if any
-    const savedQuizzes = JSON.parse(localStorage.getItem("Quiz")) || [];
-    console.log(savedQuizzes);
-
-    quizzes = [...savedQuizzes];
-    displayQuizCheck = false;
-    console.log(quizzes);
-  });
 
   //need to sugar quiz if its in the format of quiz1,2,3
   //which is [{question,answer,choices:[choice1,choice2,choice3,choice4]}, ...]
