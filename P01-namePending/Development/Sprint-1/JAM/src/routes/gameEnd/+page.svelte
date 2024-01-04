@@ -45,7 +45,7 @@
 <main>
   <body>
     <h1 id="home">JAM</h1>
-    <div class="container" id="inside-box">
+    <div class="container2" id="inside-box">
       <h1>Game End</h1>
       <!--Display all scores, scores are sent via [0,1,0,1] where length = questions-->
       {#if playerScores.length == 0}
@@ -107,6 +107,18 @@
     margin-left: 5rem;
     margin-top: -0.75rem;
     font-family: JejuGothic, sans-serif;
+  }
+  .container2 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem;
+    border-radius: 15px;
+    background-color: #018198;
+    color: #c49eff;
+    border: none;
+    margin-top: 20rem;
   }
   .btn-secondary {
     background: #c70000;

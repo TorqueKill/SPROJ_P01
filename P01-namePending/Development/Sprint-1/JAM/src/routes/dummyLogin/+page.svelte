@@ -17,6 +17,7 @@
 
   function handleSignIn() {
     $user.email = email;
+    sessionStorage.setItem("user", JSON.stringify($user));
     goto("/dummyViewHistory");
   }
 
@@ -28,7 +29,9 @@
     <div class="container">
       <h1>Dummy Login</h1>
       <input type="text" bind:value={email} placeholder="email" />
+      
       <button on:click={handleSignIn}>Sign In</button>
+      
     </div>
   </body>
 </main>

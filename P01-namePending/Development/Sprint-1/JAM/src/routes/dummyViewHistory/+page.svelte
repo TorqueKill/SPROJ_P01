@@ -23,6 +23,7 @@
 <script>
   import { writable } from "svelte/store";
   import { gameHistory } from "$lib/dummyGames";
+  import { user } from "$lib/userStore.js";
   import { quiz1, quiz2, quiz3, quiz4, quiz5 } from "$lib/dummyQuiz";
 
   // @ts-ignore
@@ -31,12 +32,12 @@
   const hostHistory = writable([]);
   let showPlayerHistory = false;
   let showHostHistory = false;
-  let playerUsername = "Player1";
+  let playerEmail = $user.email;
 
   /**
-   * @param {string} username
+   * @param {string} userEmail
    */
-  function togglePlayerHistory(username) {
+  function togglePlayerHistory(userEmail) {
     showPlayerHistory = !showPlayerHistory;
     if (showPlayerHistory) {
       /**
@@ -45,11 +46,13 @@
      */
       let playerHistory = [];
       gameHistory.forEach((quizHistory, index) => {
+        console.log("QuizHistory: ", quizHistory);
         let playerRecord = quizHistory.find(
-          (player) => player.name === username
+          (player) => player.name = userEmail
         );
         let currentQuiz = [quiz1, quiz2, quiz3, quiz4, quiz5][index];
         console.log("currentQuiz:", currentQuiz);
+        console.log("playerRecord:", playerRecord);
         if (playerRecord && currentQuiz) {
           let quizDetails = playerRecord.scores.map((score, questionIndex) => {
             let questionItem = currentQuiz[questionIndex];
@@ -117,10 +120,12 @@
   <body>
     <div class="container">
       <h1>View History</h1>
-      <button on:click={() => togglePlayerHistory(playerUsername)}
+      <button on:click={() => togglePlayerHistory(playerEmail)}
         >Player history</button
       >
-      <button on:click={toggleHostHistory}>Host history</button>
+      {#if $user.isHost}
+        <button on:click={toggleHostHistory}>Host history</button>
+      {/if}
       <button on:click={deleteHistory}>Delete history</button>
 
       {#if showPlayerHistory}
