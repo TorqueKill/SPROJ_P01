@@ -8,17 +8,27 @@
 
   let quizzes;
   let displayQuizCheck;
-  let quizToDisplay;
+  let quizToDisplay = [];
   let quizChosen;
-
   let quizIdx;
+
+  // onMount(() => {
+  //   let savedQuizzes = JSON.parse(localStorage.getItem("Quiz")) || [];
+  //   if (savedQuizzes.length > 5) {
+  //     savedQuizzes = savedQuizzes.slice(0, 3);
+  //     localStorage.setItem("Quiz", JSON.stringify(savedQuizzes));
+  //   }
+  //   quizzes = [...savedQuizzes];
+  //   displayQuizCheck = false;
+  //   console.log("Loaded quizzes:", quizzes);
+  // });
 
   onMount(() => {
     //append more from local storage if any
     const savedQuizzes = JSON.parse(localStorage.getItem("Quiz")) || [];
     console.log(savedQuizzes);
 
-    quizzes = [quiz1, quiz2, quiz3, ...savedQuizzes];
+    quizzes = [...savedQuizzes];
     displayQuizCheck = false;
     console.log(quizzes);
   });
@@ -44,12 +54,11 @@
     return newQuiz;
   };
 
-  const displayQuiz = (quiz, idx) => {
+  function displayQuiz(quiz, idx) {
     quizToDisplay = sugarQuiz(quiz);
-    console.log(quizToDisplay);
     displayQuizCheck = true;
     quizIdx = idx;
-  };
+  }
 
   const closeQuiz = () => {
     displayQuizCheck = false;
@@ -61,12 +70,26 @@
     quizChosen = true;
     displayQuizCheck = false;
   };
+
+  // update questions, answers, options, and time limits
+  function updateQuizDetails(quizIdx, questionIdx, field, value, optionIdx) {
+    if (field === "question") {
+      quizzes[quizIdx][questionIdx].question = value;
+    } else if (field === "answer") {
+      quizzes[quizIdx][questionIdx].answer = value;
+    } else if (field === "options") {
+      quizzes[quizIdx][questionIdx].choices[optionIdx] = value;
+    } else if (field === "timeLimit") {
+      quizzes[quizIdx][questionIdx].timeLimit = parseInt(value, 10);
+    }
+    // quizzes = [...quizzes];
+  }
 </script>
 
 <main>
   <body>
     <h1 id="home">JAM</h1>
-    <h2>Create Quiz</h2>
+    <h2 class="create-quiz">Create Quiz</h2>
     {#if displayQuizCheck}
       <h5>SCROLL DOWN TO VIEW</h5>
     {:else}
@@ -98,7 +121,7 @@
           class="btn btn-tertiary btn-block"
           id="createNew"
           on:click={() => {
-            goto("/createQuestion");
+            goto("/CreateQuestion");
           }}>Create new Quiz</button
         >
 
@@ -111,35 +134,73 @@
         >
       </div>
     </div>
-    <div class="quiz-load">
+    <div class="quiz-editor">
       {#if displayQuizCheck}
-        <h2 id="chooseQuizHead">Choose the quiz</h2>
-        {#each quizToDisplay as question, idx}
-          <p id="question" class="card-header">
-            Question {idx + 1}: {question.question}
-          </p>
-          <p id="answer">Answer: {question.answer}</p>
-          {#each question.options as option}
-            <p id="option">{option}</p>
-          {/each}
-          <p id="time-limit">Time limit: {question.timeLimit}</p>
+        <h2>Choose or edit the quiz</h2>
+        {#each quizToDisplay as question, qIdx}
+          <div class="question-block">
+            <input
+              class="question-input"
+              type="text"
+              bind:value={question.question}
+              on:input={(e) =>
+                updateQuizDetails(quizIdx, qIdx, "question", e.target.value)}
+            />
+
+            <div class="answer-block">
+              <label class="answer-label" for={`answer-${qIdx}`}>Answer:</label>
+              <input
+                class="answer-input"
+                type="text"
+                bind:value={question.answer}
+                on:input={(e) =>
+                  updateQuizDetails(quizIdx, qIdx, "answer", e.target.value)}
+              />
+            </div>
+
+            <div class="options-block">
+              {#each question.options as option, oIdx}
+                <div class="option-item">
+                  <label class="option-label" for={`option-${qIdx}-${oIdx}`}
+                    >Option {oIdx + 1}:</label
+                  >
+                  <input
+                    class="option-input"
+                    type="text"
+                    bind:value={option}
+                    on:input={(e) =>
+                      updateQuizDetails(
+                        quizIdx,
+                        qIdx,
+                        "options",
+                        e.target.value,
+                        oIdx
+                      )}
+                  />
+                </div>
+              {/each}
+            </div>
+
+            <div class="time-limit-block">
+              <label class="time-limit-label" for={`timeLimit-${qIdx}`}
+                >Time Limit:</label
+              >
+              <input
+                class="time-limit-input"
+                type="number"
+                bind:value={question.timeLimit}
+                on:input={(e) =>
+                  updateQuizDetails(quizIdx, qIdx, "timeLimit", e.target.value)}
+              />
+            </div>
+          </div>
         {/each}
-        <div class="btn-group">
-          <button
-            class="btn btn-secondary btn-block"
-            id="choose"
-            on:click={() => {
-              chooseQuiz();
-            }}>Choose</button
-          >
-          <button
-            class="btn btn-secondary btn-block"
-            id="goBack1"
-            on:click={() => {
-              closeQuiz();
-            }}>Close</button
-          >
-        </div>
+        <button class="btn btn-tertiary" on:click={() => chooseQuiz()}
+          >Choose</button
+        >
+        <button class="btn btn-secondary" on:click={() => closeQuiz()}
+          >Close</button
+        >
       {/if}
     </div>
   </body>
@@ -214,6 +275,13 @@
     color: white;
     font-family: JejuGothic, sans-serif;
     font-size: 45px;
+    margin-left: 29rem;
+    margin-top: -2rem;
+  }
+  .create-quiz {
+    color: white;
+    font-family: JejuGothic, sans-serif;
+    font-size: 45px;
     margin-left: 36rem;
     margin-top: -2rem;
   }
@@ -237,56 +305,78 @@
     font-family: JejuGothic, sans-serif;
     margin-left: 39.5rem;
   }
-  #question {
+
+  .question-block {
+    margin-bottom: 20px;
+  }
+
+  .answer-block,
+  .options-block,
+  .time-limit-block {
+    margin-top: 10px;
+  }
+
+  .option-item {
+    margin-top: 5px;
+  }
+
+  .question-input {
+    display: block;
+    width: 80rem;
+    margin-bottom: 5px;
+    height: 2rem;
+    padding-left: 1rem;
+    font-size: 20px;
     font-family: JejuGothic, sans-serif;
     font-size: 20px;
     color: #7801a8;
     background: white;
-    width: 50rem;
-    height: 2rem;
-    border-radius: 12px;
-    margin-left: 1rem;
-    margin-top: 2rem;
-    padding-left: 1rem;
-    padding-top: 0.5rem;
+    border-radius: 12rem;
   }
-  #chooseQuizHead {
-    color: white;
-    font-family: JejuGothic, sans-serif;
-    font-size: 45px;
-    margin-left: 33rem;
-    margin-top: 4rem;
-  }
-  #answer {
-    margin-left: 1rem;
-    margin-top: 2rem;
-    padding-left: 1rem;
-    padding-top: 0.5rem;
+  .answer-input {
+    display: block;
+    width: 10rem;
+    margin-bottom: 5px;
+    margin-top: 1rem;
+    text-align: center;
+    padding-left: -3rem;
+    /* padding-top: 0.5rem; */
     color: #c49eff;
     font-family: JejuGothic, sans-serif;
+    font-size: 15px;
+    border-radius: 12rem;
   }
-  #option {
-    margin-left: 1rem;
-    margin-top: -1rem;
+  .option-input {
+    display: block;
+    width: 10rem;
+    margin-bottom: 5px;
+    font-family: JejuGothic, sans-serif;
+    font-size: 15px;
+    border-radius: 12rem;
     padding-left: 1rem;
+    color: #7801a8;
+  }
+
+  .time-limit-input {
+    color: red;
+    /* margin-left: 2rem; */
+    font-family: JejuGothic, sans-serif;
+    border-radius: 5rem;
+    /* padding-left: 2rem; */
+    text-align: center;
+  }
+  .answer-label {
+    display: block;
+    margin-top: 10px;
     padding-top: 0.5rem;
-    color: black;
     font-family: JejuGothic, sans-serif;
   }
-  #choose {
-    background: #00a59b;
-    margin-left: 1rem;
-  }
-  #choose:active {
-    background: #018279;
-    border: None;
-  }
-  #goBack1 {
-    margin-left: 31rem;
-  }
-  #time-limit {
-    color: red;
-    margin-left: 2rem;
+  .option-label,
+  .time-limit-label {
+    display: block;
+    margin-top: 10px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
     font-family: JejuGothic, sans-serif;
   }
 </style>
