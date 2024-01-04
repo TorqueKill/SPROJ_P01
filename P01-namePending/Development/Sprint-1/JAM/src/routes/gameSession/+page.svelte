@@ -236,6 +236,7 @@
           <p id="answer">You chose:</p>
           <p id="real-answer">{answerSubmitted}</p>
         </h2>
+        <button on:click={()=>{goto("/dummyViewHistory")}}>View history</button>
 
         <!------------------------------- TIMEOUT DISPLAY --------------------------------->
         {:else if $timeLeft == -100}
