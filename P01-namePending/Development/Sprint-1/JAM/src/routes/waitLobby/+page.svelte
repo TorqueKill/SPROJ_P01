@@ -70,7 +70,7 @@
 <main>
   <body>
     <h1 id="home">JAM</h1>
-    <h1>Loading...</h1>
+      <h1>Loading...</h1>
     <div class="container">
       <div
         class="container mt-4 mb-5 d-flex justify-content-center"
@@ -169,6 +169,8 @@
     border-radius: 12px;
     height: 3rem;
     font-size: 20px;
+    max-width: 100%;
+    padding: 10px;
   }
   .btn:active {
     background-color: #7801a8;
@@ -179,7 +181,7 @@
     border: None;
     margin-top: 8.75rem;
     margin-left: 5rem;
-    font-size: 20px;
+    font-size: 1em;
     color: white;
     font-family: JejuGothic, sans-serif;
   }
@@ -211,4 +213,31 @@
     margin-left: 8rem;
     color: #7801a8;
   }
-</style>
+
+  @media screen and (max-width: 768px) {
+  .container {
+    margin-left: 5rem;
+  }
+  
+  .btn {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 10px;
+  }
+ 
+  h1{
+    margin-left: 5rem;
+    display: flex;
+    justify-content: center;
+  }
+ }
+
+ @media screen and (min-width: 769px) {
+ 
+  .btn {
+    padding: 10px 25px;
+    font-size: 18px;
+    border-radius: 20px;
+  }
+ }
+</style>  

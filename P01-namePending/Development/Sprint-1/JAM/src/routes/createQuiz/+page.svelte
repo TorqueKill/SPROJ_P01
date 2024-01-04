@@ -380,4 +380,36 @@
     padding-bottom: 0.5rem;
     font-family: JejuGothic, sans-serif;
   }
+
+  @media screen and (max-width: 768px) {
+  .container {
+    margin-left: 5rem;
+  }
+  
+  .btn {
+    padding: 5px;
+    font-size: 14px;
+  }
+
+  .create-quiz{
+    font-size: 30px;
+    margin-left: 5rem;
+    display: flex;
+    justify-content: center;
+  }
+ 
+  h5{
+    margin-left: 5rem;
+    display: flex;
+    justify-content: center;
+  }
+ }
+
+ @media screen and (min-width: 769px) {
+  
+  .btn {
+    padding: 10px;
+    font-size: 18px;
+  }
+ }
 </style>

@@ -152,4 +152,25 @@
     font-family: JejuGothic, sans-serif;
     font-size: 18px;
   }
+
+  @media screen and (max-width: 768px) {
+  .container {
+    margin-left: 5rem;
+  }
+  
+  .btn {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 10px;
+  }
+ 
+ }
+
+ @media screen and (min-width: 769px) {
+  .btn {
+    padding: 10px 25px;
+    font-size: 18px;
+    border-radius: 20px;
+  }
+ }
 </style>
