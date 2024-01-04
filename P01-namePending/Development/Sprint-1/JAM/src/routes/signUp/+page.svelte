@@ -179,6 +179,7 @@
     button {
       padding: 8px;
       font-size: 12px;
+      border-radius: 15px;
     }
   }
 
