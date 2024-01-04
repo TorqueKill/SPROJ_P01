@@ -113,34 +113,130 @@
   }
 </script>
 
-<h1>View History</h1>
-<button on:click={() => togglePlayerHistory(playerUsername)}
-  >Player history</button
->
-<button on:click={toggleHostHistory}>Host history</button>
-<button on:click={deleteHistory}>Delete history</button>
+<main>
+  <body>
+    <div class="container">
+      <h1>View History</h1>
+      <button on:click={() => togglePlayerHistory(playerUsername)}
+        >Player history</button
+      >
+      <button on:click={toggleHostHistory}>Host history</button>
+      <button on:click={deleteHistory}>Delete history</button>
 
-{#if showPlayerHistory}
-  {#each $detailedPlayerHistory as quiz (quiz.quiz)}
-    <h3>{quiz.quiz}</h3>
-    <ul>
-      {#each quiz.details as detail}
-        <li>
-          {detail.question}: {detail.correctAnswer}
-          ({detail.wasCorrect ? "Correct" : "Incorrect"})
-        </li>
-      {/each}
-    </ul>
-  {/each}
-{/if}
+      {#if showPlayerHistory}
+        {#each $detailedPlayerHistory as quiz (quiz.quiz)}
+          <h3>{quiz.quiz}</h3>
+          <ul>
+            {#each quiz.details as detail}
+              <li>
+                {detail.question}: {detail.correctAnswer}
+                ({detail.wasCorrect ? "Correct" : "Incorrect"})
+              </li>
+            {/each}
+          </ul>
+        {/each}
+      {/if}
 
-{#if showHostHistory}
-  {#each $hostHistory as quiz}
-    <h3>{quiz.quiz}</h3>
-    <ul>
-      {#each quiz.players as player}
-        <li>{player.name}: {player.score}</li>
-      {/each}
-    </ul>
-  {/each}
-{/if}
+      {#if showHostHistory}
+        {#each $hostHistory as quiz}
+          <h3>{quiz.quiz}</h3>
+          <ul>
+            {#each quiz.players as player}
+              <li>{player.name}: {player.score}</li>
+            {/each}
+          </ul>
+        {/each}
+      {/if}
+    </div>
+  </body>
+</main>
+
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #7801a8;
+    font-family: "Jeju Gothic", sans-serif;
+    color: #ffffff;
+  }
+
+  .container {
+    text-align: center;
+    max-width: 800px;
+    width: 80%;
+    margin: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    background-color: #018198;
+    font-family: "Jeju Gothic", sans-serif;
+  }
+
+  button {
+    background-color: #ccc;
+    border: none;
+    color: white;
+    padding: 5px 25px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 140px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-family: "Jeju Gothic", sans-serif;
+  }
+
+  button:hover {
+    background-color: #c49eff;
+  }
+  h1,
+  h3 {
+    margin: 10px 0;
+    font-family: "Jeju Gothic", sans-serif;
+    font-size: 2rem;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+    font-family: "Jeju Gothic", sans-serif;
+    font-size: 20px;
+  }
+
+  li {
+    background-color: #c49eff;
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 5px;
+    font-family: "Jeju Gothic", sans-serif;
+    font-size: 20px;
+  }
+
+  @media (max-width: 480px) {
+    h1,
+    h3 {
+      font-size: 1.25rem;
+    }
+
+    li {
+      font-size: 0.875rem;
+    }
+
+    button {
+      font-size: 0.9rem;
+      padding: 6px 12px;
+    }
+    .container {
+      margin: 10px;
+      padding: 10px;
+    }
+  }
+</style>
