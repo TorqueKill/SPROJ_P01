@@ -9,9 +9,11 @@ const { createClient } = require("@supabase/supabase-js");
 const cors = require("cors");
 const userAuth = require("./userAuth");
 
-const supabaseUrl = "https://wikvasjknjglndxhtjnk.supabase.co";
-const supabaseKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indpa3Zhc2prbmpnbG5keGh0am5rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDE2MjA1MTUsImV4cCI6MjAxNzE5NjUxNX0.L6-OCZNNI0d6xE0bbwsjvX5KPvzv-RdVagKF-QZO7ss";
+const _consts = require("./config");
+
+const supabaseUrl = _consts.SUPABASE_URL;
+const supabaseKey = _consts.SUPABASE_KEY;
+
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 let corsOptions = {
@@ -50,12 +52,12 @@ let rooms = [];
 //users = [{socketid: socketid, name: name, roomid: roomid, email: email, vegetativeState: true/false}]
 let users = [];
 
-const MAX_PLAYERS_PER_LOBBY = 10;
-const MIN_PLAYERS_PER_LOBBY = 2;
-const TIME_PER_QUESTION = 30; //seconds
-const LAG_BIAS = 3; //seconds
-const DEFAUL_PLAYER_NAME = "Player";
-const REPORT_DISPLAY_TIME = 10;
+const MAX_PLAYERS_PER_LOBBY = _consts.MAX_PLAYERS_PER_LOBBY;
+const MIN_PLAYERS_PER_LOBBY = _consts.MIN_PLAYERS_PER_LOBBY;
+const TIME_PER_QUESTION = _consts.TIME_PER_QUESTION; //seconds
+const LAG_BIAS = _consts.LAG_BIAS; //seconds
+const DEFAUL_PLAYER_NAME = _consts.DEFAUL_PLAYER_NAME;
+const REPORT_DISPLAY_TIME = _consts.REPORT_DISPLAY_TIME;
 
 //<-------------------------SERVER FUNCTIONS------------------------->
 
