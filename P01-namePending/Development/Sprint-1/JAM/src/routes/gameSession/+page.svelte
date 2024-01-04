@@ -1,17 +1,15 @@
-<script >
+<script>
   // @ts-nocheck
-
 
   //------------------------------------PRESISTANCE------------------------------------
   // navigate to main menu if user is disconnected, if user is not logged in, goto login/signup
 
-  import { SCREENS,GAME_SETTINGS } from "$lib/constants.js";
+  import { SCREENS, GAME_SETTINGS } from "$lib/constants.js";
   import { user } from "$lib/userStore.js";
   import { socket, roomEvents, gameEvents } from "$lib/socketStore.js";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { tweened } from "svelte/motion";
-
 
   let isHost;
   let quiz;
@@ -26,8 +24,6 @@
   let scoreDisplayCheck = false;
   let scoreDisplayTimer = GAME_SETTINGS.SCORE_DISPLAY_TIME;
 
-
-  
   onMount(() => {
     quiz = $user.quiz;
     isHost = $user.isHost; //hosts will display the question
@@ -35,11 +31,10 @@
     isAnswerSubmitted = false;
     answerSubmitted = "";
 
-    if ($user.currentSession!=SCREENS.GAME){
+    if ($user.currentSession != SCREENS.GAME) {
       $user.currentSession = SCREENS.GAME;
       socket.emit("session-loaded", $user.gameid, SCREENS.GAME);
     }
-
   });
 
   //----------------------------REACTIVE CHANGES-------------------------
@@ -57,7 +52,7 @@
       timeRanOut = false;
 
       // reset score display check to start timer
-      scoreDisplayCheck = false; 
+      scoreDisplayCheck = false;
 
       //set the event to null so that it doesn't get called repeatedly
       events.nextQuestion = null;
@@ -77,31 +72,28 @@
         timeRanOut = false;
 
         console.log("timeout");
-        if ($user.reconnected){
-          sendAnswer(-1, currentQuestion-1); //reconnected user waits till timeout
-        }else{
+        if ($user.reconnected) {
+          sendAnswer(-1, currentQuestion - 1); //reconnected user waits till timeout
+        } else {
           sendAnswer(-1, _currentQuestion); // Index is -1 if time runs out
         }
       }
 
       //set the event to null so that it doesn't get called repeatedly
       events.timeout = null;
-
     }
 
-    if (events.scoresTillQuestion){
+    if (events.scoresTillQuestion) {
       sessionScores = events.scoresTillQuestion;
       scoreDisplayCheck = true;
       scoreDisplayTimer = events.display_time;
       events.scoresTillQuestion = null;
     }
-
   }
 
-  $:{
+  $: {
     const events = $roomEvents;
     console.log(events);
-
 
     if (events.roomDeleted) {
       socket.disconnect();
@@ -116,12 +108,13 @@
 
   //---------------------------CLIENT TIMER-----------------------------------
 
-  if (!$user.isHost || scoreDisplayCheck) { // timer is only for non-hosts unless score is being displayed
+  if (!$user.isHost || scoreDisplayCheck) {
+    // timer is only for non-hosts unless score is being displayed
     setInterval(() => {
-      if (scoreDisplayCheck){
-        if (scoreDisplayTimer > 0){
+      if (scoreDisplayCheck) {
+        if (scoreDisplayTimer > 0) {
           scoreDisplayTimer--;
-        } 
+        }
         return; // don't run the timer if score is being displayed
       }
 
@@ -141,14 +134,13 @@
       if ($timeLeft > 0) {
         $timeLeft--;
 
-      // Time ran out for this question
+        // Time ran out for this question
       } else if ($timeLeft <= 0 && $timeLeft > -100) {
         timeRanOut = true;
 
         // set to -100 so that send answer doesn't get called repeatedly
         $timeLeft = -100;
       }
-
     }, 1000);
   }
 
@@ -173,7 +165,6 @@
     socket.emit("handle-answer", $user.gameid, answerIdx, questionIdx);
   };
 
-
   const playerScore = (scoreList) => {
     let score = 0;
     for (let i = 0; i < scoreList.length; i++) {
@@ -192,8 +183,8 @@
       <!------------------------------- LOADING ------------------------------------------>
       {#if currentQuestion == -1}
         <h1 class="loading">Waiting for Server...</h1>
-      
-      <!------------------------------- SCORE DISPLAY ------------------------------------>
+
+        <!------------------------------- SCORE DISPLAY ------------------------------------>
       {:else if scoreDisplayCheck}
         <h1>Score Display</h1>
         {#each Object.entries(sessionScores) as [idx, ps]}
@@ -203,7 +194,7 @@
         {/each}
         <h1>Next Question in {scoreDisplayTimer} seconds</h1>
 
-      <!------------------------------- QUESTION DISPLAY (HOST)--------------------------------->
+        <!------------------------------- QUESTION DISPLAY (HOST)--------------------------------->
       {:else if quiz}
         {#if isHost}
           <h1 id="host-question" class="inside-box">
@@ -218,27 +209,26 @@
               }}>Leave Room</button
             >
           </h1>
-      
-      <!------------------------------- ANSWER DISPLAY (PLAYER)--------------------------------->
-      {:else if $timeLeft >= 0}
-        <h1>Time Left: {secondsLeft}</h1>
-        <!-- <p>Time Left: {timeLeft}</p> -->
-        <h2 id="chooseOpt" class="inside-option">
-          <p id="choose">Choose one</p>
-          {#each quiz[currentQuestion].choices as choice, idx}
-            <button
-              class="btn1 btn-tertiary btn-block"
-              id="chooseAnswer"
-              on:click={() => sendAnswer(idx, currentQuestion)}
-              >{choice}</button
-            >
-          {/each}
-          <p id="answer">You chose:</p>
-          <p id="real-answer">{answerSubmitted}</p>
-        </h2>
-        <button on:click={()=>{goto("/dummyViewHistory")}}>View history</button>
 
-        <!------------------------------- TIMEOUT DISPLAY --------------------------------->
+          <!------------------------------- ANSWER DISPLAY (PLAYER)--------------------------------->
+        {:else if $timeLeft >= 0}
+          <h1>Time Left: {secondsLeft}</h1>
+          <!-- <p>Time Left: {timeLeft}</p> -->
+          <h2 id="chooseOpt" class="inside-option">
+            <p id="choose">Choose one</p>
+            {#each quiz[currentQuestion].choices as choice, idx}
+              <button
+                class="btn1 btn-tertiary btn-block"
+                id="chooseAnswer"
+                on:click={() => sendAnswer(idx, currentQuestion)}
+                >{choice}</button
+              >
+            {/each}
+            <p id="answer">You chose:</p>
+            <p id="real-answer">{answerSubmitted}</p>
+          </h2>
+
+          <!------------------------------- TIMEOUT DISPLAY --------------------------------->
         {:else if $timeLeft == -100}
           <h2>You ran out of time for this question</h2>
         {/if}
