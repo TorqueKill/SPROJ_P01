@@ -99,33 +99,6 @@
 </main>
 
 <style>
-  /* .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
-  
-    .logo {
-      margin-bottom: 2rem;
-    }
-  
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      width: 300px;
-      margin: 0 auto;
-      padding: 2rem;
-      border-radius: 5px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-    }
-  
-    .error {
-      color: red;
-    } */
-
   body {
     background: #7801a8;
   }
@@ -159,7 +132,6 @@
     border: None;
     background-color: #018198;
     margin-bottom: 2rem;
-
   }
   ::placeholder {
     padding-left: 0.5rem;
@@ -179,7 +151,7 @@
   }
 
   button {
-    background-color: #ccc; /* Green background */
+    background-color: #ccc;
     border: none;
     color: white;
     padding: 5px 25px;
@@ -189,39 +161,36 @@
     font-size: 16px;
     margin: 4px 140px;
     cursor: pointer;
-    border-radius: 5px; /* Rounded corners */
-    transition: all 0.3s ease; /* Smooth transition for hover effect */
+    border-radius: 5px;
+    transition: all 0.3s ease;
   }
 
-  /* Hover effect for buttons */
   button:hover {
     background-color: #c49eff;
   }
 
-  /* Responsive adjustments for form inputs and buttons */
   @media (max-width: 768px) {
     form {
-      width: 90%; /* Form takes more width on smaller screens */
+      width: 90%;
       padding: 1rem;
     }
 
     input,
     button {
-      padding: 8px; /* Slightly smaller padding for small screens */
-      font-size: 12px; /* Adjust font size as needed */
+      padding: 8px;
+      font-size: 12px;
     }
   }
 
-  /* Adjustments for medium to larger screens */
   @media (min-width: 769px) {
     form {
-      padding: 2rem; /* More padding for larger screens */
+      padding: 2rem;
     }
 
     .buttons button {
-      padding: 10px 25px; /* Larger padding for buttons */
-      font-size: 18px; /* Larger font size for buttons */
-      border-radius: 20px; /* More pronounced rounded corners for a modern look */
+      padding: 10px 25px;
+      font-size: 18px;
+      border-radius: 20px;
     }
   }
 </style>
