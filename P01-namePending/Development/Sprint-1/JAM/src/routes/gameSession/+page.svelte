@@ -197,7 +197,7 @@
         <!------------------------------- QUESTION DISPLAY (HOST)--------------------------------->
       {:else if quiz}
         {#if isHost}
-          <h1 id="host-question" class="inside-box">
+          <h1 id="host-question" class="inside-box container2">
             {quiz[currentQuestion].question}
             <button
               class="btn btn-secondary btn-block"
@@ -212,10 +212,11 @@
 
           <!------------------------------- ANSWER DISPLAY (PLAYER)--------------------------------->
         {:else if $timeLeft >= 0}
+        
           <h1>Time Left: {secondsLeft}</h1>
           <!-- <p>Time Left: {timeLeft}</p> -->
-          <h2 id="chooseOpt" class="inside-option">
-            <p id="choose">Choose one</p>
+          <h2 id="chooseOpt" class="inside-option container2">
+            <p id="choose" style="color: #c49eff">Choose one</p>
             {#each quiz[currentQuestion].choices as choice, idx}
               <button
                 class="btn1 btn-tertiary btn-block"
@@ -225,8 +226,9 @@
               >
             {/each}
             <p id="answer">You chose:</p>
-            <p id="real-answer">{answerSubmitted}</p>
+            <p id="real-answer" style="color: white;">{answerSubmitted}</p>
           </h2>
+        
 
           <!------------------------------- TIMEOUT DISPLAY --------------------------------->
         {:else if $timeLeft == -100}
@@ -275,7 +277,7 @@
     font-size: 20px;
   }
   .btn:active {
-    background-color: #800000;
+    background-color: #800080;
     color: #f0e9e9;
   }
   .btn-secondary {
@@ -342,5 +344,13 @@
     font-family: JejuGothic, sans-serif;
     margin-top: -3rem;
     color: red;
+  }
+  .container2 {
+    flex-direction: column;
+    align-items: center;
+    border-radius: 15px;
+    background-color: #018198;
+    color: #c49eff;
+    border: none;
   }
 </style>
