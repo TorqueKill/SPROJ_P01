@@ -29,4 +29,5 @@ export const user = writable({
   email: "",
   currentSession: 0,
   reconnected: false,
+  currentQuestion: -1,
 });
