@@ -11,8 +11,8 @@
   import { onMount } from "svelte";
 
   const MIN_PLAYERS = ROOM_SETTINGS.MIN_PLAYERS;
-  const MAX_PLAYERS = ROOM_SETTINGS.MAX_PLAYERS
-  const MAX_REPORT_SCORES = ROOM_SETTINGS.MAX_QUESTIONS_PER_REPORT
+  const MAX_PLAYERS = ROOM_SETTINGS.MAX_PLAYERS;
+  const MAX_REPORT_SCORES = ROOM_SETTINGS.MAX_QUESTIONS_PER_REPORT;
 
   let roomid;
   let isRoomFull = false;
@@ -24,7 +24,6 @@
   };
 
   let _userName;
-
 
   onMount(() => {
     $user.id = socket.id;
@@ -43,7 +42,7 @@
     if (events.roomCreated) {
       $user.gameid = events.roomCreated;
 
-      events.roomCreated = null
+      events.roomCreated = null;
     }
 
     if (events.roomFull) {
@@ -52,28 +51,34 @@
       isRoomFull = true;
       roomid = "";
 
-      events.roomFull = null
+      events.roomFull = null;
     }
   }
 
   //-------------------------------FUNCTIONS---------------------------------
 
   const createRoom = (soc, roomsettings) => {
-    if (roomsettings.maxPlayers < MIN_PLAYERS || roomsettings.maxPlayers > MAX_PLAYERS) {
+    if (
+      roomsettings.maxPlayers < MIN_PLAYERS ||
+      roomsettings.maxPlayers > MAX_PLAYERS
+    ) {
       alert("max players must be between 2 and 10");
       maxPlayers = MIN_PLAYERS;
       return;
     }
 
-    if (roomsettings.reportScores < -1 || roomsettings.reportScores > MAX_REPORT_SCORES) {
+    if (
+      roomsettings.reportScores < -1 ||
+      roomsettings.reportScores > MAX_REPORT_SCORES
+    ) {
       alert("report scores must be between -1 and 5");
       roomsettings.reportScores = -1;
       return;
     }
 
     let userData = {
-        username: $user.userName,
-        email: $user.email,
+      username: $user.userName,
+      email: $user.email,
     };
 
     soc.emit("create-room", $user.hostQuiz, roomSettings, userData);
@@ -85,7 +90,6 @@
 
   const joinRoom = (soc, roomid, username) => {
     if (roomid) {
-
       let userData = {
         username: username,
         email: $user.email,
@@ -117,22 +121,16 @@
   };
 </script>
 
-
 <main>
   <body>
-    <h1 id="home">JAM</h1>
-    <div class="container mb-4">
-      <div
-        class="container mt-4 mb-5 d-flex justify-content-center"
-        id="inside-box"
-      >
+    <div class="container">
+      <div>
         <!--ask if host or player-->
         <!--if host, show create room button else show joing room-->
         {#if !$user.userDecided}
           <p>
             <button
               type="button"
-              class="btn btn-primary btn-block"
               id="hostQuiz"
               on:click={() => {
                 $user.isHost = true;
@@ -143,7 +141,6 @@
           <p>
             <button
               type="button"
-              class="btn btn-secondary btn-block"
               id="hostQuiz"
               on:click={() => {
                 $user.userDecided = true;
@@ -165,18 +162,15 @@
             <h2>Report scores in between</h2>
             <input
               type="number"
-              class="form-control"
               id="participants"
               placeholder="Enter total number of participants"
               bind:value={roomSettings.reportScores}
             />
-            <p>(-1 will report at the end)</p>
+            <p id="report">-1: Report at the end</p>
           </div>
           <p>
             <button
               type="button"
-              class="btn btn-secondary btn-block"
-              id="createRoom"
               on:click={() => createRoom(socket, roomSettings)}
               >Create Room</button
             >
@@ -184,39 +178,35 @@
           <p>
             <button
               type="button"
-              class="btn btn-secondary btn-block"
-              id="createQuiz"
               on:click={() => {
                 goto("/createQuiz");
               }}>Create Quiz</button
             >
           </p>
         {:else}
-          <h2 id="setUser">Enter roomID and username</h2>
+          <h2>Enter roomID and username</h2>
           <input
             type="text"
-            class="form-control"
+            class="form"
             id="roomId"
             placeholder="Enter room ID"
             bind:value={roomid}
           />
           <input
             type="text"
-            class="form-control"
-            id="username"
+            class="form"
+            id="roomId"
             placeholder="Enter username"
             bind:value={_userName}
           />
-          <button
-            class="btn btn-tertiary btn-block"
-            id="setUsername"
+          <!-- <button
+          type = "button"
             on:click={() => {
               setUserName(_userName);
             }}>Save username</button
-          >
+          > -->
           <button
-            class="btn btn-tertiary btn-block"
-            id="createRoom"
+            type="button"
             on:click={() => joinRoom(socket, roomid, $user.userName)}
             >Join Room</button
           >
@@ -228,112 +218,114 @@
 
 <style>
   body {
+    padding: 0;
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     background: #7801a8;
   }
-  #home {
-    color: #f0e9e9;
-    font-family: JejuGothic, sans-serif;
-    font-size: 36px;
-    margin-left: 5rem;
-    margin-top: 4rem;
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem;
+    border-radius: 15px;
+    background-color: #018198;
+    color: #c49eff;
+    border: none;
+    margin-top: 15rem;
   }
 
-  #inside-box {
-    width: 25rem;
-    height: 25rem;
-    background: #c49eff;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-    border-radius: 51px;
-    padding-top: 6rem;
-  }
-  .container {
-    margin-top: 4rem;
-    margin-left: 16rem;
-  }
-  .btn {
-    margin-top: 3rem;
-    margin-left: 7.5rem;
-    margin-right: 6rem;
-    width: 10rem;
-    background: #f0e9e9;
-    border: None;
+  button {
+    background-color: #ccc;
+    border: none;
     color: white;
+    padding: 5px 25px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 25px;
+    margin: 4px 140px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s ease;
     font-family: JejuGothic, sans-serif;
-    border-radius: 12px;
-    height: 3.5rem;
-    font-size: 20px;
   }
-  .btn:active {
-    background-color: #7801a8;
-    color: #f0e9e9;
+  button:hover {
+    background-color: #c49eff;
   }
-  .btn-secondary {
-    background: #00a59b;
-    border: None;
-    margin-top: 1rem;
-    margin-left: 7.5rem;
-    font-size: 20px;
+
+  #report {
+    color: rgb(194, 12, 12);
+    text-align: center;
+    margin-top: -1rem;
   }
+
+  input {
+    width: 30%;
+    padding: 10px;
+    margin-bottom: 1rem;
+    font-family: JejuGothic, sans-serif;
+    font-size: 18px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+  }
+
   #participants {
     border: None;
     padding: 0.75rem;
     background-color: #f0e9e9;
     margin-bottom: 2rem;
     border-radius: 12px;
-    margin-left: 7rem;
-    margin-top: 1rem;
+    text-align: center;
+    margin-left: 8rem;
   }
   h2 {
     font-family: JejuGothic, sans-serif;
     font-size: 15px;
-    margin-left: 6.65rem;
-    margin-top: -1rem;
+    text-align: center;
   }
-  #username {
-    border: None;
-    padding: 0.75rem;
-    background-color: #f0e9e9;
-    margin-bottom: 2rem;
-    border-radius: 12px;
-    margin-left: 7rem;
-    margin-top: -2rem;
-  }
+
   #roomId {
     border: None;
     padding: 0.75rem;
     background-color: #f0e9e9;
     margin-bottom: 2rem;
     border-radius: 12px;
-    margin-left: 7rem;
-    margin-top: 1rem;
+    margin-left: 8rem;
   }
-  #setUsername {
-    background: #00a59b;
-    color: white;
-    font-size: 20px;
-    font-family: JejuGothic;
-    font-weight: 400;
+  .form {
+    text-align: center;
+    margin-left: 21rem;
+    margin-top: 2rem;
   }
-  #setUsername:active {
-    background: #02625c;
+
+  #hostQuiz {
+    font-size: 28px;
+    text-align: center;
+    width: 30%;
   }
-  #setUser {
-    font-family: JejuGothic, sans-serif;
-    font-size: 20px;
-    margin-left: 4.5rem;
-    margin-top: -1rem;
+
+  @media (max-width: 768px) {
+    input,
+    button {
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 10px;
+    }
   }
-  .btn-tertiary {
-    margin-top: 0.75rem;
-    width: 10rem;
-    height: 3rem;
-    background: #00a59b;
-    color: white;
-    font-size: 20px;
-    font-family: JejuGothic;
-    font-weight: 400;
-  }
-  .btn-primary {
-    background: #00a59b;
+
+  @media (min-width: 769px) {
+    button {
+      padding: 10px 25px;
+      font-size: 18px;
+      border-radius: 20px;
+    }
   }
 </style>

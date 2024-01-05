@@ -45,7 +45,7 @@
 <main>
   <body>
     <h1 id="home">JAM</h1>
-    <div class="container" id="inside-box">
+    <div class="container2" id="inside-box">
       <h1>Game End</h1>
       <!--Display all scores, scores are sent via [0,1,0,1] where length = questions-->
       {#if playerScores.length == 0}
@@ -56,6 +56,14 @@
             {ps.name} score: {playerScore(ps.scores)}/{totalQuestions}
           </p>
         {/each}
+        <button
+        class="btn-primary btn-block"
+        id = "hist"
+          on:click={() => {
+            goto("/dummyViewHistory");
+          }}>View history</button
+        >
+
 
         <button
           class="btn btn-secondary btn-block"
@@ -100,17 +108,38 @@
     margin-top: -0.75rem;
     font-family: JejuGothic, sans-serif;
   }
+  .container2 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem;
+    border-radius: 15px;
+    background-color: #018198;
+    color: #c49eff;
+    border: none;
+    margin-top: 20rem;
+  }
   .btn-secondary {
     background: #c70000;
     border: None;
-    margin-top: 8rem;
     margin-left: 5rem;
     font-size: 20px;
     color: white;
     font-family: JejuGothic, sans-serif;
   }
+  .btn-primary 
+  {
+    background: rgb(158, 146, 146)85;
+    border: None;
+    margin-left: 6rem;
+    font-size: 20px;
+    color: white;
+    margin-top: 5rem;
+    font-family: JejuGothic, sans-serif;
+  }
   .btn {
-    margin-top: 15rem;
+    margin-top: 10rem;
     margin-right: 6rem;
     width: 10rem;
     border: None;
@@ -118,6 +147,11 @@
     border-radius: 12px;
     height: 3rem;
     font-size: 20px;
+  }
+  #hist
+  {
+    margin-top: 5rem;
+    margin-bottom: -10rem;
   }
   .btn:active {
     background-color: #8b0000;
@@ -130,4 +164,25 @@
     font-family: JejuGothic, sans-serif;
     font-size: 18px;
   }
+
+  @media screen and (max-width: 768px) {
+  .container {
+    margin-left: 5rem;
+  }
+  
+  .btn {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 10px;
+  }
+ 
+ }
+
+ @media screen and (min-width: 769px) {
+  .btn {
+    padding: 10px 25px;
+    font-size: 18px;
+    border-radius: 20px;
+  }
+ }
 </style>

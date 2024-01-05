@@ -213,8 +213,9 @@
     color: #000000;
     border: None;
     margin-top: -0.5rem;
-    width: 5rem;
+    width: 7rem;
   }
+
   .btn:active {
     background-color: #c49eff;
     color: #000000;
@@ -311,4 +312,29 @@
     background-color: #4f036d;
     color: #f0e9e9;
   }
+
+  @media screen and (max-width: 768px) {
+  .container {
+    margin-left: 5rem;
+  }
+  
+  .btn {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 10px;
+  }
+ 
+ }
+
+ @media screen and (min-width: 769px) {
+  .container {
+    margin-left: 3rem;
+  }
+ 
+  .btn {
+    padding: 10px 25px;
+    font-size: 18px;
+    border-radius: 20px;
+  }
+ }
 </style>
