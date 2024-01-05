@@ -2,12 +2,11 @@
 // socketStore.js
 import { writable } from "svelte/store";
 import { io } from "socket.io-client";
+import { BACKEND_URL } from "./config";
 
-const socket = io(
-  //process.env.SERVER_LINK ||
-  //"https://boiling-beyond-93888-265de2b70712.herokuapp.com/"
-  "http://localhost:3001"
-);
+console.log(BACKEND_URL);
+
+const socket = io(BACKEND_URL);
 
 // Create a writable store for handling events
 export const roomEvents = writable({});

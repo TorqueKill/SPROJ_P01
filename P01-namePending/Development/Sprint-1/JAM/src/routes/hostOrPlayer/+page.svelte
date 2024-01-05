@@ -3,7 +3,7 @@
 
   import { io } from "socket.io-client";
   import { socket, roomEvents } from "$lib/socketStore.js";
-  import { ROOM_SETTINGS } from "$lib/constants"
+  import { ROOM_SETTINGS } from "$lib/config"
   import { user } from "$lib/userStore.js";
   import { quiz3 } from "$lib/dummyQuiz.js";
   import { goto } from "$app/navigation";

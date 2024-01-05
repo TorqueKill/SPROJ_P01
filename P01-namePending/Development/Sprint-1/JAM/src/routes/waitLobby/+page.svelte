@@ -6,7 +6,7 @@
 
   import { socket, roomEvents } from "$lib/socketStore.js";
   import { user } from "$lib/userStore.js";
-  import { SCREENS } from "$lib/constants";
+  import { SCREENS } from "$lib/config";
   import { goto } from "$app/navigation";
 
 

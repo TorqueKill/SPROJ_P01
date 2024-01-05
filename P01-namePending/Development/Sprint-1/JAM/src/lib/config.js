@@ -1,5 +1,3 @@
-//export constants as int
-
 export const SCREENS = {
   HOME: 0,
   CREATE: 1,
@@ -21,3 +19,7 @@ export const GAME_SETTINGS = {
   MAX_TIME_PER_REPORT: 10,
   MAX_TIME_PER_GAME: 1800,
 };
+
+export const BACKEND_URL = "http://localhost:3001"; // || process.env.BACKEND_URL;
+
+//https://boiling-beyond-93888-265de2b70712.herokuapp.com/

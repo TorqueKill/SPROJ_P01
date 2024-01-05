@@ -57,7 +57,8 @@
             // console.log(data.token);
             
             $user.email = email;
-            $user.password = password; //why tf are we storing the password? idk, co-pilot suggested it so though it was good coding pratice
+
+
             //save user to session storage but incoorporate timestamps to determine staleness/ timeout for session
             sessionStorage.setItem("user", JSON.stringify($user));
             // saving time stamp to sessionStorage

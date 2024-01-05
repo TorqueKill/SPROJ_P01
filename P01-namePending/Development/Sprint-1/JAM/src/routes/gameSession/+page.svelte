@@ -5,7 +5,7 @@
   //------------------------------------PRESISTANCE------------------------------------
   // navigate to main menu if user is disconnected, if user is not logged in, goto login/signup
 
-  import { SCREENS,GAME_SETTINGS } from "$lib/constants.js";
+  import { SCREENS,GAME_SETTINGS } from "$lib/config.js";
   import { user } from "$lib/userStore.js";
   import { socket, roomEvents, gameEvents } from "$lib/socketStore.js";
   import { onMount } from "svelte";
