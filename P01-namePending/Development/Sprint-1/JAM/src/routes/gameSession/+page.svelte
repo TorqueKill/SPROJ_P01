@@ -10,7 +10,6 @@
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { tweened } from "svelte/motion";
-  
 
   let isHost;
   let quiz;
@@ -45,9 +44,6 @@
     console.log(events);
 
     if (events.nextQuestion == 0 || events.nextQuestion) {
-      
-      
-
       currentQuestion = events.nextQuestion;
       console.log(events);
       isAnswerSubmitted = false;
@@ -158,10 +154,6 @@
     if (isAnswerSubmitted) {
       return;
     }
-    // if (questionIdx < 0) {
-    //   return;
-    // }
-
     if (answerIdx === -1) {
       answerSubmitted = "Time ran out";
     } else {
