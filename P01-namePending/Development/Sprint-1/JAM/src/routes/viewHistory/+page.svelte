@@ -21,10 +21,14 @@
 <button>view host history</button> -->
 
 <script>
+  // @ts-nocheck
+
   import { writable } from "svelte/store";
   import { gameHistory } from "$lib/dummyGames";
   import { user } from "$lib/userStore.js";
   import { quiz1, quiz2, quiz3, quiz4, quiz5 } from "$lib/dummyQuiz";
+  import { onMount } from "svelte";
+  import { goto } from "$app/navigation";
 
   // @ts-ignore
   const detailedPlayerHistory = writable([]);
@@ -33,6 +37,35 @@
   let showPlayerHistory = false;
   let showHostHistory = false;
   let playerEmail = $user.email;
+
+
+  let localPlayerHistory;
+  let localHostHistory;
+
+
+  onMount(() => {
+    if ($user.email == null || $user.email == "") {
+      alert("Must be logged in to view history");
+      goto("/");
+    }
+
+    localPlayerHistory = JSON.parse(localStorage.getItem("playerGameHistory"));
+    if (localPlayerHistory == null) {
+      localPlayerHistory = [];
+    }
+
+    localHostHistory = JSON.parse(localStorage.getItem("hostGameHistory"));
+    if (localHostHistory == null) {
+      localHostHistory = [];
+    }
+
+    console.log("localPlayerHistory:", localPlayerHistory);
+    console.log("localHostHistory:", localHostHistory);
+
+  });
+
+  //note local history has the format:
+  //{email: , username : , gameHistory: [{quiz: quiz, scores: playerScores}]}
 
   /**
    * @param {string} userEmail
@@ -45,18 +78,32 @@
     correctAnswer: string; wasCorrect: boolean; } | null)[]; }[]}
      */
       let playerHistory = [];
-      gameHistory.forEach((quizHistory, index) => {
-        console.log("QuizHistory: ", quizHistory);
-        let playerRecord = quizHistory.find(
+
+      let localGameHistory = localPlayerHistory.find(
+        (player) => player.email == userEmail
+      );
+
+      if (localGameHistory == null) {
+        alert("No history to show");
+        showPlayerHistory = !showPlayerHistory;
+        return;
+      }
+
+      //console.log("localGameHistory:", localGameHistory);
+      let games = localGameHistory.gameHistory;
+      
+      games.forEach((quizHistory, index) => {
+        //console.log("QuizHistory: ", quizHistory);
+        let playerRecord = quizHistory.scores.find(
           (player) => player.name = userEmail
         );
-        let currentQuiz = [quiz1, quiz2, quiz3, quiz4, quiz5][index];
-        console.log("currentQuiz:", currentQuiz);
-        console.log("playerRecord:", playerRecord);
+        let currentQuiz = games[index].quiz;
+        //console.log("currentQuiz:", currentQuiz);
+        //console.log("playerRecord:", playerRecord);
         if (playerRecord && currentQuiz) {
           let quizDetails = playerRecord.scores.map((score, questionIndex) => {
             let questionItem = currentQuiz[questionIndex];
-            console.log("questionItem:", questionItem);
+            //console.log("questionItem:", questionItem);
             if (questionItem) {
               return {
                 question: questionItem.question,
@@ -67,7 +114,7 @@
             }
             return null;
           });
-          console.log("quizDetails:", quizDetails);
+          //console.log("quizDetails:", quizDetails);
           playerHistory.push({
             quiz: `Quiz ${index + 1}`,
             details: quizDetails.filter((detail) => detail !== null),
@@ -88,10 +135,23 @@
        * @type {{ quiz: string; players: { name: string; score: string; }[]; }[]}
        */
       let history = [];
-      gameHistory.forEach((quizHistory, quizIndex) => {
+
+      let localGameHistory = localHostHistory.find(
+        (host) => host.email == $user.email
+      );
+
+      if (localGameHistory == null) {
+        alert("No history to show");
+        showHostHistory = !showHostHistory;
+        return;
+      }
+
+      let games = localGameHistory.gameHistory;
+
+      games.forEach((quizHistory, quizIndex) => {
         let quizResults = {
           quiz: `Quiz ${quizIndex + 1}`,
-          players: quizHistory.map((player) => ({
+          players: quizHistory.scores.map((player) => ({
             name: player.name,
             score: `${player.scores.filter((score) => score === 1).length}/${
               player.scores.length
@@ -108,11 +168,18 @@
   }
 
   function deleteHistory() {
-    window.alert("Note: Hsitroy restored on refreshing the page.");
     detailedPlayerHistory.set([]);
     hostHistory.set([]);
     showPlayerHistory = false;
     showHostHistory = false;
+
+    //delete local storage
+    localStorage.removeItem("playerGameHistory");
+    localStorage.removeItem("hostGameHistory");
+
+    //delete local variables
+    localPlayerHistory = [];
+    localHostHistory = [];
   }
 </script>
 

@@ -18,7 +18,7 @@
   function handleSignIn() {
     $user.email = email;
     sessionStorage.setItem("user", JSON.stringify($user));
-    goto("/dummyViewHistory");
+    goto("/viewHistory");
   }
 
   let email = makeid(5) + "@gmail.com";

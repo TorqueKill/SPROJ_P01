@@ -32,16 +32,6 @@
             goto("/hostOrPlayer");
           }}>Annonymous</button
         >
-        <button
-          on:click={() => {
-            goto("/dummyLogin");
-          }}>Dummy Login</button
-        >
-        <button
-          on:click={() => {
-            goto("/dummyLogin");
-          }}>Dummy view history</button
-        >
       </div>
 
       {#if signupVisible}

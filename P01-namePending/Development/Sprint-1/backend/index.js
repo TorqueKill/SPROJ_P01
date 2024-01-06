@@ -220,8 +220,7 @@ function setRoomCurrentQuestion(roomid, questionIndex) {
 function getRoomCurrentQuestion(roomid) {
   let room = getRoom(roomid);
   if (room) {
-    return room.currentQuestion;  
-
+    return room.currentQuestion;
   } else {
     return -1;
   }
@@ -237,13 +236,11 @@ function makeDummyStringList(length) {
 
 function handleAnswer(roomid, socketid, answer, questionIndex) {
   try {
-
     // if questionIndex is -1, that means user has re-connected so get the current question index
 
     // if (questionIndex === -1) {
     //   questionIndex = getRoomCurrentQuestion(roomid);
     // }
-
 
     let room = getRoom(roomid);
     let choicesIdx = answer;
@@ -819,7 +816,7 @@ io.on("connection", async (socket) => {
         }
 
         //set scores
-        console.log("final scores: " + scores);
+        //console.log("final scores: " + scores);
         setScores(roomid, scores);
         io.to(roomid).emit("game-end");
 
@@ -838,7 +835,7 @@ io.on("connection", async (socket) => {
           }
         }
 
-        console.log("scores till question: " + questionIndex);
+        //console.log("scores till question: " + questionIndex);
 
         io.to(roomid).emit("scores-till-question", scores, REPORT_DISPLAY_TIME);
 
