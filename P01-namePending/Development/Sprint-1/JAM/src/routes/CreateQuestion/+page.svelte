@@ -1,5 +1,5 @@
 <script>
-// @ts-nocheck
+  // @ts-nocheck
 
   import { goto } from "$app/navigation";
   import { user } from "$lib/userStore.js";
@@ -27,33 +27,29 @@
 
   function updateAnswer(questionIndex, choiceText) {
     quiz1[questionIndex].answer = choiceText;
- 
   }
-
 
   function updateQuestionText(questionIndex, event) {
     const target = event.currentTarget;
     quiz1[questionIndex].question = target.value;
-
   }
 
   function updateOptionText(questionIndex, optionIndex, event) {
     const target = event.currentTarget;
     quiz1[questionIndex].choices[optionIndex] = target.value;
-    
   }
 
-  function populateIfBlank(quiz){
-    for(let i = 0; i < quiz.length; i++){
-      if(quiz[i].question == ""){
-        quiz[i].question = "Question " + (i+1);
+  function populateIfBlank(quiz) {
+    for (let i = 0; i < quiz.length; i++) {
+      if (quiz[i].question == "") {
+        quiz[i].question = "Question " + (i + 1);
       }
-      for(let j = 0; j < quiz[i].choices.length; j++){
-        if(quiz[i].choices[j] == ""){
-          quiz[i].choices[j] = "Option " + (j+1);
+      for (let j = 0; j < quiz[i].choices.length; j++) {
+        if (quiz[i].choices[j] == "") {
+          quiz[i].choices[j] = "Option " + (j + 1);
         }
       }
-      if(quiz[i].answer == ""){
+      if (quiz[i].answer == "") {
         quiz[i].answer = quiz[i].choices[0];
       }
     }
@@ -126,8 +122,13 @@
           {/each}
         </div>
         <div class="col-auto">
-          <button on:click={()=>{increaseTime(qIndex)}} class="btn btn-primary btn-block btn-space ml-auto">
-              Set time limit: {question.timeLimit} seconds
+          <button
+            on:click={() => {
+              increaseTime(qIndex);
+            }}
+            class="btn btn-primary btn-block btn-space ml-auto"
+          >
+            Time limit: {question.timeLimit} seconds
           </button>
         </div>
       {/each}
@@ -141,7 +142,9 @@
           </div>
           <div class="col-auto" id="saveBtn">
             <button
-              on:click|once={()=>{saveQuiz();}}
+              on:click|once={() => {
+                saveQuiz();
+              }}
               class="btn btn-secondary btn-block btn-space ml-auto"
             >
               Save
@@ -162,179 +165,115 @@
 </main>
 
 <style>
-  .quizz {
-    margin-top: 2rem;
-    color: white;
-    font-size: 36px;
-    font-family: JejuGothic;
-    font-weight: 400;
-    word-wrap: break-word;
-    border-radius: 20px;
-  }
-  .container {
+  body {
+    background: #7801a8;
+    padding: 0;
+    margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    padding: 1rem;
-    margin-top: 2.5rem;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
   }
 
-  .question-cont {
-    background: #7801a8;
-    padding: 20px;
-    border-radius: 10px;
+  .container {
+    height: auto;
+    background: #018198;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 51px;
+    padding: 2rem;
+    margin: 1rem auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .btn {
+    background-color: #ccc;
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+  }
+
+  .btn:hover {
+    background-color: #c49eff;
+  }
+
+  #cancelBtn .btn-quaternary:hover {
+    background-color: red;
   }
 
   .option-group {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-top: 10px;
   }
 
-  body {
-    background: #7801a8;
-  }
-  .form-control {
-    color: black;
-    font-size: 20px;
-    font-family: JejuGothic;
-    font-weight: 400;
-    word-wrap: break-word;
-    width: 80rem;
-    border-radius: 12px;
-    border: None;
-    height: 2.5rem;
-    padding-left: 2rem;
-  }
-  .btn {
-    border-radius: 12px;
-    background-color: #f0e9e9;
-    color: #000000;
-    border: None;
-    margin-top: -0.5rem;
-    width: 7rem;
-  }
-
-  .btn:active {
-    background-color: #c49eff;
-    color: #000000;
-  }
-
-  .option-group {
-    display: flex;
-    gap: 2rem;
-    margin-top: 2rem;
+  .question-cont {
     margin-bottom: 2rem;
+    margin-top: 2rem;
   }
-  .options {
-    border: None;
-    width: 20rem;
-    color: black;
+
+  .btn-quaternary:hover {
+    background-color: red;
   }
-  #cancelBtn {
+
+  .form-check-input {
+    position: relative;
+    z-index: 1;
+    margin-top: 1.75rem;
+  }
+
+  .form-control.options {
+    margin-left: 1rem;
+    margin-top: 1.5rem;
     border-radius: 15px;
-    color: white;
-    font-size: 48px;
-    font-family: JejuGothic;
-    font-weight: 400;
-    margin-left: 4rem;
-    margin-top: -1.9rem;
-  }
-  .btn-secondary {
-    background: #00a59b;
     border: None;
-    width: 6rem;
-    height: 3rem;
-    font-size: 25px;
-    text-align: center;
-    color: white;
-    font-family: JejuGothic, sans-serif;
+    height: 2rem;
+    padding-left: 0.5rem;
   }
-  #saveBtn {
+
+  .quizz {
+    font-size: 20px;
     border-radius: 15px;
-    color: white;
-    font-size: 48px;
-    font-family: JejuGothic;
-    font-weight: 400;
-    word-wrap: break-word;
-    margin-top: -1.99rem;
-    margin-left: 20rem;
-    transform: translate(0, 48%);
-  }
-  #addQuestion {
-    border-radius: 12px;
-    color: white;
-    font-size: 50px;
-    font-family: JejuGothic;
-    font-weight: 400;
-    margin-left: 4rem;
-    margin-top: -1.99rem;
-    margin-right: 6rem;
-    width: 10rem;
-    height: 4rem;
-  }
-  .btn-primary:active {
-    background-color: #760000;
-    color: #f0e9e9;
-  }
-  .btn-secondary:active {
-    background-color: #05726b;
-    color: #f0e9e9;
-  }
-  .btn-tertiary:active {
-    background-color: #4f036d;
-    color: #f0e9e9;
-  }
-  .btn-quaternary {
-    background: #c70000;
-    margin-left: 30rem;
-    width: 5rem;
-    height: 3rem;
-    transform: translate(0, 5%);
-    font-size: 25px;
-    color: white;
-  }
-  .btn-quaternary:active {
-    background-color: #760000;
-    color: #f0e9e9;
-  }
-  .btn-quat {
-    background: #c49eff;
-    margin-left: -3rem;
-    width: 10rem;
-    height: 3rem;
-    transform: translate(0, 125%);
-    font-size: 25px;
-    color: white;
-  }
-  .btn-quat:active {
-    background-color: #4f036d;
-    color: #f0e9e9;
+    border: None;
+    padding-left: 0.5rem;
+    margin-top: 0.5rem;
+    margin-bottom: 2rem;
+    color: red;
+    height: 2rem;
+    width: 100%;
   }
 
   @media screen and (max-width: 768px) {
-  .container {
-    margin-left: 5rem;
-  }
-  
-  .btn {
-    padding: 10px;
-    font-size: 14px;
-    border-radius: 10px;
-  }
- 
- }
+    .container {
+      width: 80%;
+      margin-left: auto;
+      margin-right: auto;
+    }
 
- @media screen and (min-width: 769px) {
-  .container {
-    margin-left: 3rem;
+    .btn {
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 15px;
+    }
   }
- 
-  .btn {
-    padding: 10px 25px;
-    font-size: 18px;
-    border-radius: 20px;
+
+  @media screen and (min-width: 769px) {
+    .container {
+      width: 120%;
+      padding: 2rem;
+    }
+
+    .btn {
+      padding: 10px 25px;
+      font-size: 18px;
+      border-radius: 20px;
+    }
   }
- }
 </style>
