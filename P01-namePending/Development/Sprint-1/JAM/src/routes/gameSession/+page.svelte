@@ -240,26 +240,28 @@
   body {
     margin: 0;
     padding: 0;
-    height: 100%;
+    height: 100vh;
     background: #7801a8;
     display: flex;
     justify-content: center;
     align-items: center;
     font-family: "JejuGothic", sans-serif;
+    flex-direction: column;
   }
 
   .container {
-    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 80%;
     max-width: 800px;
-    margin: 2rem;
+    margin: 2rem auto;
     padding: 2rem;
     background-color: #018198;
     color: #7801a8;
     border-radius: 2rem;
     box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
   }
 
   .inside-box,
@@ -271,6 +273,10 @@
     padding: 4rem;
     box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.25);
     text-align: center;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
   }
 
   .btn,
@@ -323,7 +329,6 @@
       padding: 1rem 1.5rem;
     }
 
-    #home,
     #choose,
     #answer,
     #real-answer {
@@ -335,7 +340,6 @@
   }
 
   @media (max-width: 480px) {
-    #home,
     #choose,
     #answer,
     #real-answer {
@@ -357,7 +361,6 @@
       padding: 0.75rem 1.5rem;
     }
 
-    #home,
     #choose,
     #answer,
     #real-answer,
@@ -380,7 +383,6 @@
       padding: 1rem 2rem;
     }
 
-    #home,
     #choose,
     #answer,
     #real-answer,
