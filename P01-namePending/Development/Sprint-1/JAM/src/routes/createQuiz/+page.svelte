@@ -89,7 +89,6 @@
 
 <main>
   <body>
-    <h1 id="home">JAM</h1>
     <h2 class="create-quiz">Create Quiz</h2>
     {#if displayQuizCheck}
       <h5>SCROLL DOWN TO VIEW</h5>
@@ -105,10 +104,7 @@
     </div>
 
     <div class="container">
-      <div
-        class="container mt-4 mb-5 d-flex justify-content-center"
-        id="inside-box"
-      >
+      <div id="inside-box">
         {#if quizzes}
           {#each quizzes as quiz, idx}
             <button
@@ -210,29 +206,45 @@
 <style>
   body {
     background: #7801a8;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
   }
+
   .container {
-    margin-top: 6rem;
-    margin-left: 17rem;
-  }
-  #home {
-    color: #f0e9e9;
-    font-family: JejuGothic, sans-serif;
-    font-size: 36px;
-    margin-left: 5rem;
-    margin-top: 4rem;
-  }
-  #inside-box {
     width: 20rem;
     height: 26rem;
     background: #c49eff;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 51px;
+    padding: 2rem;
+    margin: 1rem auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .create-quiz,
+  h5,
+  #quizChosen p,
+  .quiz-editor h2 {
+    color: red;
+    text-align: center;
+  }
+
+  #inside-box {
+    width: 20rem;
+    height: 26rem;
+    border-radius: 51px;
     padding-top: 2rem;
     margin-bottom: 8rem;
+    margin-left: 1.25rem;
   }
   .btn {
-    /* margin-top: 5rem; */
     margin-right: 6rem;
     width: 5rem;
     border: None;
@@ -277,19 +289,20 @@
     font-family: JejuGothic, sans-serif;
     font-size: 45px;
     margin-left: 29rem;
-    margin-top: -2rem;
+    margin-top: 2rem;
   }
   .create-quiz {
     color: white;
     font-family: JejuGothic, sans-serif;
     font-size: 45px;
-    margin-left: 36rem;
-    margin-top: -2rem;
+    margin-left: -2rem;
+    margin-top: 2rem;
+    text-align: center;
   }
   h5 {
     color: rgb(216, 53, 53);
     font-family: JejuGothic, sans-serif;
-    margin-left: 38.7rem;
+    text-align: center;
   }
   .btn-tertiary {
     background: #00a59b;
@@ -341,7 +354,6 @@
     margin-top: 1rem;
     text-align: center;
     padding-left: -3rem;
-    /* padding-top: 0.5rem; */
     color: #c49eff;
     font-family: JejuGothic, sans-serif;
     font-size: 15px;
@@ -360,10 +372,8 @@
 
   .time-limit-input {
     color: red;
-    /* margin-left: 2rem; */
     font-family: JejuGothic, sans-serif;
     border-radius: 5rem;
-    /* padding-left: 2rem; */
     text-align: center;
   }
   .answer-label {
@@ -382,34 +392,55 @@
   }
 
   @media screen and (max-width: 768px) {
-  .container {
-    margin-left: 5rem;
-  }
-  
-  .btn {
-    padding: 5px;
-    font-size: 14px;
+    .btn {
+      padding: 5px;
+      font-size: 14px;
+    }
+
+    .create-quiz {
+      font-size: 30px;
+      margin-left: 5rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    h5 {
+      margin-left: 5rem;
+      display: flex;
+      justify-content: center;
+    }
+    .question-input {
+      margin-left: 12%;
+    }
+
+    h2 {
+      color: red;
+      font-size: 1.25rem;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      width: 80%;
+      margin-top: 2%;
+      margin-left: 14%;
+    }
+    .question-input,
+    .answer-block,
+    .options-block,
+    .time-limit-block {
+      width: 120%;
+      margin-left: 8%;
+    }
   }
 
-  .create-quiz{
-    font-size: 30px;
-    margin-left: 5rem;
-    display: flex;
-    justify-content: center;
+  @media screen and (min-width: 769px) {
+    .btn {
+      padding: 10px;
+      font-size: 18px;
+    }
+    h2 {
+      color: red;
+      font-size: 2rem;
+      margin-left: 1rem;
+    }
   }
- 
-  h5{
-    margin-left: 5rem;
-    display: flex;
-    justify-content: center;
-  }
- }
-
- @media screen and (min-width: 769px) {
-  
-  .btn {
-    padding: 10px;
-    font-size: 18px;
-  }
- }
 </style>
