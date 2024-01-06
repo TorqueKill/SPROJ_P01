@@ -277,7 +277,7 @@ function checkAllAnswered(roomid, questionIndex) {
     let room = getRoom(roomid);
     if (room) {
       let numAnswers = 0;
-      console.log(room.answers);
+      //console.log(room.answers);
       for (let key in room.answers) {
         if (room.answers[key][questionIndex]) {
           numAnswers++;
@@ -288,8 +288,8 @@ function checkAllAnswered(roomid, questionIndex) {
       }
 
       //check users in vegetative state
-      console.log(users);
-      console.log(room.users);
+      //console.log(users);
+      //console.log(room.users);
 
       let numVegetative = 0;
       for (let i = 0; i < room.users.length; i++) {
