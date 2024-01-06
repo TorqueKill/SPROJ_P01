@@ -136,6 +136,9 @@
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 51px;
     padding-top: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
   #players-ready {
     color: white;
@@ -216,15 +219,23 @@
 
   @media screen and (max-width: 768px) {
   .container {
-    margin-left: 5rem;
+    display: flex;
+    flex-direction:column;
+    align-items:center;
+    margin-left: 2rem;
+    padding: 1rem;
   }
-  
+
+  .player-div{
+    font-size: 15px;
+    margin-right: 4rem;
+  }
   .btn {
     padding: 10px;
-    font-size: 14px;
-    border-radius: 10px;
+    font-size: 15px;
+    margin-left: 6rem;
   }
- 
+
   h1{
     margin-left: 5rem;
     display: flex;
@@ -235,9 +246,8 @@
  @media screen and (min-width: 769px) {
  
   .btn {
-    padding: 10px 25px;
+    padding: 10px;
     font-size: 18px;
-    border-radius: 20px;
   }
  }
 </style>  
