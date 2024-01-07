@@ -1,4 +1,4 @@
-<script >
+<script>
   // @ts-nocheck
   import { SCREENS } from "$lib/constants.js";
   import { user } from "$lib/userStore.js";
@@ -44,8 +44,7 @@
 
 <main>
   <body>
-    <h1 id="home">JAM</h1>
-    <div class="container2" id="inside-box">
+    <div class="container" id="inside-box">
       <h1>Game End</h1>
       <!--Display all scores, scores are sent via [0,1,0,1] where length = questions-->
       {#if playerScores.length == 0}
@@ -57,14 +56,12 @@
           </p>
         {/each}
         <button
-        class="btn-primary btn-block"
-        id = "hist"
+          class="btn btn-primary btn-block"
+          id="hist"
           on:click={() => {
             goto("/dummyViewHistory");
           }}>View history</button
         >
-
-
         <button
           class="btn btn-secondary btn-block"
           id="createQuiz"
@@ -82,107 +79,78 @@
 <style>
   body {
     background: #7801a8;
-  }
-  #home {
-    color: #f0e9e9;
-    font-family: JejuGothic, sans-serif;
-    font-size: 36px;
-    margin-left: 5rem;
-    margin-top: 4rem;
-  }
-  .container {
-    margin-top: 5rem;
-    margin-left: 34rem;
-  }
-  #inside-box {
-    width: 20rem;
-    height: 30rem;
-    background: #c49eff;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-    border-radius: 51px;
-    padding-top: 3rem;
-  }
-  h1 {
-    color: white;
-    margin-left: 5rem;
-    margin-top: -0.75rem;
-    font-family: JejuGothic, sans-serif;
-  }
-  .container2 {
+    padding: 0;
+    margin: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
-    padding: 2rem;
-    border-radius: 15px;
+    justify-content: center;
+    min-height: 100vh;
+  }
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    max-width: 400px;
+    margin: 0 auto;
     background-color: #018198;
-    color: #c49eff;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 51px;
+    overflow: hidden;
+  }
+
+  #inside-box {
+    width: 100%;
+    min-height: 30rem;
+    padding: 1rem;
+    box-sizing: border-box;
+  }
+
+  .btn-secondary,
+  .btn-primary {
+    width: auto;
+    padding: 10px 15px;
+    margin-bottom: 2rem;
+    border-radius: 15px;
     border: none;
-    margin-top: 20rem;
+    background-color: #c49eff;
   }
-  .btn-secondary {
-    background: #c70000;
-    border: None;
-    margin-left: 5rem;
-    font-size: 20px;
-    color: white;
-    font-family: JejuGothic, sans-serif;
-  }
-  .btn-primary 
-  {
-    background: rgb(158, 146, 146)85;
-    border: None;
-    margin-left: 6rem;
-    font-size: 20px;
-    color: white;
-    margin-top: 5rem;
-    font-family: JejuGothic, sans-serif;
-  }
-  .btn {
-    margin-top: 10rem;
-    margin-right: 6rem;
-    width: 10rem;
-    border: None;
-    font-family: JejuGothic, sans-serif;
-    border-radius: 12px;
-    height: 3rem;
-    font-size: 20px;
-  }
-  #hist
-  {
-    margin-top: 5rem;
-    margin-bottom: -10rem;
-  }
-  .btn:active {
-    background-color: #8b0000;
-    color: #f0e9e9;
-    font-family: JejuGothic, sans-serif;
-  }
+
   p {
-    color: #02625c;
-    margin-left: 5.3rem;
-    font-family: JejuGothic, sans-serif;
-    font-size: 18px;
+    text-align: center;
+    color: white;
+    font-size: 20px;
+  }
+
+  .btn-secondary,
+  .btn-primary,
+  #hist {
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+    font-size: 15px;
+  }
+
+  .btn-secondary:hover {
+    background-color: red;
+  }
+  #hist:hover {
+    background-color: #7801a8;
   }
 
   @media screen and (max-width: 768px) {
-  .container {
-    margin-left: 5rem;
-  }
-  
-  .btn {
-    padding: 10px;
-    font-size: 14px;
-    border-radius: 10px;
-  }
- 
- }
+    #inside-box {
+      min-height: auto;
+      padding: 10px;
+    }
 
- @media screen and (min-width: 769px) {
-  .btn {
-    padding: 10px 25px;
-    font-size: 18px;
-    border-radius: 20px;
+    .btn {
+      width: 30%;
+      margin-top: -5px;
+      margin-bottom: 2rem;
+    }
   }
- }
 </style>
