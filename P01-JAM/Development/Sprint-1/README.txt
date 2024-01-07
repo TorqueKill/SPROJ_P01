@@ -1,3 +1,14 @@
+Project: JAM - P01
+
+Team: 
+24100175    ABDUL MUIZ
+24100277    BISMA NAWAZ
+24100127	ABDUR RAFAE HAROON
+24100282	WALEED NADEEM
+24100308	HAFSA AHMED
+
+
+
 ------------------------------------------------------------------------------------------------
 
 LIST OF REQUIREMENTS COMPLETED IN THE SPRINT
