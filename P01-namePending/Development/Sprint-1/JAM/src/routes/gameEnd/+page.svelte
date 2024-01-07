@@ -21,6 +21,12 @@
     if (events.roomDeleted) {
       socket.disconnect();
       socket.connect();
+
+      $user.gameid = null;
+      $user.quiz = null;
+      $user.isHost = false;
+      $user.userDecided = false;
+
       goto("/");
     }
 
@@ -40,6 +46,92 @@
     }
     return score;
   };
+
+
+  const saveHistory= ()=>{
+    //check if the user is host or player
+    //if host, save the scores in hostHistory in the local storage 
+    //if player, save the scores in playerHistory in the local storage
+
+    //format : 
+    //{email: , username : , gameHistory: [{quiz: quiz, scores: playerScores}]}
+
+    //if a user has more than 5 games, delete the oldest game (last element in the array)
+    
+    //also check if user is logged in or not (has an email)
+
+    if ($user.email == null || $user.email == "") {
+      alert("Must be logged in to save history");
+      return false;
+    }
+
+    let localGames;
+
+    if ($user.isHost){
+      localGames = JSON.parse(localStorage.getItem("hostGameHistory"));
+    } else {
+      localGames = JSON.parse(localStorage.getItem("playerGameHistory"));
+    }
+
+    if (localGames == null) {
+      localGames = [];
+    }
+
+    let quiz = $user.quiz;
+    let scores = $user.score;
+
+    //if the user is a player, then replace the username in the scores with the player's email
+    //first find the player's name in scores, then replace it with the email
+    if (!$user.isHost){
+      for (let i = 0; i < scores.length; i++) {
+        if (scores[i].name == $user.userName) {
+          scores[i].name = $user.email;
+          break;
+        }
+      }
+    }
+
+    let game = {quiz: quiz, scores: scores};
+    let userGame = {email: $user.email, gameHistory: [game]};
+
+    let found = false;
+
+    for (let i = 0; i < localGames.length; i++) {
+      if (localGames[i].email == $user.email) {
+        found = true;
+        //check if the user has more than 5 games, pop the last element
+        if (localGames[i].gameHistory.length >= 5) {
+          localGames[i].gameHistory.pop();
+        }
+        localGames[i].gameHistory.push(game);
+        break;
+      }
+    }
+
+    if (!found) {
+      localGames.push(userGame);
+    }
+
+    if ($user.isHost){
+      localStorage.setItem("hostGameHistory", JSON.stringify(localGames));
+    } else {
+      localStorage.setItem("playerGameHistory", JSON.stringify(localGames));
+    }
+
+    return true;
+  }
+
+  const restartConnection = () => {
+    socket.disconnect();
+    socket.connect();
+
+    $user.gameid = null;
+    $user.quiz = null;
+    $user.isHost = false;
+    $user.userDecided = false;
+
+    goto("/");
+  }
 </script>
 
 <main>
@@ -59,16 +151,22 @@
           class="btn btn-primary btn-block"
           id="hist"
           on:click={() => {
-            goto("/dummyViewHistory");
-          }}>View history</button
+            if (saveHistory()){
+
+              $user.gameid = null;
+              $user.quiz = null;
+              $user.isHost = false;
+              $user.userDecided = false;
+
+              goto("/viewHistory");
+            };
+          }}>Save history</button
         >
         <button
           class="btn btn-secondary btn-block"
           id="createQuiz"
           on:click={() => {
-            socket.disconnect();
-            socket.connect();
-            goto("/");
+            restartConnection();
           }}>Leave Room</button
         >
       {/if}

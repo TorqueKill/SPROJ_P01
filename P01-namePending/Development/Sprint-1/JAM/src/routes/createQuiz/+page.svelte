@@ -118,7 +118,7 @@
           class="btn btn-tertiary btn-block"
           id="createNew"
           on:click={() => {
-            goto("/CreateQuestion");
+            goto("/createQuestion");
           }}>Create new Quiz</button
         >
 

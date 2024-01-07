@@ -187,6 +187,12 @@
   <body>
     <div class="container">
       <h1>View History</h1>
+      <button on:click={()=>{goto("/hostOrPlayer")}}>Back</button>
+      {#if $user.isHost}
+        <h3>Host</h3>
+      {:else}
+        <h3>Player</h3>
+      {/if}
       <button on:click={() => togglePlayerHistory(playerEmail)}
         >Player history</button
       >

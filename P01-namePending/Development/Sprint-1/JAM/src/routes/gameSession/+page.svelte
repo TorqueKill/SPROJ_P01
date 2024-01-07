@@ -98,6 +98,12 @@
     if (events.roomDeleted) {
       socket.disconnect();
       socket.connect();
+
+      $user.gameid = null;
+      $user.quiz = null;
+      $user.isHost = false;
+      $user.userDecided = false;
+
       goto("/");
     }
 
@@ -174,6 +180,19 @@
     }
     return score;
   };
+
+
+  const restartConnection = () => {
+    socket.disconnect();
+    socket.connect();
+
+    $user.gameid = null;
+    $user.quiz = null;
+    $user.isHost = false;
+    $user.userDecided = false;
+
+    goto("/");
+  }
 </script>
 
 <main>
@@ -202,9 +221,7 @@
               class="btn btn-secondary btn-block"
               id="createQuiz"
               on:click={() => {
-                socket.disconnect();
-                socket.connect();
-                goto("/");
+                restartConnection();
               }}>Leave Room</button
             >
           </h1>

@@ -1,11 +1,9 @@
 <script lang="js">
   // @ts-nocheck
 
-  import { io } from "socket.io-client";
   import { socket, roomEvents } from "$lib/socketStore.js";
   import { ROOM_SETTINGS } from "$lib/config"
   import { user } from "$lib/userStore.js";
-  import { quiz3 } from "$lib/dummyQuiz.js";
   import { goto } from "$app/navigation";
 
   import { onMount } from "svelte";
@@ -168,6 +166,16 @@
             />
             <p id="report">-1: Report at the end</p>
           </div>
+          <button
+            type = "button"
+              on:click={() => {
+              //check if user has an email
+              if ($user.email == "") {
+                alert("must be logged in");
+              }else{
+                goto("/viewHistory");
+              }
+              }}>View History</button>
           <p>
             <button
               type="button"
@@ -183,6 +191,14 @@
               }}>Create Quiz</button
             >
           </p>
+
+          <p></p>
+          <button
+            type="button"
+            on:click={() => {
+              $user.isHost = false;
+              $user.userDecided = false;
+            }}>Go Back</button>
         {:else}
           <h2>Enter roomID and username</h2>
           <input
@@ -199,17 +215,38 @@
             placeholder="Enter username"
             bind:value={_userName}
           />
-          <!-- <button
+          <p></p>
+          <button
           type = "button"
             on:click={() => {
               setUserName(_userName);
             }}>Save username</button
-          > -->
+          >
+          <p></p>
+          <button
+          type = "button"
+            on:click={() => {
+            //check if user has an email
+            if ($user.email == "") {
+              alert("must be logged in");
+            }else{
+              goto("/viewHistory");
+            }
+            }}>View History</button
+          >
+          <p></p>
           <button
             type="button"
             on:click={() => joinRoom(socket, roomid, $user.userName)}
             >Join Room</button
           >
+          <p></p>
+          <button
+            type="button"
+            on:click={() => {
+              $user.isHost = false;
+              $user.userDecided = false;
+            }}>Go Back</button>
         {/if}
       </div>
     </div>
