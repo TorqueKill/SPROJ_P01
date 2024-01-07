@@ -1,6 +1,6 @@
 <script>
   // @ts-nocheck
-  import { SCREENS } from "$lib/constants.js";
+  import { SCREENS } from "$lib/config.js";
   import { user } from "$lib/userStore.js";
   import { socket, roomEvents } from "$lib/socketStore.js";
   import { goto } from "$app/navigation";
