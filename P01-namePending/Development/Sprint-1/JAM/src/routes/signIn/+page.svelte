@@ -5,9 +5,6 @@
   // importing userStore.js
   import { user } from "$lib/userStore.js";
 
-  import {BACKEND_URL} from "$lib/config.js";
-
-  let api = BACKEND_URL
   let email = "";
   let password = "";
   let error = "";
@@ -23,7 +20,7 @@
       // Api call to sign in
 
       try {
-        const response = await fetch(`${api}auth/signin`, {
+        const response = await fetch("http://localhost:3001/auth/signin", {
           method: "POST",
           headers: new Headers({
             "Content-Type": "application/json",

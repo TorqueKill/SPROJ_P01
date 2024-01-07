@@ -20,7 +20,6 @@ export const GAME_SETTINGS = {
   MAX_TIME_PER_GAME: 1800,
 };
 
-export const BACKEND_URL =
-  "https://polar-shore-85583-30f20901fd0e.herokuapp.com/"; //"http://localhost:3001"; // || process.env.BACKEND_URL;
+export const BACKEND_URL = "http://localhost:3001"; // || process.env.BACKEND_URL;
 
-//https://polar-shore-85583-30f20901fd0e.herokuapp.com/
+//https://boiling-beyond-93888-265de2b70712.herokuapp.com/
