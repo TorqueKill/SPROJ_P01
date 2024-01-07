@@ -178,7 +178,6 @@
 
 <main>
   <body>
-    <h1 id="home" style="color: #c49eff">JAM</h1>
     <div class="container">
       <!------------------------------- LOADING ------------------------------------------>
       {#if currentQuestion == -1}
@@ -241,109 +240,157 @@
 
 <style>
   body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
     background: #7801a8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "JejuGothic", sans-serif;
+    flex-direction: column;
   }
-  #home {
-    color: #f0e9e9;
-    font-family: JejuGothic, sans-serif;
-    font-size: 36px;
-    margin-left: 5rem;
-    margin-top: 4rem;
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 80%;
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #018198;
+    color: #7801a8;
+    border-radius: 2rem;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
   }
-  #host-question {
-    color: black;
-    font-family: JejuGothic, sans-serif;
-    font-weight: bolder;
-    margin-left: 19rem;
-    margin-top: 7rem;
-    padding-left: 8rem;
-  }
-  .inside-box {
-    width: 45rem;
-    height: 25rem;
+
+  .inside-box,
+  .inside-option {
+    width: 100%;
+    max-width: 40rem;
     background: #c49eff;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-    border-radius: 51px;
-    padding-top: 5rem;
+    border-radius: 3rem;
+    padding: 4rem;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.25);
+    text-align: center;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
   }
-  .btn {
-    margin-top: 5rem;
-    /* margin-right: 6rem; */
-    width: 10rem;
-    border: None;
-    font-family: JejuGothic, sans-serif;
-    border-radius: 12px;
-    height: 3rem;
-    font-size: 20px;
+
+  .btn,
+  .btn1 {
+    padding: 1rem 2rem;
+    margin: 2rem;
+    border: none;
+    border-radius: 1rem;
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
   }
-  .btn:active {
-    background-color: #800080;
-    color: #f0e9e9;
-  }
+
   .btn-secondary {
     background: #c70000;
-    border: None;
-    margin-top: 12rem;
-    margin-left: 12rem;
-    font-size: 20px;
     color: white;
-    font-family: JejuGothic, sans-serif;
   }
-  #chooseOpt {
-    color: #f0e9e9;
-    font-family: JejuGothic, sans-serif;
-    font-size: 36px;
-    margin-left: 18rem;
-    margin-top: 7rem;
-  }
-  .inside-option {
-    width: 45rem;
-    height: 25rem;
-    background: #c49eff;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-    border-radius: 51px;
-    padding-top: 5rem;
-    padding-left: 8rem;
-  }
+
   .btn-tertiary {
     background: #7801a8;
     color: white;
-    margin-top: 2rem;
   }
-  .btn1 {
-    margin-top: 5rem;
-    margin-right: 6rem;
-    width: 15rem;
-    border: None;
-    font-family: JejuGothic, sans-serif;
-    border-radius: 12px;
-    height: 3rem;
-    font-size: 20px;
-    transform: translate(0, 110%);
+
+  .btn:hover,
+  .btn1:hover {
+    background-color: #018198;
   }
-  .btn1:active {
-    background-color: #00a59b;
-    color: #f0e9e9;
-  }
-  #answer {
-    transform: translate(7%, 150%);
-    color: white;
-    font-family: JejuGothic, sans-serif;
-  }
+
   #choose {
-    transform: translate(25%, -110%);
-    margin-bottom: -8rem;
+    font-size: 1.5rem;
   }
+
+  #answer,
   #real-answer {
+    font-size: 1.25rem;
     color: #00a59b;
-    font-family: JejuGothic, sans-serif;
-    transform: translate(40%, -32%);
   }
-  h1 {
-    margin-left: 38rem;
-    font-family: JejuGothic, sans-serif;
-    margin-top: -3rem;
-    color: red;
+
+  @media (max-width: 768px) {
+    .container,
+    .inside-box,
+    .inside-option {
+      padding: 2rem;
+      margin: 2rem 2rem;
+    }
+
+    .btn,
+    .btn1 {
+      font-size: 1rem;
+      padding: 1rem 1.5rem;
+    }
+
+    #choose,
+    #answer,
+    #real-answer {
+      font-size: 1rem;
+    }
+    #host-question {
+      font-size: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #choose,
+    #answer,
+    #real-answer {
+      font-size: 0.75rem;
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 991px) {
+    .container,
+    .inside-box,
+    .inside-option {
+      padding: 1.5rem;
+      margin: 1.5rem auto;
+    }
+
+    .btn,
+    .btn1 {
+      font-size: 1rem;
+      padding: 0.75rem 1.5rem;
+    }
+
+    #choose,
+    #answer,
+    #real-answer,
+    #host-question {
+      font-size: 1rem;
+    }
+  }
+
+  @media (min-width: 992px) {
+    .container,
+    .inside-box,
+    .inside-option {
+      padding: 2rem;
+      margin: 2rem auto;
+    }
+
+    .btn,
+    .btn1 {
+      font-size: 1.25rem;
+      padding: 1rem 2rem;
+    }
+
+    #choose,
+    #answer,
+    #real-answer,
+    #host-question {
+      font-size: 1.5rem;
+    }
   }
   .container2 {
     flex-direction: column;

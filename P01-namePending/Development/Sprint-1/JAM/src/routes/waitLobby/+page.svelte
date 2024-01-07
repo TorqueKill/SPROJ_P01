@@ -6,9 +6,8 @@
 
   import { socket, roomEvents } from "$lib/socketStore.js";
   import { user } from "$lib/userStore.js";
-  import { SCREENS } from "$lib/config.js";
+  import { SCREENS } from "$lib/constants";
   import { goto } from "$app/navigation";
-
 
   let playersReady = 0;
   let playerNames = [];
@@ -26,7 +25,7 @@
     if (events.roomCreated) {
       $user.gameid = events.roomCreated;
 
-      //set the event to null 
+      //set the event to null
       events.roomCreated = null;
     }
 
@@ -69,13 +68,10 @@
 
 <main>
   <body>
-    <h1 id="home">JAM</h1>
-      <h1>Loading...</h1>
     <div class="container">
-      <div
-        class="container mt-4 mb-5 d-flex justify-content-center"
-        id="inside-box"
-      >
+      <h1>Loading...</h1>
+
+      <div id="inside-box">
         <div class="player-div">
           <div>
             <p id="players-ready">Players Ready</p>
@@ -116,27 +112,41 @@
 
 <style>
   body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
     background: #7801a8;
   }
+
   .container {
-    margin-top: 4rem;
-    margin-left: 17rem;
-  }
-  #home {
-    color: #f0e9e9;
-    font-family: JejuGothic, sans-serif;
-    font-size: 36px;
-    margin-left: 5rem;
-    margin-top: 4rem;
-  }
-  #inside-box {
-    width: 20rem;
-    height: 25rem;
-    background: #c49eff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    max-width: 20rem;
+    padding: 2rem;
+    background: #018198;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 51px;
-    padding-top: 3rem;
+    margin: 1rem auto;
+    transition: height 0.3s ease;
   }
+
+  #inside-box {
+    width: 80%;
+    background: #018198;
+    border-radius: 51px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.25rem;
+  }
+
   #players-ready {
     color: white;
     font-size: 15px;
@@ -146,19 +156,19 @@
     transform: translate(0, 75%);
   }
   #player-number {
-    padding-top: -1rem;
     text-align: center;
     transform: translate(0, -110%);
     color: white;
     margin-left: 9rem;
+    align-content: center;
   }
   .player-div {
-    width: 12rem;
-    height: 3rem;
-    background: #00a59b;
+    width: 100%;
+    background: #c49eff;
     text-align: center;
     border-radius: 12px;
-    margin-left: 4rem;
+    margin: 0.5rem 0;
+    transition: transform 0.3s ease;
   }
   .btn {
     margin-top: 5rem;
@@ -170,7 +180,7 @@
     height: 3rem;
     font-size: 20px;
     max-width: 100%;
-    padding: 10px;
+    padding: 5px;
   }
   .btn:active {
     background-color: #7801a8;
@@ -178,13 +188,15 @@
   }
   .btn-secondary {
     background: #c70000;
-    border: None;
-    margin-top: 8.75rem;
-    margin-left: 5rem;
-    font-size: 1em;
     color: white;
-    font-family: JejuGothic, sans-serif;
+    border: none;
+    margin-top: 1rem;
+    width: auto;
+    padding: 10px;
+    border-radius: 12px;
+    transition: background-color 0.3s ease;
   }
+
   #host-id {
     color: white;
     font-size: 15px;
@@ -195,7 +207,6 @@
   }
   #game-id {
     color: white;
-    padding-top: -1rem;
     text-align: center;
     transform: translate(0, -110%);
     margin-left: 7rem;
@@ -205,39 +216,42 @@
     font-size: 36px;
     font-family: JejuGothic;
     font-weight: 400;
-    margin-left: 30rem;
-    margin-top: 2rem;
     font-weight: bold;
+    text-align: center;
+    justify-content: center;
   }
+
   #listPlayers {
-    margin-left: 8rem;
-    color: #7801a8;
+    color: white;
+    margin: 0.5rem 0;
   }
 
   @media screen and (max-width: 768px) {
-  .container {
-    margin-left: 5rem;
-  }
-  
-  .btn {
-    padding: 10px;
-    font-size: 14px;
-    border-radius: 10px;
-  }
- 
-  h1{
-    margin-left: 5rem;
-    display: flex;
-    justify-content: center;
-  }
- }
+    .container {
+      margin: 0;
+      padding: 0.2rem;
+      width: 50%;
+      max-width: none;
+    }
 
- @media screen and (min-width: 769px) {
- 
-  .btn {
-    padding: 10px 25px;
-    font-size: 18px;
-    border-radius: 20px;
+    .btn {
+      padding: 5px;
+      font-size: 0.8em;
+      margin: 0.5rem 0;
+    }
   }
- }
-</style>  
+
+  @media screen and (min-width: 769px) {
+    .container {
+      max-width: 20rem;
+    }
+
+    .btn {
+      padding: 10px 28px;
+      font-size: 1em;
+      margin-left: 6rem;
+      text-align: center;
+      justify-content: center;
+    }
+  }
+</style>
