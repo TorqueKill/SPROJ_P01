@@ -217,6 +217,10 @@
         {#if isHost}
           <h1 id="host-question" class="inside-box container2">
             {quiz[currentQuestion].question}
+
+            {#if quiz[currentQuestion].imageUrl}
+            <img src={quiz[currentQuestion].imageUrl} class="image-preview" alt={`Image for Question ${currentQuestion + 1}`} />
+            {/if}
             <button
               class="btn btn-secondary btn-block"
               id="createQuiz"
@@ -416,5 +420,14 @@
     background-color: #018198;
     color: #c49eff;
     border: none;
+  }
+
+
+  .image-preview {
+    flex-grow: 1;
+    max-width: 50%;
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
   }
 </style>

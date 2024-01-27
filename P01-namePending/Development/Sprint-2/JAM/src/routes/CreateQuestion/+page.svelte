@@ -12,6 +12,7 @@
       answer: "",
       choices: ["", "", "", ""],
       timeLimit: 30,
+      imageUrl: "",
     },
   ];
 
@@ -21,6 +22,7 @@
       answer: "",
       choices: ["", "", "", ""],
       timeLimit: 30,
+      imageUrl: "",
     });
     quiz1 = quiz1;
   }
@@ -39,6 +41,11 @@
     quiz1[questionIndex].choices[optionIndex] = target.value;
   }
 
+  function updateImageUrl(questionIndex, event) {
+    const target = event.currentTarget;
+    quiz1[questionIndex].imageUrl = target.value;
+  }
+
   function populateIfBlank(quiz) {
     for (let i = 0; i < quiz.length; i++) {
       if (quiz[i].question == "") {
@@ -52,6 +59,8 @@
       if (quiz[i].answer == "") {
         quiz[i].answer = quiz[i].choices[0];
       }
+
+
     }
     return quiz;
   }
@@ -99,6 +108,8 @@
                 /** @type {Event & { currentTarget: EventTarget & HTMLInputElement; }} */ event
               ) => updateQuestionText(qIndex, event)}
             />
+
+            
           </div>
           {#each question.choices as choice, oIndex}
             <div class="option-group">
@@ -120,6 +131,23 @@
               />
             </div>
           {/each}
+
+          <div class="image-input-container">
+            <div class="quizz">
+              <label for={`image-url-${qIndex}`}>Image URL (optional)</label>
+              <input
+                type="text"
+                id={`image-url-${qIndex}`}
+                class="form-control quizz"
+                placeholder="Enter image URL"
+                on:input={(event) => updateImageUrl(qIndex, event)}
+                value={question.imageUrl}
+              />
+            </div>
+            {#if question.imageUrl}
+              <img src={question.imageUrl} class="image-preview" alt={`Image for Question ${qIndex + 1}`} />
+            {/if}
+          </div>
         </div>
         <div class="col-auto">
           <button
@@ -215,6 +243,7 @@
   }
 
   .question-cont {
+    position: relative;
     margin-bottom: 2rem;
     margin-top: 2rem;
   }
@@ -248,6 +277,8 @@
     color: red;
     height: 2rem;
     width: 100%;
+    flex-grow: 2; /* Adjust as needed for your layout */
+    margin-right: 10px; /* Adds some space between the input and the image preview */
   }
 
   @media screen and (max-width: 768px) {
@@ -275,4 +306,19 @@
       border-radius: 20px;
     }
   }
-</style>
+
+  .image-input-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .image-preview {
+    flex-grow: 1;
+    max-width: 100px; /* or other desired size */
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+    </style>
+    
