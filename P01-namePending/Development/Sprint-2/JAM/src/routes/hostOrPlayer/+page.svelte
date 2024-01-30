@@ -8,6 +8,8 @@
 
   import { onMount } from "svelte";
 
+  import AvatarMenu from "../avatarMenu/+page.svelte";
+
   const MIN_PLAYERS = ROOM_SETTINGS.MIN_PLAYERS;
   const MAX_PLAYERS = ROOM_SETTINGS.MAX_PLAYERS;
   const MAX_REPORT_SCORES = ROOM_SETTINGS.MAX_QUESTIONS_PER_REPORT;
@@ -23,6 +25,11 @@
   };
 
   let _userName;
+
+  let selectedAvatarIndex = null;
+  let showModal = false;
+
+  
 
   onMount(() => {
     $user.id = socket.id;
@@ -120,6 +127,20 @@
       alert("please enter a username");
     }
   };
+
+  const handleAvatarSelection = (index) => {
+    selectedAvatarIndex = index;
+    console.log(`index of selected avatar: ${index + 1}`)
+  }
+
+  function openModal() {
+    showModal = true;
+  }
+
+  function closeModal() {
+    showModal = false;
+  }
+
 </script>
 
 <main>
@@ -238,6 +259,21 @@
           <button
           type = "button"
             on:click={() => {
+              openModal();
+            }}>Choose avatar</button
+          >
+          {#if showModal}
+            <div class="modal-overlay">
+              <div class="modal-content">
+                <button on:click={closeModal} class="modal-button">Go Back</button>
+                <AvatarMenu selectAvatar={handleAvatarSelection} />
+              </div>
+            </div>
+          {/if}
+          <p></p>
+          <button
+          type = "button"
+            on:click={() => {
             //check if user has an email
             if ($user.email == "") {
               alert("must be logged in");
@@ -260,6 +296,8 @@
               $user.userDecided = false;
             }}>Go Back</button>
         {/if}
+
+        
       </div>
     </div>
   </body>
@@ -359,6 +397,32 @@
     font-size: 28px;
     text-align: center;
     width: 30%;
+  }
+
+  .modal-overlay {
+    background: rgba(0, 0, 0, 0.5); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+  }
+
+  .modal-content {
+    background-color: #7801a8;
+    padding: 20px;
+    border-radius: 10px;
+  }
+
+  .modal-button {
+    background-color: #c49eff;
+    color: white;
+    display: flex;    
+    cursor: pointer;
   }
 
   @media (max-width: 768px) {
