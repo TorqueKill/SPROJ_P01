@@ -85,6 +85,44 @@
     }
     // quizzes = [...quizzes];
   }
+
+  function escapeCSS(str) {
+    return str.replace(/("|;|\n)/g, "\\$1");
+  }
+
+  function downloadQuizAsCSS(quiz, idx) {
+    let cssContent =
+      "/* Quiz format: question { answer: value; choices: value; time-limit: value; image-url: value; } */\n\n";
+
+    // convert each quiz to CSS structure
+    quiz.forEach((item, questionIndex) => {
+      cssContent += `.question-${questionIndex + 1} {\n`;
+      cssContent += `  question: "${escapeCSS(item.question)}";\n`;
+      cssContent += `  answer: "${escapeCSS(item.answer)}";\n`;
+      cssContent += `  choices: "${item.options.map(escapeCSS).join(" | ")}";\n`; // a | b | c | d
+      cssContent += `  time-limit: "${item.timeLimit}";\n`;
+      if (item.imageUrl) {
+        cssContent += `  image-url: "${escapeCSS(item.imageUrl)}";\n`;
+      }
+      cssContent += `}\n\n`;
+    });
+    console.log(cssContent);
+
+    // Blob and URL.createObjectURL for download
+    const blob = new Blob([cssContent], { type: "text/css;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    // temporary link to trigger download
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `quiz_${idx + 1}.css`);
+    document.body.appendChild(link);
+    link.click();
+
+    // clean URL after download
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
 </script>
 
 <main>
@@ -194,6 +232,11 @@
         {/each}
         <button class="btn btn-tertiary" on:click={() => chooseQuiz()}
           >Choose</button
+        >
+        <button
+          class="btn btn-tertiary"
+          on:click={() => downloadQuizAsCSS(quizToDisplay, quizIdx)}
+          >Download</button
         >
         <button class="btn btn-secondary" on:click={() => closeQuiz()}
           >Close</button
