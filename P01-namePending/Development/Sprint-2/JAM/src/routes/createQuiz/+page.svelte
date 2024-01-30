@@ -15,7 +15,7 @@
   onMount(() => {
     let savedQuizzes = JSON.parse(localStorage.getItem("Quiz")) || [];
     if (savedQuizzes.length > 5) {
-      savedQuizzes = savedQuizzes.slice(0, 3);
+      savedQuizzes = savedQuizzes.slice(0, 6);
       localStorage.setItem("Quiz", JSON.stringify(savedQuizzes));
     }
     quizzes = [quiz1, quiz2, quiz3, ...savedQuizzes];
@@ -99,7 +99,9 @@
       cssContent += `.question-${questionIndex + 1} {\n`;
       cssContent += `  question: "${escapeCSS(item.question)}";\n`;
       cssContent += `  answer: "${escapeCSS(item.answer)}";\n`;
-      cssContent += `  choices: "${item.options.map(escapeCSS).join(" | ")}";\n`; // a | b | c | d
+      cssContent += `  choices: "${item.options
+        .map(escapeCSS)
+        .join(" | ")}";\n`; // a | b | c | d
       cssContent += `  time-limit: "${item.timeLimit}";\n`;
       if (item.imageUrl) {
         cssContent += `  image-url: "${escapeCSS(item.imageUrl)}";\n`;
@@ -119,9 +121,59 @@
     document.body.appendChild(link);
     link.click();
 
-    // clean URL after download
+    // clean url after download
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+  }
+
+  function importQuiz(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target.result;
+        const parsedQuiz = parseCSSQuiz(content);
+        quizzes.set([...$quizzes, ...parsedQuiz]);
+      };
+      reader.readAsText(file);
+    }
+  }
+
+  function parseCSSQuiz(cssText) {
+    let newQuizzes = [];
+
+    // regex to match the quiz format
+    const quizRegex =
+      /\.question-\d+ {\s*question: "([^"]+)";\s*answer: "([^"]+)";\s*choices: "([^"]+)";\s*time-limit: "(\d+)";\s*}/g;
+    let match;
+
+    while ((match = quizRegex.exec(cssText)) !== null) {
+      const [, question, answer, choices, timeLimit] = match;
+
+      const choicesArray = choices.split(" | ");
+
+      const quiz = {
+        question,
+        answer,
+        choices: choicesArray,
+        timeLimit: parseInt(timeLimit, 10),
+      };
+      newQuizzes.push(quiz);
+    }
+
+    quizzes = quizzes.concat(
+      newQuizzes.filter(
+        (newQuiz) =>
+          !quizzes.some(
+            (existingQuiz) => existingQuiz.question === newQuiz.question
+          )
+      )
+    );
+    console.log(newQuizzes);
+
+    saveQuizzes();
+    quizToDisplay = quizzes[quizzes.length - newQuizzes.length];
+    displayQuizCheck = true;
   }
 </script>
 
@@ -156,9 +208,10 @@
           class="btn btn-tertiary btn-block"
           id="createNew"
           on:click={() => {
-            goto("/createQuestion");
+            goto("/CreateQuestion");
           }}>Create new Quiz</button
         >
+        <input type="file" accept=".css" on:change={importQuiz} />
 
         <button
           class="btn btn-secondary btn-block"
