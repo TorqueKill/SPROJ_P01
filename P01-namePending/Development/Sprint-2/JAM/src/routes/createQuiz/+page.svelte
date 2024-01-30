@@ -126,7 +126,7 @@
           class="btn btn-secondary btn-block"
           id="goBack"
           on:click={() => {
-            goto("/");
+            goto("/hostOrPlayer");
           }}>Go back</button
         >
       </div>

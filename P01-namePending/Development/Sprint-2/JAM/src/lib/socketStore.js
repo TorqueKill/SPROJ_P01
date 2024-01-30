@@ -33,8 +33,10 @@ socket.on("room-full", () => {
   roomEvents.update(() => ({ roomFull: true }));
 });
 
-socket.on("game-start", (quiz) => {
-  roomEvents.update(() => ({ gameStarted: quiz }));
+socket.on("game-start", (quiz, options) => {
+  roomEvents.update(() => ({
+    gameStarted: { quiz: quiz, options: options },
+  }));
 });
 
 socket.on("next-question", (question) => {

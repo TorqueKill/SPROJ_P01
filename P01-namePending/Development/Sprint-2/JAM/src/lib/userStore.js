@@ -30,4 +30,5 @@ export const user = writable({
   currentSession: 0,
   reconnected: false,
   currentQuestion: -1,
+  displayQuestion: false,
 });

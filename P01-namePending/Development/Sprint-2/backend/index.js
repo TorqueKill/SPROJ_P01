@@ -91,6 +91,7 @@ function addUserToRoom(roomid, socketid) {
         questionsPerReport: -1,
         ROOM_LAG_BIAS: 0,
         currentQuestion: -1,
+        displayQuestion: false,
       });
     }
   } catch (e) {
@@ -223,6 +224,13 @@ function getRoomCurrentQuestion(roomid) {
     return room.currentQuestion;
   } else {
     return -1;
+  }
+}
+
+function setRoomDisplayQuestion(roomid, displayQuestion) {
+  let room = getRoom(roomid);
+  if (room) {
+    room.displayQuestion = displayQuestion;
   }
 }
 
@@ -636,6 +644,7 @@ io.on("connection", async (socket) => {
     setRoomQuiz(roomid, quiz);
     setRoomMaxPlayers(roomid, roomSettings.maxPlayers);
     setQuestionsPerReport(roomid, roomSettings.reportScores);
+    setRoomDisplayQuestion(roomid, roomSettings.displayQuestion);
     setName(socket.id, roomid, name, email);
     socket.emit("room-created", roomid);
     console.log("user created room: " + roomid);
@@ -718,7 +727,11 @@ io.on("connection", async (socket) => {
       //start measuring lag bias as send this to all users
       rooms[getRoomIndex(roomid)].ROOM_LAG_BIAS = Date.now();
 
-      io.to(roomid).emit("game-start", getRoomQuiz(roomid));
+      roomSettings = {
+        displayQuestion: getRoom(roomid).displayQuestion,
+      };
+
+      io.to(roomid).emit("game-start", getRoomQuiz(roomid), roomSettings);
     }
   });
 

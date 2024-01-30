@@ -46,7 +46,11 @@
     }
 
     if (events.gameStarted) {
-      $user.quiz = events.gameStarted;
+      console.log(events.gameStarted);
+      $user.quiz = events.gameStarted.quiz;
+      $user.displayQuestion = events?.gameStarted?.options?.displayQuestion;
+
+      console.log($user)
 
       events.gameStarted = null;
       goto("/gameSession");

@@ -19,6 +19,7 @@
   let roomSettings = {
     maxPlayers: MIN_PLAYERS,
     reportScores: -1, //means report scores at the end
+    displayQuestion: false,
   };
 
   let _userName;
@@ -78,6 +79,8 @@
       username: $user.userName,
       email: $user.email,
     };
+
+    console.log(roomSettings)
 
     soc.emit("create-room", $user.hostQuiz, roomSettings, userData);
     console.log("createRoom", roomSettings);
@@ -165,6 +168,15 @@
               bind:value={roomSettings.reportScores}
             />
             <p id="report">-1: Report at the end</p>
+          </div>
+          <div>
+            <h2>Display question on Players</h2>
+            <input
+              type="checkbox"
+              id="participants"
+              placeholder="Enter total number of participants"
+              bind:checked={roomSettings.displayQuestion}
+            />
           </div>
           <button
             type = "button"

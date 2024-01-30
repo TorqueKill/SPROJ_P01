@@ -23,10 +23,12 @@
   let sessionScores = [];
   let scoreDisplayCheck = false;
   let scoreDisplayTimer = GAME_SETTINGS.SCORE_DISPLAY_TIME;
+  let displayQuestionForPlayers = false;
 
   onMount(() => {
     quiz = $user.quiz;
     isHost = $user.isHost; //hosts will display the question
+    displayQuestionForPlayers = $user.displayQuestion;
     currentQuestion = -1;
     isAnswerSubmitted = false;
     answerSubmitted = "";
@@ -233,7 +235,6 @@
           <!------------------------------- ANSWER DISPLAY (PLAYER)--------------------------------->
         {:else if $timeLeft >= 0}
         
-          <h1>Time Left: {secondsLeft}</h1>
           <!-- <p>Time Left: {timeLeft}</p> -->
           <h2 id="chooseOpt" class="inside-option container2">
             <p id="choose" style="color: #c49eff">Choose one</p>
@@ -248,6 +249,15 @@
             <p id="answer">You chose:</p>
             <p id="real-answer" style="color: white;">{answerSubmitted}</p>
           </h2>
+          
+          {#if displayQuestionForPlayers}
+          <h1 id="host-question" class="inside-box container2">
+            {quiz[currentQuestion].question}
+          </h1>
+          {/if}
+
+
+          <h1>Time Left: {secondsLeft}</h1>
         
 
           <!------------------------------- TIMEOUT DISPLAY --------------------------------->
