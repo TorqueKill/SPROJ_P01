@@ -56,6 +56,7 @@
   };
 
   function displayQuiz(quiz, idx) {
+    //console.log(quizzes);
     quizToDisplay = sugarQuiz(quiz);
     displayQuizCheck = true;
     quizIdx = idx;
@@ -234,12 +235,18 @@
       reader.onload = (e) => {
         const content = e.target.result;
         const parsedQuiz = parseCSVToQuiz(content);
-        console.log(parsedQuiz);
-        quizzes = [...parsedQuiz];
-        displayQuiz(
-          quizzes[quizzes.length - parsedQuiz.length],
-          quizzes.length - parsedQuiz.length
-        );
+        console.log("Parsed: \n");
+        console.log(parsedQuiz)
+
+        //save to quizzes
+        quizzes.push(parsedQuiz);
+        //force svelte to update
+        quizzes = [...quizzes];
+
+        // displayQuiz(
+        //   quizzes[quizzes.length - parsedQuiz.length],
+        //   quizzes.length - parsedQuiz.length
+        // );
       };
       reader.readAsText(file);
     }
