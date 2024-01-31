@@ -175,6 +175,91 @@
     quizToDisplay = quizzes[quizzes.length - newQuizzes.length];
     displayQuizCheck = true;
   }
+
+
+  function downloadQuizAsCSV(idx) {
+    let quiz = quizzes[idx];
+
+    // Check if any quiz item has an imageUrl
+    const hasImageUrl = quiz.some(item => 'imageUrl' in item);
+
+    // Start with the header for the CSV file
+    let csvHeader = "Question,Answer,Choice1,Choice2,Choice3,Choice4,TimeLimit";
+    if (hasImageUrl) {
+        csvHeader += ",ImageUrl";
+    }
+    let csvContent = csvHeader + "\n";
+
+    // Iterate through each quiz question
+    quiz.forEach(item => {
+        // Add the question and answer
+        let row = `"${item.question}","${item.answer}"`;
+
+        // Add the choices
+        item.choices.forEach(choice => {
+            row += `,"${choice}"`;
+        });
+
+        // Add the time limit
+        row += `,${item.timeLimit}`;
+
+        // Add the image URL if it exists
+        if (hasImageUrl) {
+            row += `,"${item.imageUrl || ''}"`;
+        }
+
+        // Add the row to the CSV content
+        csvContent += row + "\n";
+    });
+
+    // Blob and URL.createObjectURL for download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    // Temporary link to trigger download
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `quiz_${idx + 1}.csv`);
+    document.body.appendChild(link);
+    link.click();
+
+    // Clean URL after download
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+function parseCSVToQuiz(csvData) {
+    // Split the CSV data into lines
+    const lines = csvData.trim().split("\n");
+
+    // Remove the header line
+    lines.shift();
+
+    // Map each line to a quiz question object
+    const quiz = lines.map(line => {
+        // Split the line by commas, considering quotes
+        const [question, answer, choice1, choice2, choice3, choice4, timeLimit, imageUrl] = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g).map(field => field.replace(/(^"|"$)/g, ''));
+
+        return {
+            question,
+            answer,
+            choices: [choice1, choice2, choice3, choice4],
+            timeLimit: parseInt(timeLimit),
+            imageUrl: imageUrl || null
+        };
+    });
+
+    // If imgUrl is null, remove it
+    quiz.forEach((item) => {
+      if (item.imageUrl === null) {
+        delete item.imageUrl;
+      }
+    });
+
+
+    return quiz;
+}
+
 </script>
 
 <main>
