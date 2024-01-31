@@ -24,6 +24,15 @@
   let _userName;
 
   onMount(() => {
+
+    //check if user is logged in. if not then redirect to landing page
+
+    if ($user.email === "") {
+      alert("Must be logged in to host or join a room");
+      goto("/");
+    }
+
+
     $user.id = socket.id;
     maxPlayers = 2;
     _userName = $user.userName;

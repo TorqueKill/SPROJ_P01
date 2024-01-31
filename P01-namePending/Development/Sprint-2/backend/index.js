@@ -122,6 +122,16 @@ function setScores(roomid, scores) {
   }
 }
 
+function playerScore(scoreList) {
+  let score = 0;
+  for (let i = 0; i < scoreList.length; i++) {
+    if (scoreList[i] == 1) {
+      score++;
+    }
+  }
+  return score;
+};
+
 function removeUserFromRoom(roomid, socketid) {
   try {
     let room = getRoom(roomid);
@@ -350,22 +360,46 @@ function getPeopleWhoAnswered(roomid, questionIndex) {
   }
 }
 
-function getScoresTillQuestion(roomid, questionIndex) {
+// function getScoresTillQuestion(roomid, questionIndex) {
+//   try {
+//     let room = getRoom(roomid);
+//     if (room) {
+//       let scores = [];
+//       for (let key in room.answers) {
+//         let score = 0;
+//         for (let i = 0; i < questionIndex; i++) {
+//           if (room.quiz[i].answer === room.answers[key][i]) {
+//             score++;
+//           }
+//         }
+//         scores.push(score);
+//       }
+//       return scores;
+//     }
+//   } catch (e) {
+//     console.log(e);
+//   }
+// }
+
+function getScoresTillQuestion(roomid, socketid, questionIndex) {
+
   try {
     let room = getRoom(roomid);
+    let scores = [];
     if (room) {
-      let scores = [];
-      for (let key in room.answers) {
-        let score = 0;
-        for (let i = 0; i < questionIndex; i++) {
-          if (room.quiz[i].answer === room.answers[key][i]) {
-            score++;
+      if (room.answers[socketid]) {
+        let quiz = room.quiz;
+        let answers = room.answers[socketid];
+        for (let i = 0; i < questionIndex + 1; i++) {
+          if (quiz[i].answer === answers[i]) {
+            scores.push(1);
+          } else {
+            scores.push(0);
           }
         }
-        scores.push(score);
       }
-      return scores;
     }
+    return scores;
   } catch (e) {
     console.log(e);
   }
@@ -808,16 +842,58 @@ io.on("connection", async (socket) => {
         //emit final scores for each player (not host)
         for (let i = 0; i < room.users.length; i++) {
           if (room.users[i] !== room.host) {
+
+            // getting score per question
+
+            let scoresPerQuestion = getFinalScores(roomid, room.users[i]);
+            let score = playerScore(scoresPerQuestion);
+
             scores.push({
               name: getName(room.users[i]),
-              scores: getFinalScores(roomid, room.users[i]),
+              scores: score,
+              correctAnswers: score,
+              wrongAnswers: scoresPerQuestion.length - score,
+              totalQuestions: scoresPerQuestion.length,
+              position: 0,
             });
+
+        
+
+
+
+            // scores.push({
+            //   name: getName(room.users[i]),
+            //   scores: getFinalScores(roomid, room.users[i]),
+            // });
           }
         }
 
         //set scores
         //console.log("final scores: " + scores);
         setScores(roomid, scores);
+
+        // making a leaderboard using the scores array
+
+        // Finding out the 1st position and then so on
+
+        scores = scores.sort((a, b) => b.scores - a.scores);
+
+        let currentPosition = 0;
+        let previousScore = null;
+
+        scores.forEach((player, index) => {
+            
+            if (player.scores !== previousScore) {
+              currentPosition++;
+            }
+  
+            player.position = currentPosition;
+            previousScore = player.scores;
+        })
+
+
+
+
         io.to(roomid).emit("game-end");
 
         //<------------------------------------REPORTING------------------------------------>
@@ -828,12 +904,47 @@ io.on("connection", async (socket) => {
         //emit scores till question
         for (let i = 0; i < room.users.length; i++) {
           if (room.users[i] !== room.host) {
+            let scoresPerQuestion = getScoresTillQuestion(roomid, room.users[i], questionIndex);
+            let score = playerScore(scoresPerQuestion);
+            
             scores.push({
               name: getName(room.users[i]),
-              scores: getScoresTillQuestion(roomid, questionIndex),
+              scores: score,
+              correctAnswers: score,
+              wrongAnswers: scoresPerQuestion.length - score,
+              totalQuestions: scoresPerQuestion.length,
+              position: 0,
+              // correctAnswers: scoresTillQuestion[i],
+              // wrongAnswers: scoresTillQuestion[i] - (questionIndex + 1),
+              // totalQuestions: questionIndex + 1,
+              // position: 0,
+
             });
           }
         }
+
+        // making a leaderboard using the scores array
+        // Finding out the 1st position and then so on
+
+        scores = scores.sort((a, b) => b.scores - a.scores);
+
+        let currentPosition = 0;
+        let previousScore = null;
+
+        scores.forEach((player, index) => {
+
+          if (player.scores !== previousScore) {
+            currentPosition++;
+          }
+
+          player.position = currentPosition;
+          previousScore = player.scores;
+        })
+
+
+
+        
+
 
         //console.log("scores till question: " + questionIndex);
 

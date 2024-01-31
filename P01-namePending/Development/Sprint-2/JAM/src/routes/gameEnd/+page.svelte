@@ -11,6 +11,15 @@
   let totalQuestions = 0;
 
   onMount(() => {
+
+    //check if user is logged in. if not then redirect to landing page
+
+    if ($user.email === "") {
+      alert("Must be logged in to host or join a room");
+      goto("/");
+    }
+
+
     socket.emit("session-loaded", $user.gameid, SCREENS.SCORE);
   });
 
@@ -142,11 +151,41 @@
       {#if playerScores.length == 0}
         <p>Waiting for scores...</p>
       {:else}
-        {#each Object.entries(playerScores) as [idx, ps]}
+        <!-- {#each Object.entries(playerScores) as [idx, ps]}
           <p>
             {ps.name} score: {playerScore(ps.scores)}/{totalQuestions}
           </p>
-        {/each}
+        {/each} -->
+
+        <div class="leaderboard">
+          <h1>Leaderboard</h1>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Position</th>
+                <th>Name</th>
+                <th>Score</th>
+                <th>Correct Answers</th>
+                <th>Wrong Answers</th>
+                <th>Total Questions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {#each playerScores as player}
+                <tr class="player-card">
+                  <td>{player.position}</td>
+                  <td>{player.name}</td>
+                  <td>{player.scores}</td>
+                  <td>{player.correctAnswers}</td>
+                  <td>{player.wrongAnswers}</td>
+                  <td>{player.totalQuestions}</td>
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        </div>
+
+
         <button
           class="btn btn-primary btn-block"
           id="hist"

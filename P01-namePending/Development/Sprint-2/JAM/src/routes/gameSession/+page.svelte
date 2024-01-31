@@ -25,6 +25,15 @@
   let scoreDisplayTimer = GAME_SETTINGS.SCORE_DISPLAY_TIME;
 
   onMount(() => {
+
+    // if user is not logged in, goto landing page
+
+    if ($user.email === "") {
+      alert("Must be logged in to host or join a room");
+      goto("/");
+    }
+
+
     quiz = $user.quiz;
     isHost = $user.isHost; //hosts will display the question
     currentQuestion = -1;
@@ -204,12 +213,42 @@
 
         <!------------------------------- SCORE DISPLAY ------------------------------------>
       {:else if scoreDisplayCheck}
-        <h1>Score Display</h1>
-        {#each Object.entries(sessionScores) as [idx, ps]}
+        <!-- <h1>Score Display</h1> -->
+        <!-- {#each Object.entries(sessionScores) as [idx, ps]}
           <p>
             {ps.name} score: {playerScore(ps.scores)}
           </p>
-        {/each}
+        {/each} -->
+
+        <div class="leaderboard">
+          <h1>Leaderboard</h1>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Position</th>
+                <th>Name</th>
+                <th>Score</th>
+                <th>Correct Answers</th>
+                <th>Wrong Answers</th>
+                <th>Total Questions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {#each sessionScores as player}
+                <tr class="player-card">
+                  <td>{player.position}</td>
+                  <td>{player.name}</td>
+                  <td>{player.scores}</td>
+                  <td>{player.correctAnswers}</td>
+                  <td>{player.wrongAnswers}</td>
+                  <td>{player.totalQuestions}</td>
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        </div>
+
+
         <h1>Next Question in {scoreDisplayTimer} seconds</h1>
 
         <!------------------------------- QUESTION DISPLAY (HOST)--------------------------------->

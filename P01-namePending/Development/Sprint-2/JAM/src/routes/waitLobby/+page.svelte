@@ -8,9 +8,22 @@
   import { user } from "$lib/userStore.js";
   import { SCREENS } from "$lib/config.js";
   import { goto } from "$app/navigation";
+  import {onMount} from "svelte";
 
   let playersReady = 0;
   let playerNames = [];
+
+  onMount(() => {
+    //check if user is logged in. if not then redirect to landing page
+
+    if ($user.email === "") {
+      alert("Must be logged in to host or join a room");
+      goto("/");
+    }
+
+    // $user.id = socket.id;
+    // console.log($user);
+  });
 
   $: {
     const events = $roomEvents;
