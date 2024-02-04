@@ -226,10 +226,7 @@
     justify-content: center;
   }
 
-  #listPlayers {
-    color: white;
-    margin: 0.5rem 0;
-  }
+
 
 
   .player-item {

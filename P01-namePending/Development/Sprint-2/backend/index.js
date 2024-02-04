@@ -358,20 +358,24 @@ function getPeopleWhoAnswered(roomid, questionIndex) {
   }
 }
 
-function getScoresTillQuestion(roomid, questionIndex) {
+function getScoresTillQuestion(roomid, questionIndex, socketid) {
   try {
     let room = getRoom(roomid);
     if (room) {
       let scores = [];
-      for (let key in room.answers) {
-        let score = 0;
-        for (let i = 0; i < questionIndex; i++) {
-          if (room.quiz[i].answer === room.answers[key][i]) {
-            score++;
+      //return scores for user with socketid, till questionIndex
+      for (let i = 0; i < questionIndex; i++) {
+        if (room.answers[socketid]) {
+          if (room.quiz[i].answer === room.answers[socketid][i]) {
+            scores.push(1);
+          } else {
+            scores.push(0);
           }
         }
-        scores.push(score);
       }
+
+      console.log("scores till question: " + scores);
+
       return scores;
     }
   } catch (e) {
@@ -862,7 +866,11 @@ io.on("connection", async (socket) => {
           if (room.users[i] !== room.host) {
             scores.push({
               name: getName(room.users[i]),
-              scores: getScoresTillQuestion(roomid, questionIndex),
+              scores: getScoresTillQuestion(
+                roomid,
+                questionIndex + 1,
+                room.users[i]
+              ),
             });
           }
         }
