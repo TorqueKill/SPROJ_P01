@@ -14,8 +14,8 @@
 
   onMount(() => {
     let savedQuizzes = JSON.parse(localStorage.getItem("Quiz")) || [];
-    if (savedQuizzes.length > 5) {
-      savedQuizzes = savedQuizzes.slice(0, 3);
+    if (savedQuizzes.length > 7) {
+      savedQuizzes = savedQuizzes.slice(0, 6);
       localStorage.setItem("Quiz", JSON.stringify(savedQuizzes));
     }
     quizzes = [quiz1, quiz2, quiz3, ...savedQuizzes];
@@ -56,6 +56,7 @@
   };
 
   function displayQuiz(quiz, idx) {
+    //console.log(quizzes);
     quizToDisplay = sugarQuiz(quiz);
     displayQuizCheck = true;
     quizIdx = idx;
@@ -84,6 +85,213 @@
       quizzes[quizIdx][questionIdx].timeLimit = parseInt(value, 10);
     }
     // quizzes = [...quizzes];
+  }
+
+  // function escapeCSS(str) {
+  //   return str.replace(/("|;|\n)/g, "\\$1");
+  // }
+
+  // function downloadQuizAsCSS(quiz, idx) {
+  //   let cssContent =
+  //     "/* Quiz format: question { answer: value; choices: value; time-limit: value; image-url: value; } */\n\n";
+
+  //   // convert each quiz to CSS structure
+  //   quiz.forEach((item, questionIndex) => {
+  //     cssContent += `.question-${questionIndex + 1} {\n`;
+  //     cssContent += `  question: "${escapeCSS(item.question)}";\n`;
+  //     cssContent += `  answer: "${escapeCSS(item.answer)}";\n`;
+  //     cssContent += `  choices: "${item.options
+  //       .map(escapeCSS)
+  //       .join(" | ")}";\n`; // a | b | c | d
+  //     cssContent += `  time-limit: "${item.timeLimit}";\n`;
+  //     if (item.imageUrl) {
+  //       cssContent += `  image-url: "${escapeCSS(item.imageUrl)}";\n`;
+  //     }
+  //     cssContent += `}\n\n`;
+  //   });
+  //   console.log(cssContent);
+
+  //   // Blob and URL.createObjectURL for download
+  //   const blob = new Blob([cssContent], { type: "text/css;charset=utf-8;" });
+  //   const url = URL.createObjectURL(blob);
+
+  //   // temporary link to trigger download
+  //   const link = document.createElement("a");
+  //   link.setAttribute("href", url);
+  //   link.setAttribute("download", `quiz_${idx + 1}.css`);
+  //   document.body.appendChild(link);
+  //   link.click();
+
+  //   // clean url after download
+  //   document.body.removeChild(link);
+  //   URL.revokeObjectURL(url);
+  // }
+
+  // function importQuiz(event) {
+  //   const file = event.target.files[0];
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onload = (e) => {
+  //       const content = e.target.result;
+  //       const parsedQuiz = parseCSVToQuiz(content);
+  //       quizzes.set([...$quizzes, ...parsedQuiz]);
+  //     };
+  //     reader.readAsText(file);
+  //   }
+  // }
+
+  // function parseCSSQuiz(cssText) {
+  //   let newQuizzes = [];
+
+  //   // regex to match the quiz format
+  //   const quizRegex =
+  //     /\.question-\d+ {\s*question: "([^"]+)";\s*answer: "([^"]+)";\s*choices: "([^"]+)";\s*time-limit: "(\d+)";\s*}/g;
+  //   let match;
+
+  //   while ((match = quizRegex.exec(cssText)) !== null) {
+  //     const [, question, answer, choices, timeLimit] = match;
+
+  //     const choicesArray = choices.split(" | ");
+
+  //     const quiz = {
+  //       question,
+  //       answer,
+  //       choices: choicesArray,
+  //       timeLimit: parseInt(timeLimit, 10),
+  //     };
+  //     newQuizzes.push(quiz);
+  //   }
+
+  //   quizzes = quizzes.concat(
+  //     newQuizzes.filter(
+  //       (newQuiz) =>
+  //         !quizzes.some(
+  //           (existingQuiz) => existingQuiz.question === newQuiz.question
+  //         )
+  //     )
+  //   );
+  //   console.log(newQuizzes);
+
+  //   saveQuizzes();
+  //   quizToDisplay = quizzes[quizzes.length - newQuizzes.length];
+  //   displayQuizCheck = true;
+  // }
+
+  function downloadQuizAsCSV(idx) {
+    let quiz = quizzes[idx];
+
+    // Check if any quiz item has an imageUrl
+    const hasImageUrl = quiz.some((item) => "imageUrl" in item);
+
+    // Start with the header for the CSV file
+    let csvHeader = "Question,Answer,Choice1,Choice2,Choice3,Choice4,TimeLimit";
+    if (hasImageUrl) {
+      csvHeader += ",ImageUrl";
+    }
+    let csvContent = csvHeader + "\n";
+
+    // Iterate through each quiz question
+    quiz.forEach((item) => {
+      // Add the question and answer
+      let row = `"${item.question}","${item.answer}"`;
+
+      // Add the choices
+      item.choices.forEach((choice) => {
+        row += `,"${choice}"`;
+      });
+
+      // Add the time limit
+      row += `,${item.timeLimit}`;
+
+      // Add the image URL if it exists
+      if (hasImageUrl) {
+        row += `,"${item.imageUrl || ""}"`;
+      }
+
+      // Add the row to the CSV content
+      csvContent += row + "\n";
+    });
+
+    // Blob and URL.createObjectURL for download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    // Temporary link to trigger download
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `quiz_${idx + 1}.csv`);
+    document.body.appendChild(link);
+    link.click();
+
+    // Clean URL after download
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  function importQuiz(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target.result;
+        const parsedQuiz = parseCSVToQuiz(content);
+        console.log("Parsed: \n");
+        console.log(parsedQuiz)
+
+        //save to quizzes
+        quizzes.push(parsedQuiz);
+        //force svelte to update
+        quizzes = [...quizzes];
+
+        // displayQuiz(
+        //   quizzes[quizzes.length - parsedQuiz.length],
+        //   quizzes.length - parsedQuiz.length
+        // );
+      };
+      reader.readAsText(file);
+    }
+  }
+
+  function parseCSVToQuiz(csvData) {
+    // Split the CSV data into lines
+    const lines = csvData.trim().split("\n");
+
+    // Remove the header line
+    lines.shift();
+
+    // Map each line to a quiz question object
+    const quiz = lines.map((line) => {
+      // Split the line by commas, considering quotes
+      const [
+        question,
+        answer,
+        choice1,
+        choice2,
+        choice3,
+        choice4,
+        timeLimit,
+        imageUrl,
+      ] = line
+        .match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g)
+        .map((field) => field.replace(/(^"|"$)/g, ""));
+
+      return {
+        question,
+        answer,
+        choices: [choice1, choice2, choice3, choice4],
+        timeLimit: parseInt(timeLimit),
+        imageUrl: imageUrl || null,
+      };
+    });
+
+    // If imgUrl is null, remove it
+    quiz.forEach((item) => {
+      if (item.imageUrl === null) {
+        delete item.imageUrl;
+      }
+    });
+
+    return quiz;
   }
 </script>
 
@@ -118,9 +326,10 @@
           class="btn btn-tertiary btn-block"
           id="createNew"
           on:click={() => {
-            goto("/createQuestion");
+            goto("/CreateQuestion");
           }}>Create new Quiz</button
         >
+        <input type="file" accept=".csv" on:change={importQuiz} />
 
         <button
           class="btn btn-secondary btn-block"
@@ -194,6 +403,10 @@
         {/each}
         <button class="btn btn-tertiary" on:click={() => chooseQuiz()}
           >Choose</button
+        >
+        <button
+          class="btn btn-tertiary"
+          on:click={() => downloadQuizAsCSV(quizIdx)}>Download</button
         >
         <button class="btn btn-secondary" on:click={() => closeQuiz()}
           >Close</button
