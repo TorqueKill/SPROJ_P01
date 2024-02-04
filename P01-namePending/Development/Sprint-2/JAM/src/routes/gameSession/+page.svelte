@@ -4,7 +4,7 @@
   //------------------------------------PRESISTANCE------------------------------------
   // navigate to main menu if user is disconnected, if user is not logged in, goto login/signup
 
-  import { SCREENS,GAME_SETTINGS } from "$lib/config.js";
+  import { SCREENS,GAME_SETTINGS,AVATARS } from "$lib/config.js";
   import { user } from "$lib/userStore.js";
   import { socket, roomEvents, gameEvents } from "$lib/socketStore.js";
   import { onMount } from "svelte";
@@ -87,6 +87,7 @@
 
     if (events.scoresTillQuestion) {
       sessionScores = events.scoresTillQuestion;
+      sessionScores.sort(sortByScore);
       scoreDisplayCheck = true;
       scoreDisplayTimer = events.display_time;
       events.scoresTillQuestion = null;
@@ -183,6 +184,10 @@
     return score;
   };
 
+  const sortByScore = (a, b) => {
+    return playerScore(b.scores) - playerScore(a.scores);
+  };
+
 
   const restartConnection = () => {
     socket.disconnect();
@@ -207,11 +212,15 @@
         <!------------------------------- SCORE DISPLAY ------------------------------------>
       {:else if scoreDisplayCheck}
         <h1>Score Display</h1>
-        {#each Object.entries(sessionScores) as [idx, ps]}
-          <p>
+        {#each Object.entries(sessionScores) as [idx, ps], i}
+        <div class="player-item {i === 0 ? 'first-place' : i === 1 ? 'second-place' : i === 2 ? 'third-place' : ''}">
+          <img src={`/avatars/${AVATARS[ps.avatarIndex]}`} alt="Player Avatar" class="player-avatar" />
+          <p class="player-name">
             {ps.name} score: {playerScore(ps.scores)}
           </p>
+        </div>
         {/each}
+      
         <h1>Next Question in {scoreDisplayTimer} seconds</h1>
 
         <!------------------------------- QUESTION DISPLAY (HOST)--------------------------------->
@@ -439,5 +448,44 @@
     height: auto;
     border: 1px solid #ddd;
     border-radius: 4px;
+  }
+
+
+
+
+
+
+  .player-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.18); /* Optional: adds a subtle border */
+  }
+
+  .player-name {
+    margin: 0; 
+    color: rgb(0, 0, 0); 
+  }
+
+  .player-avatar {
+    width: 50px; 
+    height: 50px; 
+    border-radius: 50%; /* Optional: makes the avatar circular */
+  }
+
+
+  .first-place {
+  background: rgba(255, 255, 255, 0.4); /* More opaque */
+}
+
+  .second-place {
+    background: rgba(255, 255, 255, 0.3); /* Medium opacity */
+  }
+
+  .third-place {
+    background: rgba(255, 255, 255, 0.2); /* More transparent */
   }
 </style>
