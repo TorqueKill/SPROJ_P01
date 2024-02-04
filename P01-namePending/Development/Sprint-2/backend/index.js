@@ -403,7 +403,7 @@ function getFinalScores(roomid, socketid) {
   }
 }
 
-function setName(socketid, roomid, name, email) {
+function setUser(socketid, roomid, name, email, avatarIndex) {
   let room = getRoom(roomid);
   if (room) {
     room.usersNames[socketid] = name;
@@ -414,6 +414,7 @@ function setName(socketid, roomid, name, email) {
       email: email,
       vegetativeState: false,
       justReconnected: false,
+      avatarIndex: avatarIndex,
     });
   }
 }
@@ -450,20 +451,33 @@ function getName(socketid) {
   }
 }
 
-function getAllNames(roomid, includeHost) {
+//all users are marked with their socketid (including host)
+
+function getAllUsers(roomid, includeHost) {
   let room = getRoom(roomid);
   let names = [];
   if (room) {
     for (let key in room.usersNames) {
       if (includeHost || key !== room.host) {
-        names.push(room.usersNames[key]);
+        //find avatar index else set to 0
+        if (users.find((user) => user.socketid === key)) {
+          let avatarIndex = users.find(
+            (user) => user.socketid === key
+          )?.avatarIndex;
+          if (avatarIndex === undefined) {
+            avatarIndex = 0;
+          }
+          names.push({ name: room.usersNames[key], avatarIndex: avatarIndex });
+        } else {
+          names.push({ name: room.usersNames[key], avatarIndex: 0 });
+        }
       }
     }
   }
   return names;
 }
 
-function reconnectionInit(roomid, socketid, email) {
+function reconnectionInit(roomid, socketid, email, avatarIndex) {
   try {
     if (email === undefined || email === "") {
       return false;
@@ -495,6 +509,9 @@ function reconnectionInit(roomid, socketid, email) {
       let answers = room.answers[user.socketid];
       room.answers[socketid] = answers;
       delete room.answers[user.socketid];
+
+      //update avatar index in users
+      user.avatarIndex = avatarIndex;
 
       //update socketid in users
       user.socketid = socketid;
@@ -617,7 +634,7 @@ io.on("connection", async (socket) => {
 
       //broadcast to all users in room that user left
       let playernum = getPlayerNum(room.roomid);
-      let names = getAllNames(room.roomid, false);
+      let names = getAllUsers(room.roomid, false);
       io.to(room.roomid).emit("user-left", socket.id, playernum, names);
     }
   });
@@ -645,7 +662,7 @@ io.on("connection", async (socket) => {
     setRoomMaxPlayers(roomid, roomSettings.maxPlayers);
     setQuestionsPerReport(roomid, roomSettings.reportScores);
     setRoomDisplayQuestion(roomid, roomSettings.displayQuestion);
-    setName(socket.id, roomid, name, email);
+    setUser(socket.id, roomid, name, email, 0); //default avatar index is 0
     socket.emit("room-created", roomid);
     console.log("user created room: " + roomid);
     console.log("Quiz received, first question: " + quiz[0].question);
@@ -673,6 +690,7 @@ io.on("connection", async (socket) => {
 
     let name = userData.username;
     let email = userData.email;
+    let avatarIndex = userData.avatarIndex;
 
     if (!name) {
       name = DEFAUL_PLAYER_NAME;
@@ -687,7 +705,7 @@ io.on("connection", async (socket) => {
       }
     }
 
-    if (reconnectionInit(roomid, socket.id, email)) {
+    if (reconnectionInit(roomid, socket.id, email, avatarIndex)) {
       //begin reconnection process
       console.log("reconnection process started: " + socket.id + email);
       socket.join(roomid);
@@ -708,7 +726,7 @@ io.on("connection", async (socket) => {
       return;
     }
 
-    setName(socket.id, roomid, name, email);
+    setUser(socket.id, roomid, name, email, avatarIndex);
 
     //add user to room and emit to all users in room that user joined
     console.log("user joined room: " + roomid);
@@ -717,8 +735,9 @@ io.on("connection", async (socket) => {
 
     //emit to all users in room that user joined
     let playernum = getPlayerNum(roomid);
-    let names = getAllNames(roomid, false);
-    io.to(roomid).emit("user-joined", socket.id, playernum, names);
+    let users = getAllUsers(roomid, false);
+
+    io.to(roomid).emit("user-joined", socket.id, playernum, users);
 
     //if room is full, emit game start
     if (playernum >= getRoomMaxPlayers(roomid)) {
@@ -906,8 +925,8 @@ io.on("connection", async (socket) => {
 
     //broadcast to all users in room that user left
     let playernum = getPlayerNum(roomid);
-    let names = getAllNames(roomid, false);
-    io.to(roomid).emit("user-left", socket.id, playernum, names);
+    let users = getAllUsers(roomid, false);
+    io.to(roomid).emit("user-left", socket.id, playernum, users);
 
     //if host left, delete room
     let room = getRoom(roomid);

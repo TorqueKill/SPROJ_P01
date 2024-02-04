@@ -8,7 +8,7 @@
 
   import { onMount } from "svelte";
 
-  import AvatarMenu from "../avatarMenu/+page.svelte";
+  import AvatarMenu from "../../lib/avatarMenu/+page.svelte";
 
   const MIN_PLAYERS = ROOM_SETTINGS.MIN_PLAYERS;
   const MAX_PLAYERS = ROOM_SETTINGS.MAX_PLAYERS;
@@ -101,6 +101,7 @@
       let userData = {
         username: username,
         email: $user.email,
+        avatarIndex : $user.avatarIndex
       };
 
       if ($user.email != "") {
@@ -130,7 +131,9 @@
 
   const handleAvatarSelection = (index) => {
     selectedAvatarIndex = index;
+    $user.avatarIndex = index;
     console.log(`index of selected avatar: ${index + 1}`)
+    closeModal();
   }
 
   function openModal() {

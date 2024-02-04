@@ -20,6 +20,19 @@ export const GAME_SETTINGS = {
   MAX_TIME_PER_GAME: 1800,
 };
 
+export const AVATARS = [
+  "man1.png",
+  "woman1.png",
+  "man2.png",
+  "woman2.png",
+  "man3.png",
+  "woman3.png",
+  "man4.png",
+  "woman4.png",
+  "man5.png",
+  "woman5.png",
+];
+
 export const BACKEND_URL = "http://localhost:3001"; // || process.env.BACKEND_URL;
 
 //https://boiling-beyond-93888-265de2b70712.herokuapp.com/

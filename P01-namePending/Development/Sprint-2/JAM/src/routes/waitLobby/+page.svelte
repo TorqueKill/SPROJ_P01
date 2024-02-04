@@ -6,11 +6,11 @@
 
   import { socket, roomEvents } from "$lib/socketStore.js";
   import { user } from "$lib/userStore.js";
-  import { SCREENS } from "$lib/config.js";
+  import { SCREENS,AVATARS } from "$lib/config.js";
   import { goto } from "$app/navigation";
 
   let playersReady = 0;
-  let playerNames = [];
+  let players = [];
 
   $: {
     const events = $roomEvents;
@@ -31,7 +31,7 @@
 
     if (events.roomJoined) {
       playersReady = events.roomJoined.num;
-      playerNames = events.roomJoined.names;
+      players = events.roomJoined.users;
 
       //set the event to null
       events.roomJoined = null;
@@ -39,7 +39,7 @@
 
     if (events.roomLeft) {
       playersReady = events.roomLeft.num;
-      playerNames = events.roomLeft.names;
+      players = events.roomLeft.names;
 
       //set the event to null
       events.roomLeft = null;
@@ -93,11 +93,12 @@
           </div>
         {/if}
 
-        {#if playerNames.length >= 1}
-          {#each playerNames as name}
-            <p id="listPlayers">{name}</p>
-          {/each}
-        {/if}
+        {#each players as {name, avatarIndex}}
+        <div class="player-item">
+            <p class="player-name">{name}</p>
+            <img class="player-avatar" src={`/avatars/${AVATARS[avatarIndex]}`} alt="Avatar" />
+        </div>
+        {/each}
 
         <!--Go back to menu, disconnect-->
         <button
@@ -228,6 +229,24 @@
   #listPlayers {
     color: white;
     margin: 0.5rem 0;
+  }
+
+
+  .player-item {
+    display: flex;
+    align-items: center; 
+    gap: 10px; 
+  }
+
+  .player-name {
+    margin: 0; 
+    color: white; 
+  }
+
+  .player-avatar {
+    width: 50px; 
+    height: 50px; 
+    border-radius: 50%; /* Optional: makes the avatar circular */
   }
 
   @media screen and (max-width: 768px) {

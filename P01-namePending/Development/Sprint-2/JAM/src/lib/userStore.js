@@ -31,4 +31,5 @@ export const user = writable({
   reconnected: false,
   currentQuestion: -1,
   displayQuestion: false,
+  avatarIndex: 0, //default avatar
 });
