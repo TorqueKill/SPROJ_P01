@@ -93,7 +93,9 @@ HOW TO ACCESS THE SYSTEM
 Access web app: https://p01-jam.vercel.app/
 
 Test Locally:
-Use the branch: sprint1_development_branchB
+
+Use the branch: sprint2_dev_muiz (LATEST)
+
 goto main dir, should be P01-ProjectNamePending 
 open two terminals
 terminal 1: cd P01-namePending\\Development\\Sprint-1\\backend & npm i
