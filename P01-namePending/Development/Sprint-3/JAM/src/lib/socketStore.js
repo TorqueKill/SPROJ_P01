@@ -74,6 +74,16 @@ socket.on("scores-till-question", (scores, display_time) => {
   }));
 });
 
+socket.on("timer-paused", () => {
+  console.log("pauseTimer");
+  gameEvents.update(() => ({pauseTimer: true}));
+})
+
+socket.on("timer-resumed", () => {
+  console.log("resumeTimer");
+  gameEvents.update(() => ({resumeTimer: true}));
+});
+
 // socket.on
 
 // Export the socket connection for reuse

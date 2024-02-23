@@ -88,10 +88,13 @@ function addUserToRoom(roomid, socketid) {
         maxPlayers: MIN_PLAYERS_PER_LOBBY,
         usersNames: {},
         timeOutIds: [],
+        startTimeStampOfTimer: -1, // timestamp in milliseconds when the timer was started
+        pauseTimerTime: -1,     // time elapsed in seconds when the timer was paused since the start of timer
         questionsPerReport: -1,
         ROOM_LAG_BIAS: 0,
         currentQuestion: -1,
         displayQuestion: false,
+        
       });
     }
   } catch (e) {
@@ -185,6 +188,7 @@ function setQuestionTimeOut(roomid, timeoutId) {
   let room = getRoom(roomid);
   if (room) {
     room.timeOutIds.push(timeoutId);
+    room.startTimeStampOfTimer = Date.now();
   }
 }
 
@@ -810,7 +814,43 @@ io.on("connection", async (socket) => {
         }
       }
     }
-  });
+  })
+
+  socket.on("pause-timer", (roomid, questionIndex) => {
+    let room = getRoom(roomid);
+    if (room) {
+      
+      room.pauseTimerTime = (Date.now() - room.startTimeStampOfTimer) / 1000;
+      clearTimeout(room.timeOutIds[questionIndex])
+      room.timeOutIds.pop();
+
+      io.to(roomid).emit("timer-paused", 1);
+    }
+
+  })
+
+  socket.on("resume-timer", (roomid, questionIndex) => {
+
+    let room = getRoom(roomid);
+    if (room) {
+      
+      let quiz = getRoomQuiz(roomid);
+      // finding remaining time
+      let timeLimit = quiz[questionIndex].timeLimit - room.pauseTimerTime;
+
+      let timeoutId = setTimeout(() => {
+        console.log("timeout for question: " + questionIndex);
+        io.to(roomid).emit("timeout", questionIndex + 1);
+      }, (timeLimit  + LAG_BIAS + room.ROOM_LAG_BIAS) * 1000);
+
+      //set timeout id
+      setQuestionTimeOut(roomid, timeoutId);
+      io.to(roomid).emit("timer-resumed", 1);
+      
+    }
+
+
+  })
 
   socket.on("handle-answer", (roomid, answer, questionIndex) => {
     try {
@@ -906,6 +946,7 @@ io.on("connection", async (socket) => {
             let timeoutId = setTimeout(() => {
               console.log("timeout for question: " + (questionIndex + 1));
               io.to(roomid).emit("timeout", questionIndex + 1);
+              
             }, (timeLimit + LAG_BIAS + room.ROOM_LAG_BIAS) * 1000);
 
             //set timeout id
@@ -928,6 +969,7 @@ io.on("connection", async (socket) => {
           let timeoutId = setTimeout(() => {
             console.log("timeout for question: " + (questionIndex + 1));
             io.to(roomid).emit("timeout", questionIndex + 1);
+            
           }, (timeLimit + LAG_BIAS + room.ROOM_LAG_BIAS) * 1000);
 
           //set timeout id
