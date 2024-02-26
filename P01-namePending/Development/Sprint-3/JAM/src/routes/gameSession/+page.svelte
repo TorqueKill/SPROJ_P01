@@ -63,6 +63,8 @@
 
     //check for 'timeout' event
     if (events.timeout) {
+
+
       //check if answer was submitted, if not, then send answer
       console.log("in timeout event");
       if (!isAnswerSubmitted) {
@@ -75,12 +77,32 @@
         timeRanOut = false;
 
         console.log("timeout");
-        if ($user.reconnected) {
-          sendAnswer(-1, currentQuestion - 1); //reconnected user waits till timeout
-        } else {
-          sendAnswer(-1, _currentQuestion); // Index is -1 if time runs out
+        
+        // host should not be able to send answer
+        if (!isHost) {
+
+          if ($user.reconnected) {
+            // changed from currentQuestion - 1 to currentQuestion. After rejoining it was sending answer to the prev question
+            sendAnswer(-1, currentQuestion); //reconnected user waits till timeout
+            $user.reconnected = false;
+
+          } else if ($user.lateConnected) {
+            sendAnswer(-1, currentQuestion ); //reconnected user waits till timeout
+            $user.lateConnected = false;
+          } else {
+            sendAnswer(-1, _currentQuestion); // Index is -1 if time runs out
+          }
         }
+
       }
+
+
+      //   if ($user.reconnected) {
+      //     sendAnswer(-1, currentQuestion - 1); //reconnected user waits till timeout
+      //   } else {
+      //     sendAnswer(-1, _currentQuestion); // Index is -1 if time runs out
+      //   }
+      // }
 
       //set the event to null so that it doesn't get called repeatedly
       events.timeout = null;

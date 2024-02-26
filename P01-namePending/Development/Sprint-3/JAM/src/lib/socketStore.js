@@ -57,6 +57,11 @@ socket.on("reconnect", (data) => {
   roomEvents.update(() => ({ reconnect: data }));
 });
 
+socket.on("late-connect", (quiz, options) => {
+  console.log("late-connect");
+  roomEvents.update(() => ({ lateConnect: { quiz: quiz, options: options }}));
+});
+
 socket.on("room-deleted", () => {
   roomEvents.update(() => ({ roomDeleted: true }));
 });
