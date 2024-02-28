@@ -29,6 +29,15 @@
 
   let selectedAvatarIndex = null;
   let showModal = false;
+  let showHostSettingsModal = false;
+
+  const openHostSettingsModal = () => {
+    showHostSettingsModal = true;
+  };
+
+  const closeHostSettingsModal = () => {
+    showHostSettingsModal = false;
+  };
 
   
 
@@ -161,9 +170,14 @@
 <!-- As a heading -->
 <nav>
   <ul>
-    <li><a href="/">Home</a></li>
-    <li><button on:click={() => goto("/viewHistory")}>View History</button></li>
-    <li><button on:click={logout}>Logout</button></li>
+      <li class="logo">JAM</li>
+      <li><button class="nav_button" on:click={() => goto("/")}>Home</button></li>
+      <li><button class="nav_button" on:click={() => goto("/viewHistory")}>History</button></li>
+      <li><button class="nav_button" on:click={logout}>Logout</button></li>
+      {#if $user.isHost}
+        <!-- Show Host Settings button only if the user is a host -->
+        <li><button class="nav_button" on:click={openHostSettingsModal}>Host Settings</button></li>
+      {/if}
   </ul>
 </nav>
 
@@ -190,6 +204,7 @@
               id="hostQuiz"
               on:click={() => {
                 $user.userDecided = true;
+                closeHostSettingsModal();
               }}>Join</button
             >
           </p>
@@ -202,25 +217,6 @@
               id="participants"
               placeholder="Enter total number of participants"
               bind:value={roomSettings.maxPlayers}
-            />
-          </div>
-          <div>
-            <h2>Report scores in between</h2>
-            <input
-              type="number"
-              id="participants"
-              placeholder="Enter total number of participants"
-              bind:value={roomSettings.reportScores}
-            />
-            <p id="report">-1: Report at the end</p>
-          </div>
-          <div>
-            <h2>Display question on Players</h2>
-            <input
-              type="checkbox"
-              id="participants"
-              placeholder="Enter total number of participants"
-              bind:checked={roomSettings.displayQuestion}
             />
           </div>
           <p>
@@ -304,6 +300,37 @@
           }}>Go Back</button>
       {/if}      
 
+      {#if showHostSettingsModal}
+        <div class="modal-overlay">
+          <div class="modal-content">
+              <button on:click={closeHostSettingsModal} class="modal-button" style="margin-left: -3%; margin-top: -3%;">Go Back</button>
+              <h2 style="font-size: 28px;">Host Settings</h2>
+              <div style="background: #690092;">
+                  <div>
+                      <h3>Report scores in between</h3>
+                      <input
+                          type="number"
+                          id="participants"
+                          placeholder="Enter total number of participants"
+                          bind:value={roomSettings.reportScores}
+                      />
+                      <p id="report">-1: Report at the end</p>
+                  </div>
+                  <div>
+                      <h3>Display question on Players</h3>
+                      <input
+                          type="checkbox"
+                          id="participants"
+                          placeholder="Enter total number of participants"
+                          bind:checked={roomSettings.displayQuestion}
+                      />
+                  </div>
+              </div>
+              <button type="button" on:click={closeHostSettingsModal}>Save Settings</button>
+          </div>
+      </div>    
+      {/if}
+
         
       </div>
     </div>
@@ -313,14 +340,14 @@
 <style>
   nav {
     background-color: #e3f2fd; /* Light blue background color */
-    padding: 10px;
+    padding: 2px;
     position: fixed;
     width: 100%;
     top: 0;
     z-index: 1000;
   }
   li {
-    margin-right: 10px;
+    margin-right: 1px;
   }
   ul {
     list-style: none;
@@ -328,6 +355,50 @@
     padding: 0;
     display: flex;
     justify-content: flex-end;
+  }
+  .logo {
+    color: rgb(214, 81, 209);
+    font-size: 25px;
+    /* padding-right: 60%; */
+    margin-right: auto; 
+    font-weight: bold; 
+  }
+  button {
+    background-color: #ccc;
+    border: none;
+    color: white;
+    padding: 5px 25px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 25px;
+    margin: 4px 140px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-family: JejuGothic, sans-serif;
+  }
+ .nav_button {
+    background-color: #ccc;
+    border: none;
+    color: white;
+    padding: 1px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+    margin: 6px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-family: JejuGothic, sans-serif;
+  }
+  button:hover {
+    background-color: #c49eff;
+    /* background-color: #690092; */
+  }
+  .nav_button:hover {
+    background-color: #c49eff;
   }
   body {
     padding: 0;
@@ -349,25 +420,6 @@
     color: #c49eff;
     border: none;
     margin-top: 15rem;
-  }
-
-  button {
-    background-color: #ccc;
-    border: none;
-    color: white;
-    padding: 5px 25px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 25px;
-    margin: 4px 140px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: all 0.3s ease;
-    font-family: JejuGothic, sans-serif;
-  }
-  button:hover {
-    background-color: #c49eff;
   }
 
   #report {
@@ -460,7 +512,7 @@
   }
 
   .modal-content {
-    background-color: #7801a8;
+    background-color: #8f00c7;
     padding: 20px;
     border-radius: 10px;
   }
@@ -479,6 +531,9 @@
       font-size: 14px;
       border-radius: 10px;
     }
+    .nav_button {
+        margin: 4px 20px; /* Adjusted margin for larger screens */
+    }
   }
 
   @media (min-width: 769px) {
@@ -487,5 +542,8 @@
       font-size: 18px;
       border-radius: 20px;
     }
+    .nav_button {
+        margin: 4px 20px; /* Adjusted margin for larger screens */
+    }
   }
-</style>asdada
+</style>

@@ -5,6 +5,15 @@
   import { user } from "$lib/userStore.js";
 
   const MAX_TIME_LIMIT = 60;
+  let showHostSettingsModal = false;
+
+  const openHostSettingsModal = () => {
+    showHostSettingsModal = true;
+  };
+
+  const closeHostSettingsModal = () => {
+    showHostSettingsModal = false;
+  };
 
   let quiz1 = [
     {
@@ -78,7 +87,31 @@
     localStorage.setItem("Quiz", JSON.stringify([quiz1]));
     goto("/createQuiz");
   }
+  const logout = async () => {
+  try {
+    // Call the logout method from your authentication service
+    //await authService.logout();
+
+    // Redirect to the login page or any other desired page after logout
+    goto('/signIn');
+  } catch (error) {
+    console.error('Logout failed:', error);
+  }
+  };
 </script>
+
+<nav>
+  <ul>
+      <li class="logo">JAM</li>
+      <li><button class="nav_button" on:click={() => goto("/")}>Home</button></li>
+      <li><button class="nav_button" on:click={() => goto("/viewHistory")}>History</button></li>
+      <li><button class="nav_button" on:click={logout}>Logout</button></li>
+      {#if $user.isHost}
+        <!-- Show Host Settings button only if the user is a host -->
+        <li><button class="nav_button" on:click={openHostSettingsModal}>Host Settings</button></li>
+      {/if}
+  </ul>
+</nav>
 
 <main>
   <body>
@@ -210,9 +243,34 @@
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 51px;
     padding: 2rem;
-    margin: 1rem auto;
+    margin: 4rem auto 1rem;
     display: flex;
     flex-direction: column;
+  }
+  .logo {
+    color: rgb(214, 81, 209);
+    font-size: 25px;
+    padding-right: 60%;
+    font-weight: bold; 
+  }
+
+  .nav_button {
+    background-color: #ccc;
+    border: none;
+    color: white;
+    padding: 1px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+    margin: 6px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-family: JejuGothic, sans-serif;
+  }
+  .nav_button:hover {
+    background-color: #c49eff;
   }
 
   .btn {
@@ -319,6 +377,57 @@
     height: auto;
     border: 1px solid #ddd;
     border-radius: 4px;
+  }
+  nav {
+    background-color: #e3f2fd; /* Light blue background color */
+    padding: 2px;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+  }
+  li {
+    margin-right: 1px;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: flex-end;
+  }
+  button {
+    background-color: #ccc;
+    border: none;
+    color: white;
+    padding: 5px 25px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 25px;
+    margin: 4px 140px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-family: JejuGothic, sans-serif;
+  }
+  button:hover {
+    background-color: #6a27ce;
+  }
+  @media (max-width: 768px) {
+    input,
+    button {
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 10px;
+    }
+  }
+  @media (min-width: 769px) {
+    button {
+      padding: 10px 25px;
+      font-size: 18px;
+      border-radius: 20px;
+    }
   }
     </style>
     
