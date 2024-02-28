@@ -2,7 +2,8 @@
   // @ts-nocheck
 
   import { socket, roomEvents } from "$lib/socketStore.js";
-  import { ROOM_SETTINGS } from "$lib/config"
+  import { ROOM_SETTINGS } from "$lib/config";
+  import { SCREENS,AVATARS } from "$lib/config.js";
   import { user } from "$lib/userStore.js";
   import { goto } from "$app/navigation";
 
@@ -28,6 +29,15 @@
 
   let selectedAvatarIndex = null;
   let showModal = false;
+  let showHostSettingsModal = false;
+
+  const openHostSettingsModal = () => {
+    showHostSettingsModal = true;
+  };
+
+  const closeHostSettingsModal = () => {
+    showHostSettingsModal = false;
+  };
 
   
 
@@ -62,6 +72,18 @@
   }
 
   //-------------------------------FUNCTIONS---------------------------------
+
+  const logout = async () => {
+  try {
+    // Call the logout method from your authentication service
+    //await authService.logout();
+
+    // Redirect to the login page or any other desired page after logout
+    goto('/signIn');
+  } catch (error) {
+    console.error('Logout failed:', error);
+  }
+  };
 
   const createRoom = (soc, roomsettings) => {
     if (
@@ -124,6 +146,7 @@
   const setUserName = (userName) => {
     if (userName) {
       $user.userName = userName;
+      alert("Username Saved Successfully.");
     } else {
       alert("please enter a username");
     }
@@ -145,6 +168,19 @@
   }
 
 </script>
+<!-- As a heading -->
+<nav>
+  <ul>
+      <li class="logo">JAM</li>
+      <li><button class="nav_button" on:click={() => goto("/")}>Home</button></li>
+      <li><button class="nav_button" on:click={() => goto("/viewHistory")}>History</button></li>
+      <li><button class="nav_button" on:click={logout}>Logout</button></li>
+      {#if $user.isHost}
+        <!-- Show Host Settings button only if the user is a host -->
+        <li><button class="nav_button" on:click={openHostSettingsModal}>Host Settings</button></li>
+      {/if}
+  </ul>
+</nav>
 
 <main>
   <body>
@@ -169,11 +205,12 @@
               id="hostQuiz"
               on:click={() => {
                 $user.userDecided = true;
+                closeHostSettingsModal();
               }}>Join</button
             >
           </p>
-        {:else if $user.isHost}
-          <div>
+        {:else if $user.isHost}  
+        <div>
             <h2>Number of participants</h2>
             <input
               type="number"
@@ -183,35 +220,6 @@
               bind:value={roomSettings.maxPlayers}
             />
           </div>
-          <div>
-            <h2>Report scores in between</h2>
-            <input
-              type="number"
-              id="participants"
-              placeholder="Enter total number of participants"
-              bind:value={roomSettings.reportScores}
-            />
-            <p id="report">-1: Report at the end</p>
-          </div>
-          <div>
-            <h2>Display question on Players</h2>
-            <input
-              type="checkbox"
-              id="participants"
-              placeholder="Enter total number of participants"
-              bind:checked={roomSettings.displayQuestion}
-            />
-          </div>
-          <button
-            type = "button"
-              on:click={() => {
-              //check if user has an email
-              if ($user.email == "") {
-                alert("must be logged in");
-              }else{
-                goto("/viewHistory");
-              }
-              }}>View History</button>
           <p>
             <button
               type="button"
@@ -236,7 +244,8 @@
               $user.userDecided = false;
             }}>Go Back</button>
         {:else}
-          <h2>Enter roomID and username</h2>
+        <h2>Enter roomID and username</h2>
+        <div class="user-input-container">
           <input
             type="text"
             class="form"
@@ -251,54 +260,77 @@
             placeholder="Enter username"
             bind:value={_userName}
           />
-          <p></p>
-          <button
-          type = "button"
-            on:click={() => {
-              setUserName(_userName);
-            }}>Save username</button
-          >
-          <p></p>
-          <button
-          type = "button"
-            on:click={() => {
-              openModal();
-            }}>Choose avatar</button
-          >
-          {#if showModal}
-            <div class="modal-overlay">
-              <div class="modal-content">
-                <button on:click={closeModal} class="modal-button">Go Back</button>
-                <AvatarMenu selectAvatar={handleAvatarSelection} />
-              </div>
+          {#if $user.avatarIndex !== null}
+            <div class="avatar-container">
+              <img class="player-avatar" src={`/avatars/${AVATARS[$user.avatarIndex]}`} alt="Avatar" />
             </div>
           {/if}
-          <p></p>
-          <button
-          type = "button"
-            on:click={() => {
-            //check if user has an email
-            if ($user.email == "") {
-              alert("must be logged in");
-            }else{
-              goto("/viewHistory");
-            }
-            }}>View History</button
-          >
-          <p></p>
-          <button
-            type="button"
-            on:click={() => joinRoom(socket, roomid, $user.userName)}
-            >Join Room</button
-          >
-          <p></p>
-          <button
-            type="button"
-            on:click={() => {
-              $user.isHost = false;
-              $user.userDecided = false;
-            }}>Go Back</button>
+        </div>
+        <p></p>
+        <button
+          type="button"
+          on:click={() => {
+            setUserName(_userName);
+          }}>Save username</button>
+        <p></p>
+        <button
+          type="button"
+          on:click={() => {
+            openModal();
+          }}>Choose avatar</button>
+        {#if showModal}
+          <div class="modal-overlay">
+            <div class="modal-content">
+              <button on:click={closeModal} class="modal-button">Go Back</button>
+              <AvatarMenu selectAvatar={handleAvatarSelection} />
+            </div>
+          </div>
         {/if}
+        <p></p>
+        <p></p>
+        <button
+          type="button"
+          on:click={() => joinRoom(socket, roomid, $user.userName)}
+        >Join Room</button>
+        <p></p>
+        <button
+          type="button"
+          on:click={() => {
+            $user.isHost = false;
+            $user.userDecided = false;
+          }}>Go Back</button>
+      {/if}      
+
+      {#if showHostSettingsModal}
+        <div class="modal-overlay">
+          <div class="modal-content">
+              <button on:click={closeHostSettingsModal} class="modal-button" style="margin-left: -3%; margin-top: -3%;">Go Back</button>
+              <h2 style="font-size: 28px;">Host Settings</h2>
+              <div style="background: #690092;">
+                  <div>
+                      <h3>Report scores in between</h3>
+                      <input
+                          type="number"
+                          id="participants"
+                          placeholder="Enter total number of participants"
+                          bind:value={roomSettings.reportScores}
+                      />
+                      <p id="report">-1: Report at the end</p>
+                  </div>
+                  <div>
+                      <h3>Display question on Players</h3>
+                      <input
+                          type="checkbox"
+                          id="participants"
+                          placeholder="Enter total number of participants"
+                          bind:checked={roomSettings.displayQuestion}
+                      />
+                  </div>
+              </div>
+              <button type="button" on:click={closeHostSettingsModal}>Save Settings</button>
+          </div>
+      </div>    
+      {/if}
 
         
       </div>
@@ -307,29 +339,31 @@
 </main>
 
 <style>
-  body {
-    padding: 0;
-    height: 100%;
+  nav {
+    background-color: #e3f2fd; /* Light blue background color */
+    padding: 2px;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+  }
+  li {
+    margin-right: 1px;
+  }
+  ul {
+    list-style: none;
     margin: 0;
+    padding: 0;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #7801a8;
+    justify-content: flex-end;
   }
-
-  .container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    padding: 2rem;
-    border-radius: 15px;
-    background-color: #018198;
-    color: #c49eff;
-    border: none;
-    margin-top: 15rem;
+  .logo {
+    color: rgb(214, 81, 209);
+    font-size: 25px;
+    /* padding-right: 60%; */
+    margin-right: auto; 
+    font-weight: bold; 
   }
-
   button {
     background-color: #ccc;
     border: none;
@@ -345,8 +379,48 @@
     transition: all 0.3s ease;
     font-family: JejuGothic, sans-serif;
   }
+ .nav_button {
+    background-color: #ccc;
+    border: none;
+    color: white;
+    padding: 1px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+    margin: 6px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-family: JejuGothic, sans-serif;
+  }
   button:hover {
     background-color: #c49eff;
+    /* background-color: #690092; */
+  }
+  .nav_button:hover {
+    background-color: #c49eff;
+  }
+  body {
+    padding: 0;
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #7801a8;
+  }
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem;
+    border-radius: 15px;
+    background-color: #018198;
+    color: #c49eff;
+    border: none;
+    margin-top: 15rem;
   }
 
   #report {
@@ -415,8 +489,31 @@
     z-index: 100;
   }
 
+  .player-avatar {
+    width: 50px; 
+    height: 50px; 
+    margin-top: -115px;
+    border-radius: 50%; /* Optional: makes the avatar circular */
+  }
+  .avatar-container {
+    display: flex;
+    align-items: center;
+    margin-left: 300px;
+  }
+
+  .player-item {
+    display: flex;
+    align-items: center; 
+    gap: 10px; 
+  }
+
+  .player-name {
+    margin: 0; 
+    color: white; 
+  }
+
   .modal-content {
-    background-color: #7801a8;
+    background-color: #8f00c7;
     padding: 20px;
     border-radius: 10px;
   }
@@ -435,6 +532,9 @@
       font-size: 14px;
       border-radius: 10px;
     }
+    .nav_button {
+        margin: 4px 20px; /* Adjusted margin for larger screens */
+    }
   }
 
   @media (min-width: 769px) {
@@ -442,6 +542,9 @@
       padding: 10px 25px;
       font-size: 18px;
       border-radius: 20px;
+    }
+    .nav_button {
+        margin: 4px 20px; /* Adjusted margin for larger screens */
     }
   }
 </style>
