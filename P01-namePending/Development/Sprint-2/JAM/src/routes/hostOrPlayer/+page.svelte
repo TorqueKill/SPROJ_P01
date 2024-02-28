@@ -146,6 +146,7 @@
   const setUserName = (userName) => {
     if (userName) {
       $user.userName = userName;
+      alert("Username Saved Successfully.");
     } else {
       alert("please enter a username");
     }
