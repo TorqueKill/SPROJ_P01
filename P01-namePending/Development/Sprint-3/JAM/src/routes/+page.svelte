@@ -1,8 +1,14 @@
 <script lang="js">
+  // @ts-nocheck
   import { goto } from "$app/navigation";
+  import { onMount } from "svelte";
+  import {SESSION_TIMEOUT} from "$lib/config.js";
+  import {BACKEND_URL} from "$lib/config.js";
+  import { user } from "$lib/userStore.js";
 
   let signupVisible = false;
   let signinVisible = false;
+  let loadingUserSession = false;
 
   function toggleSignup() {
     // signupVisible = !signupVisible;
@@ -15,11 +21,72 @@
     // signinVisible = !signinVisible;
     // signupVisible = false;
   }
+
+  async function loginUserSession(email, password) {
+    //call api to login the user (async)
+    //if successful, redirect to the appropriate page
+    try {
+        const response = await fetch(`${BACKEND_URL}/auth/signup`, {
+          method: "POST",
+          headers: new Headers({
+            "Content-Type": "application/json",
+          }),
+          body: JSON.stringify({
+            email: email,
+            password: password,
+          }),
+          // mode: "no-cors",
+        });
+
+        console.log(response);
+        const data = await response.json();
+        console.log(data);
+
+        if (data.error) {
+          let error = data.error;
+          console.log(error);
+          loadingUserSession = false;
+          return;
+        } else {
+          $user.email = email;
+          //redirect to the appropriate page
+          goto("/hostOrPlayer");
+        }
+      } catch (err) {
+        console.log(err);
+        loadingUserSession = false;
+        return;
+      }
+  }
+
+
+  onMount(() => {
+    console.log("Landing page mounted");
+    loadingUserSession = true;
+    //try to load user from local storage
+    let user = JSON.parse(localStorage.getItem("user-session"));
+    console.log(user);
+    if (user) {
+      //check if the user is still valid
+      let currentTime = Date.now();
+      let timeElapsed = currentTime - user.timestamp;
+      if (timeElapsed > SESSION_TIMEOUT) {
+        //clear the user from local storage
+        localStorage.removeItem("user-session");
+        loadingUserSession = false;
+      } else {
+        //call api to login the user (async)
+        //if successful, redirect to the appropriate page
+        loginUserSession(user.email, user.password);
+      }
+    }
+  });
 </script>
 
 <main>
   <body>
     <div class="landing-page">
+    {#if !loadingUserSession}
       <h1>Welcome to JAM!</h1>
       <!-- <p>A brief description of your app and its benefits.</p> -->
 
@@ -41,7 +108,12 @@
       {#if signinVisible}
         <div class="signin-form" />
       {/if}
+
+    {:else}
+      <p>Loading...</p>
+    {/if}
     </div>
+    
   </body>
 </main>
 

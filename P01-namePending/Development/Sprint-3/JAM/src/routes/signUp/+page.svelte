@@ -1,5 +1,6 @@
 <script lang="js">
   import { goto } from "$app/navigation";
+  import {BACKEND_URL} from "$lib/config.js"
 
   let email = "";
   let password = "";
@@ -20,7 +21,7 @@
       // Api call to sign up
 
       try {
-        const response = await fetch("http://localhost:3001/auth/signup", {
+        const response = await fetch(`${BACKEND_URL}/auth/signup`, {
           method: "POST",
           headers: new Headers({
             "Content-Type": "application/json",

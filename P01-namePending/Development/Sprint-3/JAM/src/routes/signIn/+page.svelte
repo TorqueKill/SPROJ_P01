@@ -4,6 +4,7 @@
   import { goto } from "$app/navigation";
   // importing userStore.js
   import { user } from "$lib/userStore.js";
+  import {BACKEND_URL} from "$lib/config.js";
 
   let email = "";
   let password = "";
@@ -20,7 +21,7 @@
       // Api call to sign in
 
       try {
-        const response = await fetch("http://localhost:3001/auth/signin", {
+        const response = await fetch(`${BACKEND_URL}/auth/signup`, {
           method: "POST",
           headers: new Headers({
             "Content-Type": "application/json",
@@ -45,9 +46,21 @@
           // console.log(data.token);
 
           $user.email = email;
-          $user.password = password; //why tf are we storing the password?
+          //$user.password = password;
           //save user to session storage but incoorporate timestamps to determine staleness/ timeout for session
           sessionStorage.setItem("user", JSON.stringify($user));
+
+          //create obj to store email, password, timestamp and user data
+          let userObj = {
+            email: email,
+            password: password,
+            timestamp: Date.now(),
+            userData: {},
+          };
+
+          //save user to local storage
+          localStorage.setItem("user-session", JSON.stringify(userObj));
+
           goto("/hostOrPlayer");
         }
       } catch (err) {
