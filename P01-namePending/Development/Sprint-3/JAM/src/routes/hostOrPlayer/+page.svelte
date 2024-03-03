@@ -3,7 +3,7 @@
 
   import { socket, roomEvents } from "$lib/socketStore.js";
   import { ROOM_SETTINGS } from "$lib/config";
-  import { SCREENS,AVATARS } from "$lib/config.js";
+  import { SCREENS, AVATARS } from "$lib/config.js";
   import { user } from "$lib/userStore.js";
   import { goto } from "$app/navigation";
 
@@ -30,6 +30,7 @@
   let selectedAvatarIndex = null;
   let showModal = false;
   let showHostSettingsModal = false;
+  
 
   const openHostSettingsModal = () => {
     showHostSettingsModal = true;
@@ -38,8 +39,6 @@
   const closeHostSettingsModal = () => {
     showHostSettingsModal = false;
   };
-
-  
 
   onMount(() => {
     $user.id = socket.id;
@@ -74,18 +73,19 @@
   //-------------------------------FUNCTIONS---------------------------------
 
   const logout = async () => {
-  try {
-    // Call the logout method from your authentication service
-    //await authService.logout();
+    try {
+      // Call the logout method from your authentication service
+      //await authService.logout();
 
-    // Redirect to the login page or any other desired page after logout
-    goto('/signIn');
-  } catch (error) {
-    console.error('Logout failed:', error);
-  }
+      // Redirect to the login page or any other desired page after logout
+      goto("/signIn");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   const createRoom = (soc, roomsettings) => {
+
     if (
       roomsettings.maxPlayers < MIN_PLAYERS ||
       roomsettings.maxPlayers > MAX_PLAYERS
@@ -109,7 +109,7 @@
       email: $user.email,
     };
 
-    console.log(roomSettings)
+    console.log(roomSettings);
 
     soc.emit("create-room", $user.hostQuiz, roomSettings, userData);
     console.log("createRoom", roomSettings);
@@ -123,7 +123,7 @@
       let userData = {
         username: username,
         email: $user.email,
-        avatarIndex : $user.avatarIndex
+        avatarIndex: $user.avatarIndex,
       };
 
       if ($user.email != "") {
@@ -155,9 +155,9 @@
   const handleAvatarSelection = (index) => {
     selectedAvatarIndex = index;
     $user.avatarIndex = index;
-    console.log(`index of selected avatar: ${index + 1}`)
+    console.log(`index of selected avatar: ${index + 1}`);
     closeModal();
-  }
+  };
 
   function openModal() {
     showModal = true;
@@ -166,19 +166,27 @@
   function closeModal() {
     showModal = false;
   }
-
 </script>
+
 <!-- As a heading -->
 <nav>
   <ul>
-      <li class="logo">JAM</li>
-      <li><button class="nav_button" on:click={() => goto("/")}>Home</button></li>
-      <li><button class="nav_button" on:click={() => goto("/viewHistory")}>History</button></li>
-      <li><button class="nav_button" on:click={logout}>Logout</button></li>
-      {#if $user.isHost}
-        <!-- Show Host Settings button only if the user is a host -->
-        <li><button class="nav_button" on:click={openHostSettingsModal}>Host Settings</button></li>
-      {/if}
+    <li class="logo">JAM</li>
+    <li><button class="nav_button" on:click={() => goto("/")}>Home</button></li>
+    <li>
+      <button class="nav_button" on:click={() => goto("/viewHistory")}
+        >History</button
+      >
+    </li>
+    <li><button class="nav_button" on:click={logout}>Logout</button></li>
+    {#if $user.isHost}
+      <!-- Show Host Settings button only if the user is a host -->
+      <li>
+        <button class="nav_button" on:click={openHostSettingsModal}
+          >Host Settings</button
+        >
+      </li>
+    {/if}
   </ul>
 </nav>
 
@@ -209,130 +217,155 @@
               }}>Join</button
             >
           </p>
-        {:else if $user.isHost}  
-        <div>
-            <h2>Number of participants</h2>
-            <input
-              type="number"
-              class="form-control"
-              id="participants"
-              placeholder="Enter total number of participants"
-              bind:value={roomSettings.maxPlayers}
-            />
+        {:else if $user.isHost}
+          <div>
+            <p>
+              <button
+                type="button"
+                on:click={() => {
+                  goto("/CreateQuestion");
+                }}>Create Quiz</button
+              >
+            </p>
+
+            <p>
+              <button
+                type="button"
+                on:click={() => {
+                  goto("/chooseQuiz");
+                }}>Choose Quiz</button
+              >
+            </p>
           </div>
-          <p>
+          <!-- <p>
             <button
               type="button"
               on:click={() => createRoom(socket, roomSettings)}
               >Create Room</button
             >
           </p>
-          <p>
-            <button
-              type="button"
-              on:click={() => {
-                goto("/createQuiz");
-              }}>Create Quiz</button
-            >
-          </p>
 
-          <p></p>
+          <h2>Number of participants</h2>
+          <input
+            type="number"
+            class="form-control"
+            id="participants"
+            placeholder="Total participants"
+            bind:value={roomSettings.maxPlayers}
+          /> -->
+
+          <p />
           <button
             type="button"
             on:click={() => {
               $user.isHost = false;
               $user.userDecided = false;
-            }}>Go Back</button>
+            }}>Go Back</button
+          >
         {:else}
-        <h2>Enter roomID and username</h2>
-        <div class="user-input-container">
-          <input
-            type="text"
-            class="form"
-            id="roomId"
-            placeholder="Enter room ID"
-            bind:value={roomid}
-          />
-          <input
-            type="text"
-            class="form"
-            id="roomId"
-            placeholder="Enter username"
-            bind:value={_userName}
-          />
-          {#if $user.avatarIndex !== null}
-            <div class="avatar-container">
-              <img class="player-avatar" src={`/avatars/${AVATARS[$user.avatarIndex]}`} alt="Avatar" />
+          <h2>Enter roomID and username</h2>
+          <div class="user-input-container">
+            <input
+              type="text"
+              class="form"
+              id="roomId"
+              placeholder="Enter room ID"
+              bind:value={roomid}
+            />
+            <input
+              type="text"
+              class="form"
+              id="roomId"
+              placeholder="Enter username"
+              bind:value={_userName}
+            />
+            {#if $user.avatarIndex !== null}
+              <div class="avatar-container">
+                <img
+                  class="player-avatar"
+                  src={`/avatars/${AVATARS[$user.avatarIndex]}`}
+                  alt="Avatar"
+                />
+              </div>
+            {/if}
+          </div>
+          <p />
+          <button
+            type="button"
+            on:click={() => {
+              setUserName(_userName);
+            }}>Save username</button
+          >
+          <p />
+          <button
+            type="button"
+            on:click={() => {
+              openModal();
+            }}>Choose avatar</button
+          >
+          {#if showModal}
+            <div class="modal-overlay">
+              <div class="modal-content">
+                <button on:click={closeModal} class="modal-button"
+                  >Go Back</button
+                >
+                <AvatarMenu selectAvatar={handleAvatarSelection} />
+              </div>
             </div>
           {/if}
-        </div>
-        <p></p>
-        <button
-          type="button"
-          on:click={() => {
-            setUserName(_userName);
-          }}>Save username</button>
-        <p></p>
-        <button
-          type="button"
-          on:click={() => {
-            openModal();
-          }}>Choose avatar</button>
-        {#if showModal}
+          <p />
+          <p />
+          <button
+            type="button"
+            on:click={() => joinRoom(socket, roomid, $user.userName)}
+            >Join Room</button
+          >
+          <p />
+          <button
+            type="button"
+            on:click={() => {
+              $user.isHost = false;
+              $user.userDecided = false;
+            }}>Go Back</button
+          >
+        {/if}
+
+        {#if showHostSettingsModal}
           <div class="modal-overlay">
             <div class="modal-content">
-              <button on:click={closeModal} class="modal-button">Go Back</button>
-              <AvatarMenu selectAvatar={handleAvatarSelection} />
+              <button
+                on:click={closeHostSettingsModal}
+                class="modal-button"
+                style="margin-left: -3%; margin-top: -3%;">Go Back</button
+              >
+              <h2 style="font-size: 28px;">Host Settings</h2>
+              <div style="background: #690092;">
+                <div>
+                  <h3>Report scores in between</h3>
+                  <input
+                    type="number"
+                    id="participants"
+                    placeholder="Enter total number of participants"
+                    bind:value={roomSettings.reportScores}
+                  />
+                  <p id="report">-1: Report at the end</p>
+                </div>
+                <div>
+                  <h3>Display question on Players</h3>
+                  <input
+                    type="checkbox"
+                    id="participants"
+                    placeholder="Enter total number of participants"
+                    bind:checked={roomSettings.displayQuestion}
+                  />
+                </div>
+              </div>
+              <button type="button" on:click={closeHostSettingsModal}
+                >Save Settings</button
+              >
             </div>
           </div>
         {/if}
-        <p></p>
-        <p></p>
-        <button
-          type="button"
-          on:click={() => joinRoom(socket, roomid, $user.userName)}
-        >Join Room</button>
-        <p></p>
-        <button
-          type="button"
-          on:click={() => {
-            $user.isHost = false;
-            $user.userDecided = false;
-          }}>Go Back</button>
-      {/if}      
-
-      {#if showHostSettingsModal}
-        <div class="modal-overlay">
-          <div class="modal-content">
-              <button on:click={closeHostSettingsModal} class="modal-button" style="margin-left: -3%; margin-top: -3%;">Go Back</button>
-              <h2 style="font-size: 28px;">Host Settings</h2>
-              <div style="background: #690092;">
-                  <div>
-                      <h3>Report scores in between</h3>
-                      <input
-                          type="number"
-                          id="participants"
-                          placeholder="Enter total number of participants"
-                          bind:value={roomSettings.reportScores}
-                      />
-                      <p id="report">-1: Report at the end</p>
-                  </div>
-                  <div>
-                      <h3>Display question on Players</h3>
-                      <input
-                          type="checkbox"
-                          id="participants"
-                          placeholder="Enter total number of participants"
-                          bind:checked={roomSettings.displayQuestion}
-                      />
-                  </div>
-              </div>
-              <button type="button" on:click={closeHostSettingsModal}>Save Settings</button>
-          </div>
-      </div>    
-      {/if}
-
-        
       </div>
     </div>
   </body>
@@ -361,8 +394,8 @@
     color: rgb(214, 81, 209);
     font-size: 25px;
     /* padding-right: 60%; */
-    margin-right: auto; 
-    font-weight: bold; 
+    margin-right: auto;
+    font-weight: bold;
   }
   button {
     background-color: #ccc;
@@ -379,7 +412,7 @@
     transition: all 0.3s ease;
     font-family: JejuGothic, sans-serif;
   }
- .nav_button {
+  .nav_button {
     background-color: #ccc;
     border: none;
     color: white;
@@ -477,7 +510,7 @@
   }
 
   .modal-overlay {
-    background: rgba(0, 0, 0, 0.5); 
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -490,8 +523,8 @@
   }
 
   .player-avatar {
-    width: 50px; 
-    height: 50px; 
+    width: 50px;
+    height: 50px;
     margin-top: -115px;
     border-radius: 50%; /* Optional: makes the avatar circular */
   }
@@ -503,13 +536,13 @@
 
   .player-item {
     display: flex;
-    align-items: center; 
-    gap: 10px; 
+    align-items: center;
+    gap: 10px;
   }
 
   .player-name {
-    margin: 0; 
-    color: white; 
+    margin: 0;
+    color: white;
   }
 
   .modal-content {
@@ -521,7 +554,7 @@
   .modal-button {
     background-color: #c49eff;
     color: white;
-    display: flex;    
+    display: flex;
     cursor: pointer;
   }
 
@@ -533,7 +566,7 @@
       border-radius: 10px;
     }
     .nav_button {
-        margin: 4px 20px; /* Adjusted margin for larger screens */
+      margin: 4px 20px; /* Adjusted margin for larger screens */
     }
   }
 
@@ -544,7 +577,7 @@
       border-radius: 20px;
     }
     .nav_button {
-        margin: 4px 20px; /* Adjusted margin for larger screens */
+      margin: 4px 20px; /* Adjusted margin for larger screens */
     }
   }
 </style>
