@@ -82,6 +82,7 @@ function addUserToRoom(roomid, socketid) {
         host: socketid,
         quiz: [],
         answers: {},
+        responseTimes: {},
         gameStarted: false,
         sessionLoaded: [],
         scores: [],
@@ -246,7 +247,7 @@ function makeDummyStringList(length) {
   return result;
 }
 
-function handleAnswer(roomid, socketid, answer, questionIndex) {
+function handleAnswer(roomid, socketid, answer, questionIndex, timeAnswered) {
   try {
     // if questionIndex is -1, that means user has re-connected so get the current question index
 
@@ -262,12 +263,29 @@ function handleAnswer(roomid, socketid, answer, questionIndex) {
         //
         room.answers[socketid] = makeDummyStringList(room.quiz.length);
       }
+
+      if (!room.responseTimes[socketid]) {
+        room.responseTimes[socketid] = makeDummyStringList(room.quiz.length);
+      }
+
+
       let answer = room?.quiz[questionIndex]?.choices[choicesIdx];
 
       //if answer is undefined, set answer to a default value
       if (!answer) {
         // answer = room.quiz[questionIndex].choices[0];
         answer = "default_value_time_ran_out";
+
+        // time ran out so respone time is 0
+        responseTime = 0;
+        room.responseTimes[socketid][questionIndex] = responseTime;
+        console.log("time remaining: ", responseTime);
+        
+      } else {
+        // player answered so repsonse time is time limit - timeAnswered
+        responseTime = room.quiz[questionIndex].timeLimit - timeAnswered;
+        room.responseTimes[socketid][questionIndex] = responseTime;
+        console.log("time remaining: ", responseTime);
       }
 
       // if answerIndex -1 then that means time ran out for that user
@@ -1077,7 +1095,10 @@ io.on("connection", async (socket) => {
 
       let room = getRoom(roomid);
       if (room) {
-        handleAnswer(roomid, socket.id, answer, questionIndex);
+
+        timeAnswered = (Date.now() - room.startTimeStampOfTimer) / 1000;
+        console.log("Time taken to answer: " + timeAnswered);
+        handleAnswer(roomid, socket.id, answer, questionIndex, timeAnswered);
       }
 
       //check if all players have answered, emit next question
