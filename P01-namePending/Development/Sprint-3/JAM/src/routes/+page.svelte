@@ -79,6 +79,8 @@
         //if successful, redirect to the appropriate page
         loginUserSession(user.email, user.password);
       }
+    } else {
+      loadingUserSession = false;
     }
   });
 </script>
