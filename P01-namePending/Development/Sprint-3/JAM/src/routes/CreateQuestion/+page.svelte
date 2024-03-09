@@ -4,6 +4,9 @@
   import { goto } from "$app/navigation";
   import { user } from "$lib/userStore.js";
 
+  import { onMount } from "svelte";
+  import { writable } from "svelte/store";
+
   const MAX_TIME_LIMIT = 60;
   let showHostSettingsModal = false;
 
@@ -23,6 +26,11 @@
   let quizChosen;
   let quizIdx;
   let isQuizSelected = false;
+  let selectedQuestionIndex = 0;
+
+  function selectQuestion(index) {
+    selectedQuestionIndex = index;
+  }
 
   // onMount(() => {
   //   //append more from local storage if any
@@ -94,6 +102,7 @@
       imageUrl: "",
     });
     quiz1 = quiz1;
+    selectQuestion(quiz1.length - 1); // Select the new question
   }
 
   function updateAnswer(questionIndex, choiceText) {
@@ -184,138 +193,166 @@
 </nav>
 
 <main>
-  <body>
-    <!-- <div class="container">
-            <div class="row align-items-center">
-                <div class="col">
-                    <p id="question1">Question 1</p>
-                </div>
-                <div class="col-auto">
-                    <button on:click={increaseTime} class="btn btn-primary btn-block btn-space ml-auto">
-                        Set time limit: {timeLimit} seconds
-                    </button>
-                </div>
-            </div>
-        </div> -->
-    <div class="container">
-      {#each quiz1 as question, qIndex}
-        <div class="question-cont">
-          <div class="quizz">
-            <label for={`question-${qIndex}`}>Question {qIndex + 1}</label>
+  <div class="sidebar">
+    {#each quiz1 as question, index}
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <div
+        class="question-preview {index === selectedQuestionIndex
+          ? 'active-question'
+          : ''}"
+        on:click={() => selectQuestion(index)}
+      >
+        Question {index + 1}
+      </div>
+    {/each}
+    <button on:click={addQuestion}>Add Question</button>
+  </div>
+  <div class="container">
+    {#if quiz1.length > 0}
+      <div class="question-cont">
+        <div class="quizz">
+          <label for={`question-${selectedQuestionIndex}`}
+            >Question {selectedQuestionIndex + 1}</label
+          >
+          <input
+            type="text"
+            id={`question-${selectedQuestionIndex}`}
+            class="form-control quizz"
+            placeholder="Type your question here"
+            bind:value={quiz1[selectedQuestionIndex].question}
+            on:input={(event) =>
+              updateQuestionText(selectedQuestionIndex, event)}
+          />
+        </div>
+        {#each quiz1[selectedQuestionIndex].choices as choice, oIndex}
+          <div class="option-group">
             <input
               type="text"
-              id={`question-${qIndex}`}
-              class="form-control quizz"
-              placeholder="Type your question here"
-              on:input={(
-                /** @type {Event & { currentTarget: EventTarget & HTMLInputElement; }} */ event
-              ) => updateQuestionText(qIndex, event)}
+              class="form-control options"
+              placeholder="Enter option"
+              bind:value={choice}
+              on:input={(event) =>
+                updateOptionText(selectedQuestionIndex, oIndex, event)}
+            />
+            <input
+              type="radio"
+              class="form-check-input"
+              bind:group={quiz1[selectedQuestionIndex].answer}
+              value={choice}
+              on:change={() => updateAnswer(selectedQuestionIndex, choice)}
             />
           </div>
-          {#each question.choices as choice, oIndex}
-            <div class="option-group">
-              <input
-                type="text"
-                class="form-control options"
-                placeholder="Enter option"
-                on:input={(event) => updateOptionText(qIndex, oIndex, event)}
-                bind:value={question.choices[oIndex]}
-              />
-              <input
-                type="radio"
-                class="form-check-input"
-                checked={choice === question.answer}
-                bind:group={question.answer}
-                value={choice}
-                on:change={() => updateAnswer(qIndex, choice)}
-                name={`option-${qIndex}`}
-              />
-            </div>
-          {/each}
-
-          <div class="image-input-container">
-            <div class="quizz">
-              <label for={`image-url-${qIndex}`}>Image URL (optional)</label>
-              <input
-                type="text"
-                id={`image-url-${qIndex}`}
-                class="form-control quizz"
-                placeholder="Enter image URL"
-                on:input={(event) => updateImageUrl(qIndex, event)}
-                value={question.imageUrl}
-              />
-            </div>
-            {#if question.imageUrl}
-              <img
-                src={question.imageUrl}
-                class="image-preview"
-                alt={`Image for Question ${qIndex + 1}`}
-              />
-            {/if}
-          </div>
-        </div>
-        <div class="col-auto">
-          <button
-            on:click={() => {
-              increaseTime(qIndex);
-            }}
-            class="btn btn-primary btn-block btn-space ml-auto"
-          >
-            Time limit: {question.timeLimit} seconds
-          </button>
-        </div>
-      {/each}
-      <div class="container-md">
-        <div class="btn-group">
-          <div id="addQuestion">
-            <button on:click={addQuestion} class="btn btn-quat"
-              >Add question</button
-            >
-            <!-- <button class="btn btn-tertiary btn-block btn-space ml-auto"> Add question </button>  -->
-          </div>
-          <div class="col-auto" id="saveBtn">
-            <!-- <button
-              on:click|once={() => {
-                saveQuiz();
-              }}
-              class="btn btn-secondary btn-block btn-space ml-auto"
-            >
-              Save and Choose
-            </button> -->
-            {#if isQuizSelected}
-              <button
-                class="btn btn-primary btn-block"
-                id="quizNo"
-                on:click={() => goto("/createRoom")}
-              >
-                Proceed
-              </button>
-            {/if}
-            <button
-              on:click={() => {
-                saveQuiz();
-              }}
-              class="btn btn-secondary btn-block btn-space ml-auto"
-            >
-              Save and Choose
-            </button>
-          </div>
-          <div class="col-auto" id="cancelBtn">
-            <button
-              class="btn btn-quaternary"
-              on:click={() => {
-                // goto("/createQuiz");
-                goto("/hostOrPlayer");
-              }}>Back</button
-            >
-          </div>
-        </div>
+        {/each}
+        <!-- ... other inputs for image URL and time limit ... -->
+        <!-- ... Save and Choose button ... -->
       </div>
-    </div>
-  </body>
+
+      <div class="image-input-container">
+        <div class="quizz">
+          <label for={`image-url-${selectedQuestionIndex}`}
+            >Image URL (optional)</label
+          >
+          <input
+            type="text"
+            id={`image-url-${selectedQuestionIndex}`}
+            class="form-control quizz"
+            placeholder="Enter image URL"
+            bind:value={quiz1[selectedQuestionIndex].imageUrl}
+            on:input={(event) => updateImageUrl(selectedQuestionIndex, event)}
+          />
+        </div>
+        {#if quiz1[selectedQuestionIndex].imageUrl}
+          <img
+            src={quiz1[selectedQuestionIndex].imageUrl}
+            class="image-preview"
+            alt={`Image for Question ${selectedQuestionIndex + 1}`}
+            on:error={(e) => {
+              e.target.onerror = null;
+              e.target.src = "path_to_placeholder_image";
+            }}
+          />
+        {/if}
+      </div>
+
+      <div class="time-limit-container">
+        <button
+          class="time-limit-button"
+          on:click={() => increaseTime(selectedQuestionIndex)}
+        >
+          Time limit: {quiz1[selectedQuestionIndex].timeLimit} seconds
+        </button>
+      </div>
+
+      <div class="col-auto" id="saveBtn">
+        <!-- <button
+          on:click|once={() => {
+            saveQuiz();
+          }}
+          class="btn btn-secondary btn-block btn-space ml-auto"
+        >
+          Save and Choose
+        </button> -->
+        {#if isQuizSelected}
+          <button
+            class="btn btn-primary btn-block"
+            id="quizNo"
+            on:click={() => goto("/createRoom")}
+          >
+            Proceed
+          </button>
+        {/if}
+        <button
+          on:click={() => {
+            saveQuiz();
+          }}
+          class="btn btn-secondary btn-block btn-space ml-auto"
+        >
+          Save and Choose
+        </button>
+      </div>
+
+      <div class="col-auto" id="cancelBtn">
+        <button
+          class="btn btn-quaternary"
+          on:click={() => {
+            // goto("/createQuiz");
+            goto("/hostOrPlayer");
+          }}>Back</button
+        >
+      </div>
+    {/if}
+  </div>
 </main>
 
 <style>
+  .sidebar {
+    width: 25%;
+    background: #f4f4f4; /* Light grey background */
+    padding: 20px;
+    float: left;
+    height: 100vh; /* Full height */
+    overflow-y: auto; /* Enable vertical scroll if needed */
+  }
+
+  .main-content {
+    width: 75%;
+    float: left;
+    padding: 20px;
+  }
+
+  .active {
+    background-color: red; /* Active item background */
+  }
+
+  .active-question {
+    background-color: #e0e0e0;
+  }
+
+  .question {
+    padding: 10px;
+    cursor: pointer;
+  }
   body {
     background: #7801a8;
     padding: 0;
