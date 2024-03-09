@@ -4,9 +4,6 @@
   import { goto } from "$app/navigation";
   import { user } from "$lib/userStore.js";
 
-  import { onMount } from "svelte";
-  import { writable } from "svelte/store";
-
   const MAX_TIME_LIMIT = 60;
   let showHostSettingsModal = false;
 
@@ -192,8 +189,8 @@
   </ul>
 </nav>
 
-<main>
-  <div class="sidebar">
+<main class="main-flex-container">
+  <div class="left-sidebar">
     {#each quiz1 as question, index}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -206,9 +203,15 @@
         Question {index + 1}
       </div>
     {/each}
-    <button on:click={addQuestion}>Add Question</button>
+    <div class="sidebar-footer">
+      <button
+        class="btn btn-secondary btn-block btn-space ml-auto"
+        on:click={addQuestion}>Add Question</button
+      >
+    </div>
   </div>
-  <div class="container">
+
+  <div class="content">
     {#if quiz1.length > 0}
       <div class="question-cont">
         <div class="quizz">
@@ -225,27 +228,28 @@
               updateQuestionText(selectedQuestionIndex, event)}
           />
         </div>
-        {#each quiz1[selectedQuestionIndex].choices as choice, oIndex}
-          <div class="option-group">
-            <input
-              type="text"
-              class="form-control options"
-              placeholder="Enter option"
-              bind:value={choice}
-              on:input={(event) =>
-                updateOptionText(selectedQuestionIndex, oIndex, event)}
-            />
-            <input
-              type="radio"
-              class="form-check-input"
-              bind:group={quiz1[selectedQuestionIndex].answer}
-              value={choice}
-              on:change={() => updateAnswer(selectedQuestionIndex, choice)}
-            />
-          </div>
-        {/each}
-        <!-- ... other inputs for image URL and time limit ... -->
-        <!-- ... Save and Choose button ... -->
+
+        <div class="options-container">
+          {#each quiz1[selectedQuestionIndex].choices as choice, oIndex}
+            <div class="option-group">
+              <input
+                type="text"
+                class="form-control options"
+                placeholder="Enter option"
+                bind:value={choice}
+                on:input={(event) =>
+                  updateOptionText(selectedQuestionIndex, oIndex, event)}
+              />
+              <input
+                type="radio"
+                class="form-check-input"
+                bind:group={quiz1[selectedQuestionIndex].answer}
+                value={choice}
+                on:change={() => updateAnswer(selectedQuestionIndex, choice)}
+              />
+            </div>
+          {/each}
+        </div>
       </div>
 
       <div class="image-input-container">
@@ -283,90 +287,149 @@
           Time limit: {quiz1[selectedQuestionIndex].timeLimit} seconds
         </button>
       </div>
-
-      <div class="col-auto" id="saveBtn">
-        <!-- <button
-          on:click|once={() => {
-            saveQuiz();
-          }}
-          class="btn btn-secondary btn-block btn-space ml-auto"
-        >
-          Save and Choose
-        </button> -->
-        {#if isQuizSelected}
-          <button
-            class="btn btn-primary btn-block"
-            id="quizNo"
-            on:click={() => goto("/createRoom")}
-          >
-            Proceed
-          </button>
-        {/if}
-        <button
-          on:click={() => {
-            saveQuiz();
-          }}
-          class="btn btn-secondary btn-block btn-space ml-auto"
-        >
-          Save and Choose
-        </button>
-      </div>
-
-      <div class="col-auto" id="cancelBtn">
-        <button
-          class="btn btn-quaternary"
-          on:click={() => {
-            // goto("/createQuiz");
-            goto("/hostOrPlayer");
-          }}>Back</button
-        >
-      </div>
     {/if}
+  </div>
+
+  <div class="right-sidebar">
+    <div class="sidebar-footer">
+      <button
+        on:click={() => {
+          saveQuiz();
+        }}
+        class="btn btn-secondary btn-block btn-space ml-auto"
+      >
+        Save and Choose
+      </button>
+    </div>
+    {#if isQuizSelected}
+      <button
+        class="btn btn-primary btn-block"
+        id="quizNo"
+        on:click={() => goto("/createRoom")}
+      >
+        Proceed
+      </button>
+    {/if}
+
+    <div class="col-auto" id="cancelBtn">
+      <button
+        class="btn btn-quaternary"
+        on:click={() => {
+          // goto("/createQuiz");
+          goto("/hostOrPlayer");
+        }}>Back</button
+      >
+    </div>
   </div>
 </main>
 
 <style>
-  .sidebar {
-    width: 25%;
-    background: #f4f4f4; /* Light grey background */
-    padding: 20px;
-    float: left;
-    height: 100vh; /* Full height */
-    overflow-y: auto; /* Enable vertical scroll if needed */
+  .time-limit-container {
+    align-self: center; 
+    padding: 10px 0; 
+    margin-top: 10rem;
+  }
+  .image-input-container {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    margin-bottom: -6rem;
+    width: 100%;
   }
 
-  .main-content {
-    width: 75%;
-    float: left;
-    padding: 20px;
+  .image-preview {
+    max-width: 100px; 
+    max-height: 100px; 
+    margin-top: 5rem;
+    margin-bottom: -9rem;
   }
 
-  .active {
-    background-color: red; /* Active item background */
-  }
-
-  .active-question {
-    background-color: #e0e0e0;
-  }
-
-  .question {
-    padding: 10px;
+  .question-preview {
+    font-family: JejuGothic, sans-serif; 
     cursor: pointer;
+    padding: 10px;
+    border-radius: 15px; 
+    transition: background-color 0.3s; 
+    background: #c49eff;
+    margin-bottom: 1.25rem;
+    color: #ccc;
+    font-size: 18px;
   }
-  body {
+
+  .question-preview:hover {
+    background-color: #7801a8; 
+  }
+  .main-flex-container {
+    display: flex;
+    flex-direction: row;
+    height: calc(100vh - 40px);
+    padding-top: 40px;
     background: #7801a8;
-    padding: 0;
-    margin: 0;
+  }
+
+  .left-sidebar {
+    width: 12%; 
+    background-color: #018198;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
+    justify-content: space-between;
+    padding: 20px;
+    overflow-y: auto;
+    /* position: fixed; */
+    height: calc(100vh - 90px);
   }
+
+  .right-sidebar {
+    width: 12%;
+    background: #018198;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+  }
+
+  .add-question-btn {
+    background-color: #ccc;
+    color: white;
+    padding: 15px 20px;
+    margin-left: 2.5rem;
+    justify-content: center;
+    text-align: center;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-family: JejuGothic, sans-serif;
+    border-radius: 15px;
+  }
+
+
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
+    overflow-y: auto;
+    background: #c49eff;
+    padding: 45px;
+    border-radius: 51px;
+    margin: 0 auto; 
+    max-width: 800px;
+    width: 80%; 
+    height: calc(100vh - 170px); 
+  }
+
+
 
   .container {
     height: auto;
-    background: #018198;
+    background: #c49eff;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 51px;
     padding: 2rem;
@@ -422,14 +485,23 @@
     background-color: red;
   }
 
+  .options-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 3rem;
+  }
+
   .option-group {
     display: flex;
     align-items: center;
+    flex-basis: calc(50% - 5px); 
   }
 
   .question-cont {
     position: relative;
-    margin-bottom: 2rem;
+    margin-bottom: -8rem;
     margin-top: 2rem;
   }
 
@@ -441,29 +513,31 @@
     position: relative;
     z-index: 1;
     margin-top: 1.75rem;
+    margin-left: 0.75rem;
   }
 
   .form-control.options {
-    margin-left: 1rem;
+    margin-left: 5.25rem;
     margin-top: 1.5rem;
     border-radius: 15px;
     border: None;
     height: 2rem;
     padding-left: 0.5rem;
+    width: 50%;
   }
 
   .quizz {
-    font-size: 20px;
+    font-size: 22px;
     border-radius: 15px;
     border: None;
     padding-left: 0.5rem;
     margin-top: 0.5rem;
     margin-bottom: 2rem;
-    color: red;
+    color: #7801a8;
     height: 2rem;
     width: 100%;
-    flex-grow: 2; /* Adjust as needed for your layout */
-    margin-right: 10px; /* Adds some space between the input and the image preview */
+    flex-grow: 2;
+    margin-right: 10px; 
   }
 
   @media screen and (max-width: 768px) {
@@ -500,7 +574,7 @@
 
   .image-preview {
     flex-grow: 1;
-    max-width: 100px; /* or other desired size */
+    max-width: 300px; /* or other desired size */
     height: auto;
     border: 1px solid #ddd;
     border-radius: 4px;
