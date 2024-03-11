@@ -275,6 +275,9 @@
       {:else if quiz}
         {#if isHost}
           <h1 id="host-question" class="inside-box container2">
+
+            <!-- displaying number of questions answered so far -->
+            <h2>Question {currentQuestion + 1} of {quiz.length}</h2>
             {quiz[currentQuestion].question}
 
             {#if quiz[currentQuestion].imageUrl}
@@ -316,6 +319,8 @@
         
           <!-- <p>Time Left: {timeLeft}</p> -->
           <h2 id="chooseOpt" class="inside-option container2">
+            <!-- displaying number of questions answered so far -->
+            <h2>Question {currentQuestion + 1} of {quiz.length}</h2>
             <p id="choose" style="color: #c49eff">Choose one</p>
             {#each quiz[currentQuestion].choices as choice, idx}
               <button
