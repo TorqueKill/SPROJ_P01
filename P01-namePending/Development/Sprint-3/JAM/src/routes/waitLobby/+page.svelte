@@ -31,6 +31,7 @@
 
     if (events.roomJoined) {
       playersReady = events.roomJoined.num;
+      console.log(playersReady);
       players = events.roomJoined.users;
 
       //set the event to null
@@ -46,6 +47,7 @@
     }
 
     if (events.gameStarted) {
+      console.log("game started event recieved on front end");
       console.log(events.gameStarted);
       $user.quiz = events.gameStarted.quiz;
       $user.displayQuestion = events?.gameStarted?.options?.displayQuestion;
@@ -65,6 +67,22 @@
       //will use data.currentQuestion in the future
 
       socket.emit("reconnected", $user.gameid);
+      goto("/gameSession");
+    }
+
+    if (events.lateConnect) {
+      
+      console.log(events.lateConnect);
+      $user.quiz = events.lateConnect.quiz;
+      console.log($user.quiz);
+      $user.displayQuestion = events?.lateConnect?.options?.displayQuestion;
+      $user.currentSession = SCREENS.GAME;
+      $user.lateConnected = true;
+
+      socket.emit("late-connected", $user.gameid);
+
+      events.gameStarted = null;
+
       goto("/gameSession");
     }
   }
@@ -99,6 +117,16 @@
             <img class="player-avatar" src={`/avatars/${AVATARS[avatarIndex]}`} alt="Avatar" />
         </div>
         {/each}
+
+        <!-- Force start the quiz atleast one player has joined -->
+        {#if $user.isHost && playersReady >= 1}
+          <button
+            class="btn btn-secondary btn-block"
+            on:click={() => {
+              socket.emit("force-start-game", $user.gameid);
+            }}>Start Quiz</button
+          >
+        {/if}
 
         <!--Go back to menu, disconnect-->
         <button

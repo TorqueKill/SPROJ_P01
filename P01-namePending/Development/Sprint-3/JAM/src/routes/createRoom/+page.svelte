@@ -3,13 +3,9 @@
 
   import { socket, roomEvents } from "$lib/socketStore.js";
   import { ROOM_SETTINGS } from "$lib/config";
-  import { SCREENS, AVATARS } from "$lib/config.js";
   import { user } from "$lib/userStore.js";
   import { goto } from "$app/navigation";
-
   import { onMount } from "svelte";
-
-  import AvatarMenu from "../../lib/avatarMenu/+page.svelte";
 
   const MIN_PLAYERS = ROOM_SETTINGS.MIN_PLAYERS;
   const MAX_PLAYERS = ROOM_SETTINGS.MAX_PLAYERS;
@@ -30,7 +26,6 @@
   let selectedAvatarIndex = null;
   let showModal = false;
   let showHostSettingsModal = false;
-  
 
   const openHostSettingsModal = () => {
     showHostSettingsModal = true;
@@ -85,7 +80,6 @@
   };
 
   const createRoom = (soc, roomsettings) => {
-
     if (
       roomsettings.maxPlayers < MIN_PLAYERS ||
       roomsettings.maxPlayers > MAX_PLAYERS
@@ -193,180 +187,63 @@
 <main>
   <body>
     <div class="container">
-      <div>
-        <!--ask if host or player-->
-        <!--if host, show create room button else show joing room-->
-        {#if !$user.userDecided}
-          <p>
-            <button
-              type="button"
-              id="hostQuiz"
-              on:click={() => {
-                $user.isHost = true;
-                $user.userDecided = true;
-              }}>Host</button
-            >
-          </p>
-          <p>
-            <button
-              type="button"
-              id="hostQuiz"
-              on:click={() => {
-                $user.userDecided = true;
-                closeHostSettingsModal();
-              }}>Join</button
-            >
-          </p>
-        {:else if $user.isHost}
-          <div>
-            <p>
-              <button
-                type="button"
-                on:click={() => {
-                  goto("/CreateQuestion");
-                }}>Create Quiz</button
-              >
-            </p>
-
-            <p>
-              <button
-                type="button"
-                on:click={() => {
-                  goto("/chooseQuiz");
-                }}>Choose Quiz</button
-              >
-            </p>
-          </div>
-          <!-- <p>
-            <button
-              type="button"
-              on:click={() => createRoom(socket, roomSettings)}
-              >Create Room</button
-            >
-          </p>
-
-          <h2>Number of participants</h2>
-          <input
-            type="number"
-            class="form-control"
-            id="participants"
-            placeholder="Total participants"
-            bind:value={roomSettings.maxPlayers}
-          /> -->
-
-          <p />
+      {#if $user.isHost}
+        <p>
           <button
             type="button"
-            on:click={() => {
-              $user.isHost = false;
-              $user.userDecided = false;
-            }}>Go Back</button
+            on:click={() => createRoom(socket, roomSettings)}
+            >Create Room</button
           >
-        {:else}
-          <h2>Enter roomID and username</h2>
-          <div class="user-input-container">
-            <input
-              type="text"
-              class="form"
-              id="roomId"
-              placeholder="Enter room ID"
-              bind:value={roomid}
-            />
-            <input
-              type="text"
-              class="form"
-              id="roomId"
-              placeholder="Enter username"
-              bind:value={_userName}
-            />
-            {#if $user.avatarIndex !== null}
-              <div class="avatar-container">
-                <img
-                  class="player-avatar"
-                  src={`/avatars/${AVATARS[$user.avatarIndex]}`}
-                  alt="Avatar"
+        </p>
+
+        <h2>Number of participants</h2>
+        <input
+          type="number"
+          class="form-control"
+          id="participants"
+          placeholder="Total participants"
+          bind:value={roomSettings.maxPlayers}
+        />
+
+        <p />
+      {/if}
+
+      {#if showHostSettingsModal}
+        <div class="modal-overlay">
+          <div class="modal-content">
+            <button
+              on:click={closeHostSettingsModal}
+              class="modal-button"
+              style="margin-left: -3%; margin-top: -3%;">Go Back</button
+            >
+            <h2 style="font-size: 28px;">Host Settings</h2>
+            <div style="background: #690092;">
+              <div>
+                <h3>Report scores in between</h3>
+                <input
+                  type="number"
+                  id="participants"
+                  placeholder="Enter total number of participants"
+                  bind:value={roomSettings.reportScores}
+                />
+                <p id="report">-1: Report at the end</p>
+              </div>
+              <div>
+                <h3>Display question on Players</h3>
+                <input
+                  type="checkbox"
+                  id="participants"
+                  placeholder="Enter total number of participants"
+                  bind:checked={roomSettings.displayQuestion}
                 />
               </div>
-            {/if}
-          </div>
-          <p />
-          <button
-            type="button"
-            on:click={() => {
-              setUserName(_userName);
-            }}>Save username</button
-          >
-          <p />
-          <button
-            type="button"
-            on:click={() => {
-              openModal();
-            }}>Choose avatar</button
-          >
-          {#if showModal}
-            <div class="modal-overlay">
-              <div class="modal-content">
-                <button on:click={closeModal} class="modal-button"
-                  >Go Back</button
-                >
-                <AvatarMenu selectAvatar={handleAvatarSelection} />
-              </div>
             </div>
-          {/if}
-          <p />
-          <p />
-          <button
-            type="button"
-            on:click={() => joinRoom(socket, roomid, $user.userName)}
-            >Join Room</button
-          >
-          <p />
-          <button
-            type="button"
-            on:click={() => {
-              $user.isHost = false;
-              $user.userDecided = false;
-            }}>Go Back</button
-          >
-        {/if}
-
-        {#if showHostSettingsModal}
-          <div class="modal-overlay">
-            <div class="modal-content">
-              <button
-                on:click={closeHostSettingsModal}
-                class="modal-button"
-                style="margin-left: -3%; margin-top: -3%;">Go Back</button
-              >
-              <h2 style="font-size: 28px;">Host Settings</h2>
-              <div style="background: #690092;">
-                <div>
-                  <h3>Report scores in between</h3>
-                  <input
-                    type="number"
-                    id="participants"
-                    placeholder="Enter total number of participants"
-                    bind:value={roomSettings.reportScores}
-                  />
-                  <p id="report">-1: Report at the end</p>
-                </div>
-                <div>
-                  <h3>Display question on Players</h3>
-                  <input
-                    type="checkbox"
-                    id="participants"
-                    placeholder="Enter total number of participants"
-                    bind:checked={roomSettings.displayQuestion}
-                  />
-                </div>
-              </div>
-              <button type="button" on:click={closeHostSettingsModal}
-                >Save Settings</button
-              >
-            </div>
+            <button type="button" on:click={closeHostSettingsModal}
+              >Save Settings</button
+            >
           </div>
-        {/if}
-      </div>
+        </div>
+      {/if}
     </div>
   </body>
 </main>

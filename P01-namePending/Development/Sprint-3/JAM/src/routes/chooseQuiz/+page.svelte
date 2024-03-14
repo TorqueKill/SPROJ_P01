@@ -12,6 +12,7 @@
   let quizChosen;
   let quizIdx;
   let showHostSettingsModal = false;
+  let isQuizSelected = false;
 
   const openHostSettingsModal = () => {
     showHostSettingsModal = true;
@@ -80,6 +81,7 @@
     $user.hostQuiz = quizzes[quizIdx];
     quizChosen = true;
     displayQuizCheck = false;
+    isQuizSelected = true;
   };
 
   // update questions, answers, options, and time limits
@@ -95,96 +97,6 @@
     }
     // quizzes = [...quizzes];
   }
-
-  // function escapeCSS(str) {
-  //   return str.replace(/("|;|\n)/g, "\\$1");
-  // }
-
-  // function downloadQuizAsCSS(quiz, idx) {
-  //   let cssContent =
-  //     "/* Quiz format: question { answer: value; choices: value; time-limit: value; image-url: value; } */\n\n";
-
-  //   // convert each quiz to CSS structure
-  //   quiz.forEach((item, questionIndex) => {
-  //     cssContent += `.question-${questionIndex + 1} {\n`;
-  //     cssContent += `  question: "${escapeCSS(item.question)}";\n`;
-  //     cssContent += `  answer: "${escapeCSS(item.answer)}";\n`;
-  //     cssContent += `  choices: "${item.options
-  //       .map(escapeCSS)
-  //       .join(" | ")}";\n`; // a | b | c | d
-  //     cssContent += `  time-limit: "${item.timeLimit}";\n`;
-  //     if (item.imageUrl) {
-  //       cssContent += `  image-url: "${escapeCSS(item.imageUrl)}";\n`;
-  //     }
-  //     cssContent += `}\n\n`;
-  //   });
-  //   console.log(cssContent);
-
-  //   // Blob and URL.createObjectURL for download
-  //   const blob = new Blob([cssContent], { type: "text/css;charset=utf-8;" });
-  //   const url = URL.createObjectURL(blob);
-
-  //   // temporary link to trigger download
-  //   const link = document.createElement("a");
-  //   link.setAttribute("href", url);
-  //   link.setAttribute("download", `quiz_${idx + 1}.css`);
-  //   document.body.appendChild(link);
-  //   link.click();
-
-  //   // clean url after download
-  //   document.body.removeChild(link);
-  //   URL.revokeObjectURL(url);
-  // }
-
-  // function importQuiz(event) {
-  //   const file = event.target.files[0];
-  //   if (file) {
-  //     const reader = new FileReader();
-  //     reader.onload = (e) => {
-  //       const content = e.target.result;
-  //       const parsedQuiz = parseCSVToQuiz(content);
-  //       quizzes.set([...$quizzes, ...parsedQuiz]);
-  //     };
-  //     reader.readAsText(file);
-  //   }
-  // }
-
-  // function parseCSSQuiz(cssText) {
-  //   let newQuizzes = [];
-
-  //   // regex to match the quiz format
-  //   const quizRegex =
-  //     /\.question-\d+ {\s*question: "([^"]+)";\s*answer: "([^"]+)";\s*choices: "([^"]+)";\s*time-limit: "(\d+)";\s*}/g;
-  //   let match;
-
-  //   while ((match = quizRegex.exec(cssText)) !== null) {
-  //     const [, question, answer, choices, timeLimit] = match;
-
-  //     const choicesArray = choices.split(" | ");
-
-  //     const quiz = {
-  //       question,
-  //       answer,
-  //       choices: choicesArray,
-  //       timeLimit: parseInt(timeLimit, 10),
-  //     };
-  //     newQuizzes.push(quiz);
-  //   }
-
-  //   quizzes = quizzes.concat(
-  //     newQuizzes.filter(
-  //       (newQuiz) =>
-  //         !quizzes.some(
-  //           (existingQuiz) => existingQuiz.question === newQuiz.question
-  //         )
-  //     )
-  //   );
-  //   console.log(newQuizzes);
-
-  //   saveQuizzes();
-  //   quizToDisplay = quizzes[quizzes.length - newQuizzes.length];
-  //   displayQuizCheck = true;
-  // }
 
   function downloadQuizAsCSV(idx) {
     let quiz = quizzes[idx];
@@ -245,7 +157,7 @@
         const content = e.target.result;
         const parsedQuiz = parseCSVToQuiz(content);
         console.log("Parsed: \n");
-        console.log(parsedQuiz)
+        console.log(parsedQuiz);
 
         //save to quizzes
         quizzes.push(parsedQuiz);
@@ -262,15 +174,15 @@
   }
 
   const logout = async () => {
-  try {
-    // Call the logout method from your authentication service
-    //await authService.logout();
+    try {
+      // Call the logout method from your authentication service
+      //await authService.logout();
 
-    // Redirect to the login page or any other desired page after logout
-    goto('/signIn');
-  } catch (error) {
-    console.error('Logout failed:', error);
-  }
+      // Redirect to the login page or any other desired page after logout
+      goto("/signIn");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   function parseCSVToQuiz(csvData) {
@@ -318,20 +230,28 @@
 
 <nav>
   <ul>
-      <li class="logo">JAM</li>
-      <li><button class="nav_button" on:click={() => goto("/")}>Home</button></li>
-      <li><button class="nav_button" on:click={() => goto("/viewHistory")}>History</button></li>
-      <li><button class="nav_button" on:click={logout}>Logout</button></li>
-      {#if $user.isHost}
-        <!-- Show Host Settings button only if the user is a host -->
-        <li><button class="nav_button" on:click={openHostSettingsModal}>Host Settings</button></li>
-      {/if}
+    <li class="logo">JAM</li>
+    <li><button class="nav_button" on:click={() => goto("/")}>Home</button></li>
+    <li>
+      <button class="nav_button" on:click={() => goto("/viewHistory")}
+        >History</button
+      >
+    </li>
+    <li><button class="nav_button" on:click={logout}>Logout</button></li>
+    {#if $user.isHost}
+      <!-- Show Host Settings button only if the user is a host -->
+      <li>
+        <button class="nav_button" on:click={openHostSettingsModal}
+          >Host Settings</button
+        >
+      </li>
+    {/if}
   </ul>
 </nav>
 
 <main>
   <body>
-    <h2 class="create-quiz" style="margin-top: 60px">Create Quiz</h2>
+    <h2 class="create-quiz" style="margin-top: 60px">Choose Quiz</h2>
     {#if displayQuizCheck}
       <h5>SCROLL DOWN TO VIEW</h5>
     {:else}
@@ -357,14 +277,20 @@
           {/each}
         {/if}
 
-        <button
-          class="btn btn-tertiary btn-block"
-          id="createNew"
-          on:click={() => {
-            goto("/CreateQuestion");
-          }}>Create new Quiz</button
-        >
-        <!-- <input type="file" accept=".csv" on:change={importQuiz} /> -->
+        <input
+          type="file"
+          accept=".csv"
+          on:change={importQuiz}
+          id="inputQuiz"
+        />
+
+        {#if isQuizSelected}
+          <button
+            class="btn btn-primary btn-block"
+            id = "quizNo"
+            on:click={() => goto("/createRoom")}>Proceed</button
+          >
+        {/if}
 
         <button
           class="btn btn-secondary btn-block"
@@ -375,6 +301,7 @@
         >
       </div>
     </div>
+
     <div class="quiz-editor">
       {#if displayQuizCheck}
         <h2>Choose or edit the quiz</h2>
@@ -439,6 +366,7 @@
         <button class="btn btn-tertiary" on:click={() => chooseQuiz()}
           >Choose</button
         >
+
         <button
           class="btn btn-tertiary"
           on:click={() => downloadQuizAsCSV(quizIdx)}>Download</button
@@ -484,7 +412,7 @@
     color: rgb(214, 81, 209);
     font-size: 25px;
     padding-right: 60%;
-    font-weight: bold; 
+    font-weight: bold;
   }
 
   .container {
@@ -681,6 +609,10 @@
     padding-bottom: 0.5rem;
     font-family: JejuGothic, sans-serif;
   }
+  #inputQuiz {
+    margin-left: 7.5rem;
+    margin-top: 2rem;
+  }
 
   @media screen and (max-width: 768px) {
     .btn {
@@ -688,7 +620,7 @@
       font-size: 14px;
     }
     .nav_button {
-        margin: 4px 20px; /* Adjusted margin for larger screens */
+      margin: 4px 20px; /* Adjusted margin for larger screens */
     }
 
     .create-quiz {
@@ -750,7 +682,7 @@
       font-size: 18px;
     }
     .nav_button {
-        margin: 4px 20px; /* Adjusted margin for larger screens */
+      margin: 4px 20px; /* Adjusted margin for larger screens */
     }
     h2 {
       color: red;
@@ -766,7 +698,7 @@
       border-radius: 10px;
     }
     .nav_button {
-        margin: 4px 20px; /* Adjusted margin for larger screens */
+      margin: 4px 20px; /* Adjusted margin for larger screens */
     }
   }
   @media (min-width: 769px) {
@@ -776,7 +708,7 @@
       border-radius: 20px;
     }
     .nav_button {
-        margin: 4px 20px; /* Adjusted margin for larger screens */
+      margin: 4px 20px; /* Adjusted margin for larger screens */
     }
   }
 </style>

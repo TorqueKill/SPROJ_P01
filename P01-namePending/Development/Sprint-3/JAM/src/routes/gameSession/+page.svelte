@@ -20,6 +20,9 @@
   let timeLeft = tweened(originalTimer);
   let resetTimer = false; // true when next question is loaded
   let timeRanOut = false; // true when time runs out for a question
+  let ispauseTimer = false;
+  let playersAnsweredSoFar = 0; // Variable to store the count of players who have answered
+  let numPlayers = 0;
   let sessionScores = [];
   let scoreDisplayCheck = false;
   let scoreDisplayTimer = GAME_SETTINGS.SCORE_DISPLAY_TIME;
@@ -37,6 +40,13 @@
       $user.currentSession = SCREENS.GAME;
       socket.emit("session-loaded", $user.gameid, SCREENS.GAME);
     }
+    socket.on("players-answered", (playersData) => {
+      // Update the count of players who have answered
+      console.log("Received players data:", playersData);
+      playersAnsweredSoFar = playersData.numAnswers;
+      numPlayers = playersData.totalPlayers;
+      // You may also update other relevant variables here if needed
+    });
   });
 
   //----------------------------REACTIVE CHANGES-------------------------
@@ -62,8 +72,10 @@
 
     //check for 'timeout' event
     if (events.timeout) {
-      //check if answer was submitted, if not, then send answer
 
+
+      //check if answer was submitted, if not, then send answer
+      console.log("in timeout event");
       if (!isAnswerSubmitted) {
         let _currentQuestion = currentQuestion;
         currentQuestion = events.timeout;
@@ -74,12 +86,32 @@
         timeRanOut = false;
 
         console.log("timeout");
-        if ($user.reconnected) {
-          sendAnswer(-1, currentQuestion - 1); //reconnected user waits till timeout
-        } else {
-          sendAnswer(-1, _currentQuestion); // Index is -1 if time runs out
+        
+        // host should not be able to send answer
+        if (!isHost) {
+
+          if ($user.reconnected) {
+            // changed from currentQuestion - 1 to currentQuestion. After rejoining it was sending answer to the prev question
+            sendAnswer(-1, currentQuestion); //reconnected user waits till timeout
+            $user.reconnected = false;
+
+          } else if ($user.lateConnected) {
+            sendAnswer(-1, currentQuestion ); //reconnected user waits till timeout
+            $user.lateConnected = false;
+          } else {
+            sendAnswer(-1, _currentQuestion); // Index is -1 if time runs out
+          }
         }
+
       }
+
+
+      //   if ($user.reconnected) {
+      //     sendAnswer(-1, currentQuestion - 1); //reconnected user waits till timeout
+      //   } else {
+      //     sendAnswer(-1, _currentQuestion); // Index is -1 if time runs out
+      //   }
+      // }
 
       //set the event to null so that it doesn't get called repeatedly
       events.timeout = null;
@@ -91,6 +123,16 @@
       scoreDisplayCheck = true;
       scoreDisplayTimer = events.display_time;
       events.scoresTillQuestion = null;
+    }
+
+    if (events.pauseTimer) {
+      ispauseTimer = true;
+      events.pauseTimer = null;
+    }
+
+    if (events.resumeTimer) {
+      ispauseTimer = false;
+      events.resumeTimer = null;
     }
   }
 
@@ -127,6 +169,10 @@
         return; // don't run the timer if score is being displayed
       }
 
+      if (ispauseTimer) {
+        return;
+      }
+
       // timer is reset when new question is loaded
       if (resetTimer) {
         $timeLeft = quiz[currentQuestion].timeLimit;
@@ -160,7 +206,7 @@
   //quiz format: refer to dummyQuiz.js in lib folder
 
   const sendAnswer = (answerIdx, questionIdx) => {
-    if (isAnswerSubmitted) {
+    if (isAnswerSubmitted || ispauseTimer ) {
       return;
     }
     if (answerIdx === -1) {
@@ -186,6 +232,17 @@
 
   const sortByScore = (a, b) => {
     return playerScore(b.scores) - playerScore(a.scores);
+  };
+
+  const pauseTimer = () => {
+    
+    socket.emit("pause-timer", $user.gameid, currentQuestion);
+    
+    
+  };
+
+  const resumeTimer = () => {
+    socket.emit("resume-timer", $user.gameid, currentQuestion);
   };
 
 
@@ -232,6 +289,28 @@
             {#if quiz[currentQuestion].imageUrl}
             <img src={quiz[currentQuestion].imageUrl} class="image-preview" alt={`Image for Question ${currentQuestion + 1}`} />
             {/if}
+            <!-- button for pausing the timer -->
+            {#if ispauseTimer}
+              <button
+                class="btn btn-secondary btn-block"
+                id="createQuiz"
+                on:click={() => {
+                  ispauseTimer = false;
+                  resumeTimer();
+                }}>Resume Timer</button
+              >
+
+            {:else}
+              <button
+                class="btn btn-secondary btn-block"
+                id="createQuiz"
+                on:click={() => {
+                  ispauseTimer = true;
+                  pauseTimer();
+                }}>Pause Timer</button
+              >
+
+            {/if}
             <button
               class="btn btn-secondary btn-block"
               id="createQuiz"
@@ -240,6 +319,7 @@
               }}>Leave Room</button
             >
           </h1>
+          <h2>Players Answered: {playersAnsweredSoFar} / {numPlayers}</h2>
 
           <!------------------------------- ANSWER DISPLAY (PLAYER)--------------------------------->
         {:else if $timeLeft >= 0}

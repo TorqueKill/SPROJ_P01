@@ -15,6 +15,66 @@
     showHostSettingsModal = false;
   };
 
+  // @ts-nocheck
+
+  let quizzes;
+  let displayQuizCheck;
+  let quizToDisplay = [];
+  let quizChosen;
+  let quizIdx;
+  let isQuizSelected = false;
+
+  // onMount(() => {
+  //   //append more from local storage if any
+  //   const savedQuizzes = JSON.parse(localStorage.getItem("Quiz")) || [];
+  //   console.log(savedQuizzes);
+  //   // localStorage.setItem("Quiz", JSON.stringify(savedQuizzes));
+
+  //   quizzes = [...savedQuizzes];
+  //   displayQuizCheck = false;
+  //   console.log(quizzes);
+  // });
+
+  //need to sugar quiz if its in the format of quiz1,2,3
+  //which is [{question,answer,choices:[choice1,choice2,choice3,choice4]}, ...]
+  const sugarQuiz = (quiz) => {
+    //wrap each question in []
+    let newQuiz = [];
+    for (let x in quiz) {
+      //also wrap choices in []
+      let newChoices = [];
+      for (let y in quiz[x].choices) {
+        newChoices.push(quiz[x].choices[y]);
+      }
+      newQuiz.push({
+        question: quiz[x].question,
+        answer: quiz[x].answer,
+        options: newChoices,
+        timeLimit: quiz[x].timeLimit,
+      });
+    }
+    return newQuiz;
+  };
+
+  function displayQuiz(quiz, idx) {
+    //console.log(quizzes);
+    quizToDisplay = sugarQuiz(quiz);
+    displayQuizCheck = true;
+    quizIdx = idx;
+  }
+
+  const closeQuiz = () => {
+    displayQuizCheck = false;
+  };
+
+  //MAKE SURE TO SAVE QUIZ FROM THE OG QUIZ ARRAY
+  // const chooseQuiz = () => {
+  //   $user.hostQuiz = quizzes[quizIdx];
+  //   quizChosen = true;
+  //   displayQuizCheck = false;
+  //   isQuizSelected = true;
+  // };
+
   let quiz1 = [
     {
       question: "",
@@ -68,8 +128,6 @@
       if (quiz[i].answer == "") {
         quiz[i].answer = quiz[i].choices[0];
       }
-
-
     }
     return quiz;
   }
@@ -85,31 +143,43 @@
     populateIfBlank(saveingQuiz);
     console.log(saveingQuiz);
     localStorage.setItem("Quiz", JSON.stringify([quiz1]));
-    goto("/createQuiz");
+    // goto("/createRoom");
+    $user.hostQuiz = saveingQuiz;
+    quizChosen = true;
+    isQuizSelected = true;
   }
-  const logout = async () => {
-  try {
-    // Call the logout method from your authentication service
-    //await authService.logout();
 
-    // Redirect to the login page or any other desired page after logout
-    goto('/signIn');
-  } catch (error) {
-    console.error('Logout failed:', error);
-  }
+  const logout = async () => {
+    try {
+      // Call the logout method from your authentication service
+      //await authService.logout();
+
+      // Redirect to the login page or any other desired page after logout
+      goto("/signIn");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 </script>
 
 <nav>
   <ul>
-      <li class="logo">JAM</li>
-      <li><button class="nav_button" on:click={() => goto("/")}>Home</button></li>
-      <li><button class="nav_button" on:click={() => goto("/viewHistory")}>History</button></li>
-      <li><button class="nav_button" on:click={logout}>Logout</button></li>
-      {#if $user.isHost}
-        <!-- Show Host Settings button only if the user is a host -->
-        <li><button class="nav_button" on:click={openHostSettingsModal}>Host Settings</button></li>
-      {/if}
+    <li class="logo">JAM</li>
+    <li><button class="nav_button" on:click={() => goto("/")}>Home</button></li>
+    <li>
+      <button class="nav_button" on:click={() => goto("/viewHistory")}
+        >History</button
+      >
+    </li>
+    <li><button class="nav_button" on:click={logout}>Logout</button></li>
+    {#if $user.isHost}
+      <!-- Show Host Settings button only if the user is a host -->
+      <li>
+        <button class="nav_button" on:click={openHostSettingsModal}
+          >Host Settings</button
+        >
+      </li>
+    {/if}
   </ul>
 </nav>
 
@@ -141,8 +211,6 @@
                 /** @type {Event & { currentTarget: EventTarget & HTMLInputElement; }} */ event
               ) => updateQuestionText(qIndex, event)}
             />
-
-            
           </div>
           {#each question.choices as choice, oIndex}
             <div class="option-group">
@@ -178,7 +246,11 @@
               />
             </div>
             {#if question.imageUrl}
-              <img src={question.imageUrl} class="image-preview" alt={`Image for Question ${qIndex + 1}`} />
+              <img
+                src={question.imageUrl}
+                class="image-preview"
+                alt={`Image for Question ${qIndex + 1}`}
+              />
             {/if}
           </div>
         </div>
@@ -202,20 +274,38 @@
             <!-- <button class="btn btn-tertiary btn-block btn-space ml-auto"> Add question </button>  -->
           </div>
           <div class="col-auto" id="saveBtn">
-            <button
+            <!-- <button
               on:click|once={() => {
                 saveQuiz();
               }}
               class="btn btn-secondary btn-block btn-space ml-auto"
             >
-              Save
+              Save and Choose
+            </button> -->
+            {#if isQuizSelected}
+              <button
+                class="btn btn-primary btn-block"
+                id="quizNo"
+                on:click={() => goto("/createRoom")}
+              >
+                Proceed
+              </button>
+            {/if}
+            <button
+              on:click={() => {
+                saveQuiz();
+              }}
+              class="btn btn-secondary btn-block btn-space ml-auto"
+            >
+              Save and Choose
             </button>
           </div>
           <div class="col-auto" id="cancelBtn">
             <button
               class="btn btn-quaternary"
               on:click={() => {
-                goto("/createQuiz");
+                // goto("/createQuiz");
+                goto("/hostOrPlayer");
               }}>Back</button
             >
           </div>
@@ -251,7 +341,7 @@
     color: rgb(214, 81, 209);
     font-size: 25px;
     padding-right: 60%;
-    font-weight: bold; 
+    font-weight: bold;
   }
 
   .nav_button {
@@ -429,5 +519,4 @@
       border-radius: 20px;
     }
   }
-    </style>
-    
+</style>

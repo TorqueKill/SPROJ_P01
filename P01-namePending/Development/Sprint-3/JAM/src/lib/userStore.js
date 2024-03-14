@@ -29,6 +29,7 @@ export const user = writable({
   email: "",
   currentSession: 0,
   reconnected: false,
+  lateConnected: false,
   currentQuestion: -1,
   displayQuestion: false,
   avatarIndex: 0, //default avatar
