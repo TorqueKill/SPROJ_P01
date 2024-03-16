@@ -705,6 +705,36 @@ function removeAllUsers(roomid, rooms, users) {
   }
 }
 
+function getResponseTimesTillQuestion(roomid, questionIndex, socketid, rooms) {
+  try {
+    let room = getRoom(roomid, rooms);
+    if (room) {
+      if (room.responseTimes[socketid]) {
+        let responseTimes = [];
+        for (let i = 0; i < questionIndex; i++) {
+          responseTimes.push(room.responseTimes[socketid][i]);
+        }
+        return responseTimes;
+      }
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+function getFinalResponseTimes(roomid, socketid, rooms) {
+  try {
+    let room = getRoom(roomid, rooms);
+    if (room) {
+      if (room.responseTimes[socketid]) {
+        return room.responseTimes[socketid];
+      }
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
+
 module.exports = {
   getRoom,
   getRoomIndex,
@@ -738,4 +768,6 @@ module.exports = {
   lateConnectionInit,
   checkSessionLoaded,
   removeAllUsers,
+  getResponseTimesTillQuestion,
+  getFinalResponseTimes,
 };

@@ -2,13 +2,14 @@ const express = require("express");
 const router = express.Router();
 const devAccounts = require("../config/config").DEV_ACCOUNTS;
 
-router.get("/", (req, res) => {
+router.post("/", (req, res) => {
   res.send("/dev endpoint.");
 });
 
-router.get("/auth/signin", (req, res) => {
+router.post("/auth/signin", (req, res) => {
   const { email, password } = req.body;
   //check if the user is a dev and has entered the correct credentials
+  console.log(email, password);
   let user = devAccounts.find((user) => user.email === email);
   if (user && user.password === password) {
     return res.status(200).json({ user });

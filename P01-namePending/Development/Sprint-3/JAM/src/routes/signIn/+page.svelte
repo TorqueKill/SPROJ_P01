@@ -20,8 +20,17 @@
     } else {
       // Api call to sign in
 
+      const normalFetch = `${BACKEND_URL}/auth/signin`
+      const devFetch = `${BACKEND_URL}/dev/auth/signin`
+
+      let fetchUrl = normalFetch;
+
+      if (email.includes("@dev")) {
+        fetchUrl = devFetch;
+      }
+
       try {
-        const response = await fetch(`${BACKEND_URL}/auth/signup`, {
+        const response = await fetch(fetchUrl, {
           method: "POST",
           headers: new Headers({
             "Content-Type": "application/json",

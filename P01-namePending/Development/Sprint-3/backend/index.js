@@ -38,9 +38,9 @@ const bodyParser = require("body-parser");
 
 app.use(bodyParser.json());
 
-app.use("/auth", userAuth(supabase), cors(corsOptions));
+app.use("/dev", devRoutes, cors(corsOptions));
 
-app.use("/dev", devRoutes);
+app.use("/auth", userAuth(supabase), cors(corsOptions));
 
 socketController(server);
 

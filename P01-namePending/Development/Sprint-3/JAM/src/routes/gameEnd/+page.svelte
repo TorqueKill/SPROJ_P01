@@ -54,8 +54,12 @@
 
   const saveHistory = () => {
     //check if the user is host or player
+    //further check if its a dev account or not
+    //if DEV:
     //if host, save the scores in hostHistory in the local storage
     //if player, save the scores in playerHistory in the local storage
+    //if not DEV:
+    //if host, save the scores in 
 
     //format :
     //{email: , username : , gameHistory: [{quiz: quiz, scores: playerScores}]}

@@ -97,6 +97,11 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
                   room.users[i],
                   rooms
                 ),
+                responseTimes: gameManager.getFinalResponseTimes(
+                  roomid,
+                  room.users[i],
+                  rooms
+                ),
                 avatarIndex: users.find(
                   (user) => user.socketid === room.users[i]
                 )?.avatarIndex,
@@ -124,6 +129,12 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
               scores.push({
                 name: gameManager.getName(room.users[i], users),
                 scores: gameManager.getScoresTillQuestion(
+                  roomid,
+                  questionIndex + 1,
+                  room.users[i],
+                  rooms
+                ),
+                responseTimes: gameManager.getResponseTimesTillQuestion(
                   roomid,
                   questionIndex + 1,
                   room.users[i],
