@@ -6,7 +6,7 @@
 
   import { socket, roomEvents } from "$lib/socketStore.js";
   import { user } from "$lib/userStore.js";
-  import { SCREENS,AVATARS } from "$lib/config.js";
+  import { SCREENS, AVATARS } from "$lib/config.js";
   import { goto } from "$app/navigation";
 
   let playersReady = 0;
@@ -52,7 +52,7 @@
       $user.quiz = events.gameStarted.quiz;
       $user.displayQuestion = events?.gameStarted?.options?.displayQuestion;
 
-      console.log($user)
+      console.log($user);
 
       events.gameStarted = null;
       goto("/gameSession");
@@ -71,7 +71,6 @@
     }
 
     if (events.lateConnect) {
-      
       console.log(events.lateConnect);
       $user.quiz = events.lateConnect.quiz;
       console.log($user.quiz);
@@ -111,17 +110,21 @@
           </div>
         {/if}
 
-        {#each players as {name, avatarIndex}}
-        <div class="player-item">
+        {#each players as { name, avatarIndex }}
+          <div class="player-item">
             <p class="player-name">{name}</p>
-            <img class="player-avatar" src={`/avatars/${AVATARS[avatarIndex]}`} alt="Avatar" />
-        </div>
+            <img
+              class="player-avatar"
+              src={`/avatars/${AVATARS[avatarIndex]}`}
+              alt="Avatar"
+            />
+          </div>
         {/each}
 
         <!-- Force start the quiz atleast one player has joined -->
         {#if $user.isHost && playersReady >= 1}
           <button
-            class="btn btn-secondary btn-block"
+            class="btn btn-tertiary btn-block"
             on:click={() => {
               socket.emit("force-start-game", $user.gameid);
             }}>Start Quiz</button
@@ -144,6 +147,20 @@
 </main>
 
 <style>
+  .btn-tertiary {
+    background: #00a59b;
+    border: None;
+    margin-top: 1rem;
+    margin-left: 4.5rem;
+    font-size: 20px;
+    color: white;
+    width: 12rem;
+    font-family: JejuGothic, sans-serif;
+  }
+
+  .btn-tertiary:hover {
+    background-color: #c49eff;
+  }
   body {
     display: flex;
     justify-content: center;
@@ -221,13 +238,18 @@
   }
   .btn-secondary {
     background: #c70000;
-    color: white;
+    color: #ccc;
     border: none;
     margin-top: 1rem;
-    width: auto;
+    width: 10.5rem;
     padding: 10px;
     border-radius: 12px;
     transition: background-color 0.3s ease;
+  }
+
+  .btn-secondary:hover {
+    background: #810101;
+    color: #ccc;
   }
 
   #host-id {
@@ -254,23 +276,20 @@
     justify-content: center;
   }
 
-
-
-
   .player-item {
     display: flex;
-    align-items: center; 
-    gap: 10px; 
+    align-items: center;
+    gap: 10px;
   }
 
   .player-name {
-    margin: 0; 
-    color: white; 
+    margin: 0;
+    color: white;
   }
 
   .player-avatar {
-    width: 50px; 
-    height: 50px; 
+    width: 50px;
+    height: 50px;
     border-radius: 50%; /* Optional: makes the avatar circular */
   }
 

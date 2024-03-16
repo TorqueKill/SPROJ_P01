@@ -229,15 +229,14 @@
 </script>
 
 <nav>
+  <div class="logo">JAM</div>
   <ul>
-    <li class="logo">JAM</li>
     <li><button class="nav_button" on:click={() => goto("/")}>Home</button></li>
     <li>
       <button class="nav_button" on:click={() => goto("/viewHistory")}
         >History</button
       >
     </li>
-    <li><button class="nav_button" on:click={logout}>Logout</button></li>
     {#if $user.isHost}
       <!-- Show Host Settings button only if the user is a host -->
       <li>
@@ -246,6 +245,7 @@
         >
       </li>
     {/if}
+    <li><button class="nav_button" on:click={logout}>Logout</button></li>
   </ul>
 </nav>
 
@@ -287,7 +287,7 @@
         {#if isQuizSelected}
           <button
             class="btn btn-primary btn-block"
-            id = "quizNo"
+            id="quizNo"
             on:click={() => goto("/createRoom")}>Proceed</button
           >
         {/if}
@@ -391,28 +391,57 @@
     min-height: 100vh;
   }
   nav {
-    background-color: #e3f2fd; /* Light blue background color */
-    padding: 2px;
-    position: fixed;
-    width: 100%;
-    top: 0;
-    z-index: 1000;
+    background-color: #690092; /* Purple background color */
+    padding: 0.5rem 1rem; /* Padding around the navbar */
+    position: fixed; /* Fix the position at the top */
+    width: 100%; /* Full width */
+    top: 0; /* Position at the top of the page */
+    z-index: 1000; /* Stack above other content */
+    display: flex; /* Use flexbox for positioning */
+    justify-content: space-between; /* Space between items */
+    align-items: center; /* Center items vertically */
   }
-  li {
-    margin-right: 1px;
-  }
+
   ul {
-    list-style: none;
+    list-style: none; /* Remove list styling */
+    display: flex; /* Display as flex for inline positioning */
     margin: 0;
     padding: 0;
-    display: flex;
-    justify-content: flex-end;
+    align-items: center; /* Center items vertically */
   }
+
   .logo {
-    color: rgb(214, 81, 209);
-    font-size: 25px;
-    padding-right: 60%;
+    flex-grow: 1; /* Allows the logo to grow and push the nav buttons to the right */
+    color: #c49eff; /* Logo text color */
+    font-size: 1.5rem; /* Logo text size */
     font-weight: bold;
+    margin-left: 2rem;
+  }
+
+  .nav_button {
+    background-color: transparent; /* Transparent button background */
+    color: #c49eff; /* Button text color */
+    padding: 0.5rem 1rem; /* Padding inside buttons */
+    border: none; /* No border for buttons */
+    text-align: center; /* Center the text inside buttons */
+    text-decoration: none; /* No underline */
+    font-size: 1rem; /* Button text size */
+    cursor: pointer; /* Pointer cursor on hover */
+    border-radius: 0.25rem; /* Slightly rounded corners for buttons */
+    transition: color 0.3s ease, background-color 0.3s ease; /* Transition effect for hover */
+  }
+
+  .nav_button:hover {
+    background-color: #c49eff; /* Button background color on hover */
+    color: #690092; /* Button text color on hover */
+  }
+
+  /* Adjustments for mobile screens */
+  @media (max-width: 768px) {
+    .nav_button {
+      padding: 0.5rem; /* Smaller padding on mobile */
+      font-size: 0.875rem; /* Smaller text on mobile */
+    }
   }
 
   .container {
@@ -426,25 +455,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-  }
-
-  .nav_button {
-    background-color: #ccc;
-    border: none;
-    color: white;
-    padding: 1px 10px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 20px;
-    margin: 6px 20px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: all 0.3s ease;
-    font-family: JejuGothic, sans-serif;
-  }
-  .nav_button:hover {
-    background-color: #c49eff;
   }
 
   .create-quiz,

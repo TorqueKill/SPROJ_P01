@@ -1,6 +1,6 @@
 <script>
   // @ts-nocheck
-  import { SCREENS,AVATARS } from "$lib/config.js";
+  import { SCREENS, AVATARS } from "$lib/config.js";
   import { user } from "$lib/userStore.js";
   import { socket, roomEvents } from "$lib/socketStore.js";
   import { goto } from "$app/navigation";
@@ -52,17 +52,16 @@
     return playerScore(b.scores) - playerScore(a.scores);
   };
 
-
-  const saveHistory= ()=>{
+  const saveHistory = () => {
     //check if the user is host or player
-    //if host, save the scores in hostHistory in the local storage 
+    //if host, save the scores in hostHistory in the local storage
     //if player, save the scores in playerHistory in the local storage
 
-    //format : 
+    //format :
     //{email: , username : , gameHistory: [{quiz: quiz, scores: playerScores}]}
 
     //if a user has more than 5 games, delete the oldest game (last element in the array)
-    
+
     //also check if user is logged in or not (has an email)
     
 
@@ -73,7 +72,7 @@
 
     let localGames;
 
-    if ($user.isHost){
+    if ($user.isHost) {
       localGames = JSON.parse(localStorage.getItem("hostGameHistory"));
     } else {
       localGames = JSON.parse(localStorage.getItem("playerGameHistory"));
@@ -88,7 +87,7 @@
 
     //if the user is a player, then replace the username in the scores with the player's email
     //first find the player's name in scores, then replace it with the email
-    if (!$user.isHost){
+    if (!$user.isHost) {
       for (let i = 0; i < scores.length; i++) {
         if (scores[i].name == $user.userName) {
           scores[i].name = $user.email;
@@ -97,8 +96,8 @@
       }
     }
 
-    let game = {quiz: quiz, scores: scores};
-    let userGame = {email: $user.email, gameHistory: [game]};
+    let game = { quiz: quiz, scores: scores };
+    let userGame = { email: $user.email, gameHistory: [game] };
 
     let found = false;
 
@@ -118,14 +117,14 @@
       localGames.push(userGame);
     }
 
-    if ($user.isHost){
+    if ($user.isHost) {
       localStorage.setItem("hostGameHistory", JSON.stringify(localGames));
     } else {
       localStorage.setItem("playerGameHistory", JSON.stringify(localGames));
     }
 
     return true;
-  }
+  };
 
   const restartConnection = () => {
     socket.disconnect();
@@ -137,7 +136,7 @@
     $user.userDecided = false;
 
     goto("/");
-  }
+  };
 </script>
 
 <main>
@@ -149,26 +148,37 @@
         <p>Waiting for scores...</p>
       {:else}
         {#each Object.entries(playerScores) as [idx, ps], i}
-        <div class="player-item {i === 0 ? 'first-place' : i === 1 ? 'second-place' : i === 2 ? 'third-place' : ''}">
-          <img src={`/avatars/${AVATARS[ps.avatarIndex]}`} alt="Player Avatar" class="player-avatar" />
-          <p class="player-name">
-            {ps.name} score: {playerScore(ps.scores)}
-          </p>
-        </div>
+          <div
+            class="player-item {i === 0
+              ? 'first-place'
+              : i === 1
+              ? 'second-place'
+              : i === 2
+              ? 'third-place'
+              : ''}"
+          >
+            <img
+              src={`/avatars/${AVATARS[ps.avatarIndex]}`}
+              alt="Player Avatar"
+              class="player-avatar"
+            />
+            <p class="player-name">
+              {ps.name} score: {playerScore(ps.scores)}
+            </p>
+          </div>
         {/each}
         <button
           class="btn btn-primary btn-block"
           id="hist"
           on:click={() => {
-            if (saveHistory()){
-
+            if (saveHistory()) {
               $user.gameid = null;
               $user.quiz = null;
               $user.isHost = false;
               $user.userDecided = false;
 
               goto("/viewHistory");
-            };
+            }
           }}>Save history</button
         >
         <button
@@ -200,7 +210,7 @@
     align-items: center;
     justify-content: center;
     width: auto;
-    max-width: 400px;
+    max-width: 600px;
     margin: 0 auto;
     background-color: #018198;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
@@ -272,20 +282,19 @@
   }
 
   .player-name {
-    margin: 0; 
-    color: rgb(0, 0, 0); 
+    margin: 0;
+    color: rgb(0, 0, 0);
   }
 
   .player-avatar {
-    width: 50px; 
-    height: 50px; 
+    width: 50px;
+    height: 50px;
     border-radius: 50%; /* Optional: makes the avatar circular */
   }
 
-
   .first-place {
-  background: rgba(255, 255, 255, 0.4); /* More opaque */
-}
+    background: rgba(255, 255, 255, 0.4); /* More opaque */
+  }
 
   .second-place {
     background: rgba(255, 255, 255, 0.3); /* Medium opacity */
