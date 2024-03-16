@@ -64,6 +64,7 @@
     //if a user has more than 5 games, delete the oldest game (last element in the array)
     
     //also check if user is logged in or not (has an email)
+    
 
     if ($user.email == null || $user.email == "") {
       alert("Must be logged in to save history");

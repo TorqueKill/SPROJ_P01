@@ -19,4 +19,5 @@ module.exports = {
   REPORT_DISPLAY_TIME: REPORT_DISPLAY_TIME,
   SUPABASE_URL: process.env.SUPABASE_URL,
   SUPABASE_KEY: process.env.SUPABASE_KEY,
+  PORT: process.env.PORT,
 };

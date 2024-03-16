@@ -26,7 +26,7 @@
     //call api to login the user (async)
     //if successful, redirect to the appropriate page
     try {
-        const response = await fetch(`${BACKEND_URL}/auth/signup`, {
+        const response = await fetch(`${BACKEND_URL}/auth/signin`, {
           method: "POST",
           headers: new Headers({
             "Content-Type": "application/json",
@@ -57,6 +57,11 @@
         loadingUserSession = false;
         return;
       }
+  }
+
+  function loginUsingState(email){
+    //if we know the session isnt expired, we can use the user state to login
+
   }
 
 
