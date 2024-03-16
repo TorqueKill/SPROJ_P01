@@ -5,6 +5,30 @@ const LAG_BIAS = 3; //seconds
 const DEFAUL_PLAYER_NAME = "Player";
 const REPORT_DISPLAY_TIME = 10;
 
+let devAccounts = [
+  {
+    username: "dev1",
+    password: "dev123",
+    email: "test1@dev",
+    id: 1,
+    other: {},
+  },
+  {
+    username: "dev2",
+    password: "dev123",
+    email: "test2@dev",
+    id: 2,
+    other: {},
+  },
+  {
+    username: "dev3",
+    password: "dev123",
+    email: "test3@dev",
+    id: 3,
+    other: {},
+  },
+];
+
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -20,4 +44,5 @@ module.exports = {
   SUPABASE_URL: process.env.SUPABASE_URL,
   SUPABASE_KEY: process.env.SUPABASE_KEY,
   PORT: process.env.PORT,
+  DEV_ACCOUNTS: devAccounts,
 };

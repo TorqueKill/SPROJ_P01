@@ -25,8 +25,21 @@
   async function loginUserSession(email, password) {
     //call api to login the user (async)
     //if successful, redirect to the appropriate page
+
+    //check if user has @dev in their email
+    //if they do, send req for /dev/auth/signin
+
+    const normalFetch = `${BACKEND_URL}/auth/signin`
+    const devFetch = `${BACKEND_URL}/dev/auth/signin`
+
+    let fetchUrl = normalFetch;
+
+    if (email.includes("@dev")) {
+      fetchUrl = devFetch;
+    }
+
     try {
-        const response = await fetch(`${BACKEND_URL}/auth/signin`, {
+        const response = await fetch(fetchUrl, {
           method: "POST",
           headers: new Headers({
             "Content-Type": "application/json",
@@ -59,10 +72,6 @@
       }
   }
 
-  function loginUsingState(email){
-    //if we know the session isnt expired, we can use the user state to login
-
-  }
 
 
   onMount(() => {

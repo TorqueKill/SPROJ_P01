@@ -9,6 +9,7 @@ const socketController = require("./socket-controller/socketManager");
 const { createClient } = require("@supabase/supabase-js");
 const cors = require("cors");
 const userAuth = require("./controller/userAuth");
+const devRoutes = require("./controller/devAuth");
 
 const _consts = require("./config/config");
 
@@ -38,6 +39,8 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
 app.use("/auth", userAuth(supabase), cors(corsOptions));
+
+app.use("/dev", devRoutes);
 
 socketController(server);
 

@@ -16,7 +16,6 @@ module.exports = (server) => {
 
   io.on("connection", async (socket) => {
     console.log("a user connected with id: " + socket.id);
-    console.log("users: " + users);
 
     roomEvents(socket, io, gameManager, config, rooms, users);
     gameEvents(socket, io, gameManager, config, rooms, users);
