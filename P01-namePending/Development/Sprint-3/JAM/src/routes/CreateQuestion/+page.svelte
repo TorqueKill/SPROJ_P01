@@ -169,15 +169,14 @@
 </script>
 
 <nav>
+  <div class="logo">JAM</div>
   <ul>
-    <li class="logo">JAM</li>
     <li><button class="nav_button" on:click={() => goto("/")}>Home</button></li>
     <li>
       <button class="nav_button" on:click={() => goto("/viewHistory")}
         >History</button
       >
     </li>
-    <li><button class="nav_button" on:click={logout}>Logout</button></li>
     {#if $user.isHost}
       <!-- Show Host Settings button only if the user is a host -->
       <li>
@@ -186,6 +185,7 @@
         >
       </li>
     {/if}
+    <li><button class="nav_button" on:click={logout}>Logout</button></li>
   </ul>
 </nav>
 
@@ -325,31 +325,31 @@
 
 <style>
   .time-limit-container {
-    align-self: center; 
-    padding: 10px 0; 
+    align-self: center;
+    padding: 10px 0;
     margin-top: 10rem;
   }
   .image-input-container {
     display: flex;
-    flex-direction: column; 
+    flex-direction: column;
     align-items: center;
     margin-bottom: -6rem;
     width: 100%;
   }
 
   .image-preview {
-    max-width: 100px; 
-    max-height: 100px; 
+    max-width: 100px;
+    max-height: 100px;
     margin-top: 5rem;
     margin-bottom: -9rem;
   }
 
   .question-preview {
-    font-family: JejuGothic, sans-serif; 
+    font-family: JejuGothic, sans-serif;
     cursor: pointer;
     padding: 10px;
-    border-radius: 15px; 
-    transition: background-color 0.3s; 
+    border-radius: 15px;
+    transition: background-color 0.3s;
     background: #c49eff;
     margin-bottom: 1.25rem;
     color: #ccc;
@@ -357,26 +357,26 @@
   }
 
   .question-preview:hover {
-    background-color: #7801a8; 
+    background-color: #7801a8;
   }
   .main-flex-container {
     display: flex;
     flex-direction: row;
-    height: calc(100vh - 40px);
-    padding-top: 40px;
+    height: calc(100vh - 60px);
+    padding-top: 55px;
     background: #7801a8;
+    width: 100%;
   }
 
   .left-sidebar {
-    width: 12%; 
+    width: 12%;
     background-color: #018198;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     padding: 20px;
     overflow-y: auto;
-    /* position: fixed; */
-    height: calc(100vh - 90px);
+    height: calc(100vh - 92px);
   }
 
   .right-sidebar {
@@ -387,6 +387,8 @@
     justify-content: space-between;
     padding: 20px;
     overflow-y: auto;
+    height: calc(100vh - 92px);
+    margin-top: -0.5rem;
   }
 
   .sidebar-footer {
@@ -408,8 +410,6 @@
     border-radius: 15px;
   }
 
-
-
   .content {
     display: flex;
     flex-direction: column;
@@ -419,48 +419,65 @@
     background: #c49eff;
     padding: 45px;
     border-radius: 51px;
-    margin: 0 auto; 
+    margin: 0 auto;
     max-width: 800px;
-    width: 80%; 
-    height: calc(100vh - 170px); 
+    width: 80%;
+    height: calc(100vh - 170px);
+  }
+  nav {
+    background-color: #690092; /* Purple background color */
+    padding: 0.5rem 1rem; /* Padding around the navbar */
+    position: fixed; /* Fix the position at the top */
+    width: 100%; /* Full width */
+    top: 0; /* Position at the top of the page */
+    z-index: 1000; /* Stack above other content */
+    display: flex; /* Use flexbox for positioning */
+    justify-content: space-between; /* Space between items */
+    align-items: center; /* Center items vertically */
   }
 
-
-
-  .container {
-    height: auto;
-    background: #c49eff;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-    border-radius: 51px;
-    padding: 2rem;
-    margin: 4rem auto 1rem;
-    display: flex;
-    flex-direction: column;
+  ul {
+    list-style: none; /* Remove list styling */
+    display: flex; /* Display as flex for inline positioning */
+    align-items: center; /* Align items vertically */
+    padding: 0;
+    margin-right: 2rem; /* Add right margin to align with the design */
+    margin-bottom: 0rem;
+    margin-top: 0rem;
   }
+
   .logo {
-    color: rgb(214, 81, 209);
-    font-size: 25px;
-    padding-right: 60%;
+    color: #c49eff; /* Logo text color */
+    font-size: 1.5rem; /* Logo text size */
     font-weight: bold;
+    margin-left: 2rem; /* Add left margin to align with the design */
   }
 
   .nav_button {
-    background-color: #ccc;
-    border: none;
-    color: white;
-    padding: 1px 10px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 20px;
-    margin: 6px 20px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: all 0.3s ease;
-    font-family: JejuGothic, sans-serif;
+    background-color: transparent; /* Transparent button background */
+    color: #c49eff; /* Button text color */
+    padding: 0.5rem 1rem; /* Padding inside buttons */
+    border: none; /* No border for buttons */
+    text-align: center; /* Center the text inside buttons */
+    text-decoration: none; /* No underline */
+    font-size: 1rem; /* Button text size */
+    cursor: pointer; /* Pointer cursor on hover */
+    border-radius: 0.25rem; /* Slightly rounded corners for buttons */
+    margin-left: 0.5rem; /* Adjust left margin to reduce space */
+    margin-right: 0.5rem; /* Adjust right margin to reduce space */
+    transition: color 0.3s ease, background-color 0.3s ease; /* Transition effect for hover */
   }
+
   .nav_button:hover {
-    background-color: #c49eff;
+    background-color: #c49eff; /* Button background color on hover */
+    color: #690092; /* Button text color on hover */
+  }
+  /* Adjustments for mobile screens */
+  @media (max-width: 768px) {
+    .nav_button {
+      padding: 0.5rem; /* Smaller padding on mobile */
+      font-size: 0.875rem; /* Smaller text on mobile */
+    }
   }
 
   .btn {
@@ -475,6 +492,22 @@
     cursor: pointer;
     border-radius: 5px;
     transition: all 0.3s ease;
+  }
+
+  button {
+    background-color: #ccc;
+    border: none;
+    color: white;
+    padding: 5px 25px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 25px;
+    margin: 4px 140px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-family: JejuGothic, sans-serif;
   }
 
   .btn:hover {
@@ -496,7 +529,7 @@
   .option-group {
     display: flex;
     align-items: center;
-    flex-basis: calc(50% - 5px); 
+    flex-basis: calc(50% - 5px);
   }
 
   .question-cont {
@@ -537,7 +570,7 @@
     height: 2rem;
     width: 100%;
     flex-grow: 2;
-    margin-right: 10px; 
+    margin-right: 10px;
   }
 
   @media screen and (max-width: 768px) {
@@ -579,24 +612,7 @@
     border: 1px solid #ddd;
     border-radius: 4px;
   }
-  nav {
-    background-color: #e3f2fd; /* Light blue background color */
-    padding: 2px;
-    position: fixed;
-    width: 100%;
-    top: 0;
-    z-index: 1000;
-  }
-  li {
-    margin-right: 1px;
-  }
-  ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: flex-end;
-  }
+
   button {
     background-color: #ccc;
     border: none;

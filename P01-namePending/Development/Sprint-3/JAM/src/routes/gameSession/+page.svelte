@@ -4,7 +4,7 @@
   //------------------------------------PRESISTANCE------------------------------------
   // navigate to main menu if user is disconnected, if user is not logged in, goto login/signup
 
-  import { SCREENS,GAME_SETTINGS,AVATARS } from "$lib/config.js";
+  import { SCREENS, GAME_SETTINGS, AVATARS } from "$lib/config.js";
   import { user } from "$lib/userStore.js";
   import { socket, roomEvents, gameEvents } from "$lib/socketStore.js";
   import { onMount } from "svelte";
@@ -63,8 +63,6 @@
 
     //check for 'timeout' event
     if (events.timeout) {
-
-
       //check if answer was submitted, if not, then send answer
       console.log("in timeout event");
       if (!isAnswerSubmitted) {
@@ -77,25 +75,21 @@
         timeRanOut = false;
 
         console.log("timeout");
-        
+
         // host should not be able to send answer
         if (!isHost) {
-
           if ($user.reconnected) {
             // changed from currentQuestion - 1 to currentQuestion. After rejoining it was sending answer to the prev question
             sendAnswer(-1, currentQuestion); //reconnected user waits till timeout
             $user.reconnected = false;
-
           } else if ($user.lateConnected) {
-            sendAnswer(-1, currentQuestion ); //reconnected user waits till timeout
+            sendAnswer(-1, currentQuestion); //reconnected user waits till timeout
             $user.lateConnected = false;
           } else {
             sendAnswer(-1, _currentQuestion); // Index is -1 if time runs out
           }
         }
-
       }
-
 
       //   if ($user.reconnected) {
       //     sendAnswer(-1, currentQuestion - 1); //reconnected user waits till timeout
@@ -197,7 +191,7 @@
   //quiz format: refer to dummyQuiz.js in lib folder
 
   const sendAnswer = (answerIdx, questionIdx) => {
-    if (isAnswerSubmitted || ispauseTimer ) {
+    if (isAnswerSubmitted || ispauseTimer) {
       return;
     }
     if (answerIdx === -1) {
@@ -226,16 +220,12 @@
   };
 
   const pauseTimer = () => {
-    
     socket.emit("pause-timer", $user.gameid, currentQuestion);
-    
-    
   };
 
   const resumeTimer = () => {
     socket.emit("resume-timer", $user.gameid, currentQuestion);
   };
-
 
   const restartConnection = () => {
     socket.disconnect();
@@ -247,12 +237,12 @@
     $user.userDecided = false;
 
     goto("/");
-  }
+  };
 </script>
 
 <main>
   <body>
-    <div class="container">
+    <div>
       <!------------------------------- LOADING ------------------------------------------>
       {#if currentQuestion == -1}
         <h1 class="loading">Waiting for Server...</h1>
@@ -261,14 +251,26 @@
       {:else if scoreDisplayCheck}
         <h1>Score Display</h1>
         {#each Object.entries(sessionScores) as [idx, ps], i}
-        <div class="player-item {i === 0 ? 'first-place' : i === 1 ? 'second-place' : i === 2 ? 'third-place' : ''}">
-          <img src={`/avatars/${AVATARS[ps.avatarIndex]}`} alt="Player Avatar" class="player-avatar" />
-          <p class="player-name">
-            {ps.name} score: {playerScore(ps.scores)}
-          </p>
-        </div>
+          <div
+            class="player-item {i === 0
+              ? 'first-place'
+              : i === 1
+              ? 'second-place'
+              : i === 2
+              ? 'third-place'
+              : ''}"
+          >
+            <img
+              src={`/avatars/${AVATARS[ps.avatarIndex]}`}
+              alt="Player Avatar"
+              class="player-avatar"
+            />
+            <p class="player-name">
+              {ps.name} score: {playerScore(ps.scores)}
+            </p>
+          </div>
         {/each}
-      
+
         <h1>Next Question in {scoreDisplayTimer} seconds</h1>
 
         <!------------------------------- QUESTION DISPLAY (HOST)--------------------------------->
@@ -278,29 +280,31 @@
             {quiz[currentQuestion].question}
 
             {#if quiz[currentQuestion].imageUrl}
-            <img src={quiz[currentQuestion].imageUrl} class="image-preview" alt={`Image for Question ${currentQuestion + 1}`} />
+              <img
+                src={quiz[currentQuestion].imageUrl}
+                class="image-preview"
+                alt={`Image for Question ${currentQuestion + 1}`}
+              />
             {/if}
             <!-- button for pausing the timer -->
             {#if ispauseTimer}
               <button
-                class="btn btn-secondary btn-block"
+                class="btn btn-tertiary btn-block"
                 id="createQuiz"
                 on:click={() => {
                   ispauseTimer = false;
                   resumeTimer();
                 }}>Resume Timer</button
               >
-
             {:else}
               <button
-                class="btn btn-secondary btn-block"
+                class="btn btn-tertiary btn-block"
                 id="createQuiz"
                 on:click={() => {
                   ispauseTimer = true;
                   pauseTimer();
                 }}>Pause Timer</button
               >
-
             {/if}
             <button
               class="btn btn-secondary btn-block"
@@ -313,9 +317,8 @@
 
           <!------------------------------- ANSWER DISPLAY (PLAYER)--------------------------------->
         {:else if $timeLeft >= 0}
-        
           <!-- <p>Time Left: {timeLeft}</p> -->
-          <h2 id="chooseOpt" class="inside-option container2">
+          <!-- <h2 id="chooseOpt" class="inside-option container2">
             <p id="choose" style="color: #c49eff">Choose one</p>
             {#each quiz[currentQuestion].choices as choice, idx}
               <button
@@ -327,17 +330,31 @@
             {/each}
             <p id="answer">You chose:</p>
             <p id="real-answer" style="color: white;">{answerSubmitted}</p>
+          </h2> -->
+          <h2 id="chooseOpt" class="inside-option container2">
+            <p id="choose" style="color: #c49eff">Choose one</p>
+            <div class="options-container">
+              <!-- Wrap the buttons -->
+              {#each quiz[currentQuestion].choices as choice, idx}
+                <button
+                  class="btn1 btn-tertiary btn-block"
+                  id="chooseAnswer"
+                  on:click={() => sendAnswer(idx, currentQuestion)}
+                  >{choice}</button
+                >
+              {/each}
+            </div>
+            <p id="answer">You chose:</p>
+            <p id="real-answer" style="color: white;">{answerSubmitted}</p>
           </h2>
-          
+
           {#if displayQuestionForPlayers}
-          <h1 id="host-question" class="inside-box container2">
-            {quiz[currentQuestion].question}
-          </h1>
+            <h1 id="host-question" class="inside-box container2">
+              {quiz[currentQuestion].question}
+            </h1>
           {/if}
 
-
-          <h1>Time Left: {secondsLeft}</h1>
-        
+          <h1 id="time-left">Time Left: {secondsLeft}</h1>
 
           <!------------------------------- TIMEOUT DISPLAY --------------------------------->
         {:else if $timeLeft == -100}
@@ -349,16 +366,30 @@
 </main>
 
 <style>
+  #time-left {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    text-align: center;
+    font-size: 1.5rem;
+    color: #ffffff;
+    padding: 5rem 0;
+    background-color: #7801a8; /* Adjust the color to match your design */
+    z-index: 10;
+  }
+
   body {
     margin: 0;
     padding: 0;
     height: 100vh;
     background: #7801a8;
+    font-family: "JejuGothic", sans-serif;
+    flex-direction: column;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: "JejuGothic", sans-serif;
-    flex-direction: column;
   }
 
   .container {
@@ -372,16 +403,30 @@
     padding: 2rem;
     background-color: #018198;
     color: #7801a8;
-    border-radius: 2rem;
+    border-radius: 15px;
     box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
   }
 
-  .inside-box,
+  .inside-box {
+    width: 80%;
+    max-width: 1000px;
+    margin: auto;
+    background: #c49eff;
+    border-radius: 15px;
+    padding: 4rem;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.25);
+    text-align: center;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
+
   .inside-option {
     width: 100%;
     max-width: 40rem;
     background: #c49eff;
-    border-radius: 3rem;
+    border-radius: 15rem;
     padding: 4rem;
     box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.25);
     text-align: center;
@@ -412,9 +457,16 @@
     color: white;
   }
 
-  .btn:hover,
+  .btn-secondary:hover {
+    background-color: #860808;
+  }
+
+  .btn-tertiary:hover {
+    background-color: #c49eff;
+  }
+
   .btn1:hover {
-    background-color: #018198;
+    background-color: #c49eff;
   }
 
   #choose {
@@ -425,6 +477,23 @@
   #real-answer {
     font-size: 1.25rem;
     color: #00a59b;
+  }
+  .options-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    width: 40%;
+  }
+
+  .btn1 {
+    flex: 1 1 calc(50% - 10px);
+    margin: 5px;
+    font-family: "JejuGothic", sans-serif;
+  }
+  .btn1:hover {
+    background-color: #c49eff;
   }
 
   @media (max-width: 768px) {
@@ -511,7 +580,6 @@
     border: none;
   }
 
-
   .image-preview {
     flex-grow: 1;
     max-width: 50%;
@@ -519,11 +587,6 @@
     border: 1px solid #ddd;
     border-radius: 4px;
   }
-
-
-
-
-
 
   .player-item {
     display: flex;
@@ -536,20 +599,19 @@
   }
 
   .player-name {
-    margin: 0; 
-    color: rgb(0, 0, 0); 
+    margin: 0;
+    color: rgb(0, 0, 0);
   }
 
   .player-avatar {
-    width: 50px; 
-    height: 50px; 
+    width: 50px;
+    height: 50px;
     border-radius: 50%; /* Optional: makes the avatar circular */
   }
 
-
   .first-place {
-  background: rgba(255, 255, 255, 0.4); /* More opaque */
-}
+    background: rgba(255, 255, 255, 0.4); /* More opaque */
+  }
 
   .second-place {
     background: rgba(255, 255, 255, 0.3); /* Medium opacity */
