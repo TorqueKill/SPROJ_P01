@@ -52,86 +52,144 @@
     return playerScore(b.scores) - playerScore(a.scores);
   };
 
-  const saveHistory = () => {
-    //check if the user is host or player
-    //further check if its a dev account or not
+  // const saveHistory = () => {
+  //   //check if the user is host or player
+  //   //further check if its a dev account or not
 
-    //if DEV:
-    //if host, save the scores in hostHistory in the local storage
-    //if player, save the scores in playerHistory in the local storage
+  //   //if DEV:
+  //   //if host, save the scores in hostHistory in the local storage
+  //   //if player, save the scores in playerHistory in the local storage
 
-    //if not DEV:
-    //save the scores on supabase
+  //   //if not DEV:
+  //   //save the scores on supabase
 
-    //format :
-    //{email: , username : , gameHistory: [{quiz: quiz, scores: playerScores}]}
+  //   //format :
+  //   //{email: , username : , gameHistory: [{quiz: quiz, scores: playerScores}]}
 
-    //if a user has more than 5 games, delete the oldest game (last element in the array)
+  //   //if a user has more than 5 games, delete the oldest game (last element in the array)
 
-    //also check if user is logged in or not (has an email)
-    
+  //   //also check if user is logged in or not (has an email)
 
-    if ($user.email == null || $user.email == "") {
+  //   if ($user.email == null || $user.email == "") {
+  //     alert("Must be logged in to save history");
+  //     return false;
+  //   }
+
+  //   //FOLLOWING SHOULD BE DONE ONLY IF DEV ACCOUNT: aka emails ending with '@dev'
+
+  //   let localGames;
+
+  //   if ($user.isHost) {
+  //     localGames = JSON.parse(localStorage.getItem("hostGameHistory"));
+  //   } else {
+  //     localGames = JSON.parse(localStorage.getItem("playerGameHistory"));
+  //   }
+
+  //   if (localGames == null) {
+  //     localGames = [];
+  //   }
+
+  //   let quiz = $user.quiz;
+  //   let scores = $user.score;
+
+  //   //if the user is a player, then replace the username in the scores with the player's email
+  //   //first find the player's name in scores, then replace it with the email
+  //   if (!$user.isHost) {
+  //     for (let i = 0; i < scores.length; i++) {
+  //       if (scores[i].name == $user.userName) {
+  //         scores[i].name = $user.email;
+  //         break;
+  //       }
+  //     }
+  //   }
+
+  //   let game = { quiz: quiz, scores: scores };
+  //   let userGame = { email: $user.email, gameHistory: [game] };
+
+  //   let found = false;
+
+  //   for (let i = 0; i < localGames.length; i++) {
+  //     if (localGames[i].email == $user.email) {
+  //       found = true;
+  //       //check if the user has more than 5 games, pop the last element
+  //       if (localGames[i].gameHistory.length >= 5) {
+  //         localGames[i].gameHistory.pop();
+  //       }
+  //       localGames[i].gameHistory.push(game);
+  //       break;
+  //     }
+  //   }
+
+  //   if (!found) {
+  //     localGames.push(userGame);
+  //   }
+
+  //   if ($user.isHost) {
+  //     localStorage.setItem("hostGameHistory", JSON.stringify(localGames));
+  //   } else {
+  //     localStorage.setItem("playerGameHistory", JSON.stringify(localGames));
+  //   }
+
+  //   return true;
+  // };
+
+  async function saveHistory() {
+    if (!$user.email) {
       alert("Must be logged in to save history");
       return false;
     }
 
-    //FOLLOWING SHOULD BE DONE ONLY IF DEV ACCOUNT: aka emails ending with '@dev'
+    let game = {
+      quiz: $user.quiz,
+      scores: $user.score,
+    };
 
-    let localGames;
-
-    if ($user.isHost) {
-      localGames = JSON.parse(localStorage.getItem("hostGameHistory"));
+    if ($user.email.endsWith("@dev")) {
+      saveHistoryToLocalStorage($user.email, game);
     } else {
-      localGames = JSON.parse(localStorage.getItem("playerGameHistory"));
-    }
+      try {
+        const response = await fetch("/backend/controller/saveHistory", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: $user.email,
+            gameHistory: game,
+          }),
+        });
 
-    if (localGames == null) {
-      localGames = [];
-    }
-
-    let quiz = $user.quiz;
-    let scores = $user.score;
-
-    //if the user is a player, then replace the username in the scores with the player's email
-    //first find the player's name in scores, then replace it with the email
-    if (!$user.isHost) {
-      for (let i = 0; i < scores.length; i++) {
-        if (scores[i].name == $user.userName) {
-          scores[i].name = $user.email;
-          break;
+        if (!response.ok) {
+          throw new Error("Response not ok");
         }
+
+        const result = await response.json();
+        alert("History saved to Supabase");
+        goto("/viewHistory");
+      } catch (error) {
+        console.error("Failed to save history:", error);
+        alert("Failed to save history");
       }
     }
-
-    let game = { quiz: quiz, scores: scores };
-    let userGame = { email: $user.email, gameHistory: [game] };
-
-    let found = false;
-
-    for (let i = 0; i < localGames.length; i++) {
-      if (localGames[i].email == $user.email) {
-        found = true;
-        //check if the user has more than 5 games, pop the last element
-        if (localGames[i].gameHistory.length >= 5) {
-          localGames[i].gameHistory.pop();
-        }
-        localGames[i].gameHistory.push(game);
-        break;
-      }
-    }
-
-    if (!found) {
-      localGames.push(userGame);
-    }
-
-    if ($user.isHost) {
-      localStorage.setItem("hostGameHistory", JSON.stringify(localGames));
-    } else {
-      localStorage.setItem("playerGameHistory", JSON.stringify(localGames));
-    }
-
     return true;
+  }
+
+  const saveHistoryToLocalStorage = (email, game) => {
+    let historyKey = $user.isHost ? "hostGameHistory" : "playerGameHistory";
+    let localHistory = JSON.parse(localStorage.getItem(historyKey)) || [];
+    let historyEntry = localHistory.find((entry) => entry.email === email);
+
+    if (!historyEntry) {
+      historyEntry = { email, gameHistory: [] };
+      localHistory.push(historyEntry);
+    }
+
+    historyEntry.gameHistory.unshift(game);
+    if (historyEntry.gameHistory.length > 5) {
+      historyEntry.gameHistory.pop();
+    }
+
+    localStorage.setItem(historyKey, JSON.stringify(localHistory));
   };
 
   const restartConnection = () => {
@@ -178,16 +236,7 @@
         <button
           class="btn btn-primary btn-block"
           id="hist"
-          on:click={() => {
-            if (saveHistory()) {
-              $user.gameid = null;
-              $user.quiz = null;
-              $user.isHost = false;
-              $user.userDecided = false;
-
-              goto("/viewHistory");
-            }
-          }}>Save history</button
+          on:click={saveHistory}>Save history</button
         >
         <button
           class="btn btn-secondary btn-block"

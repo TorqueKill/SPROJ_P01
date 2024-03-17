@@ -10,6 +10,7 @@ const { createClient } = require("@supabase/supabase-js");
 const cors = require("cors");
 const userAuth = require("./controller/userAuth");
 const devRoutes = require("./controller/devAuth");
+const histRoutes = require("./controller/supabaseRoutes")
 
 const _consts = require("./config/config");
 
@@ -18,6 +19,8 @@ const supabaseKey = _consts.SUPABASE_KEY;
 const port = _consts.PORT;
 
 const supabase = createClient(supabaseUrl, supabaseKey);
+
+
 
 let corsOptions = {
   origin: "*",
@@ -41,6 +44,8 @@ app.use(bodyParser.json());
 app.use("/dev", devRoutes, cors(corsOptions));
 
 app.use("/auth", userAuth(supabase), cors(corsOptions));
+
+app.use("/backend/controller", histRoutes(supabase), cors(corsOptions))
 
 socketController(server);
 
