@@ -254,16 +254,7 @@
     <h2 class="create-quiz" style="margin-top: 60px">Choose Quiz</h2>
     {#if displayQuizCheck}
       <h5>SCROLL DOWN TO VIEW</h5>
-    {:else}
-      <h5>Note: Only saves 1 quiz (quiz 4)</h5>
-      <h5>Quiz 1,2,3 are dummy quizzes</h5>
     {/if}
-
-    <div id="quizChosen">
-      {#if quizChosen}
-        <p>You choose quiz: {quizIdx + 1}</p>
-      {/if}
-    </div>
 
     <div class="container">
       <div id="inside-box">
@@ -277,12 +268,8 @@
           {/each}
         {/if}
 
-        <input
-          type="file"
-          accept=".csv"
-          on:change={importQuiz}
-          id="inputQuiz"
-        />
+        <label for="inputQuiz" class="file-upload-btn">Upload Quiz CSV</label>
+        <input type="file" accept=".csv" on:change={importQuiz} id="inputQuiz" class="file-input"/>
 
         {#if isQuizSelected}
           <button
@@ -436,6 +423,25 @@
     color: #690092; /* Button text color on hover */
   }
 
+  .file-upload-btn {
+    display: inline-block;
+    padding: 10px 25px;
+    color: white;
+    background-color: #6a27ce;  
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: 'JejuGothic', sans-serif;
+    font-size: 18px;
+    margin-top: 20px;
+    margin-left: 20px; /* Adjust this as necessary to align with other elements */
+  }
+
+  .file-input {
+    opacity: 0; /* Hide the actual input field */
+    position: absolute;
+    z-index: -1;
+  }
+
   /* Adjustments for mobile screens */
   @media (max-width: 768px) {
     .nav_button {
@@ -466,16 +472,14 @@
   }
 
   #inside-box {
-    width: 20rem;
-    height: 26rem;
-    border-radius: 51px;
-    padding-top: 2rem;
-    margin-bottom: 8rem;
-    margin-left: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around; /* This will space out your items evenly */
   }
   .btn {
     margin-right: 6rem;
-    width: 5rem;
+    width: 12rem;
     border: None;
     font-family: JejuGothic, sans-serif;
     border-radius: 12px;
@@ -501,7 +505,7 @@
   .btn-secondary {
     background: #c70000;
     border: None;
-    margin-top: 3rem;
+    margin-top: 1.5rem;
     margin-left: 6.75rem;
     font-size: 20px;
     color: white;
@@ -522,11 +526,10 @@
   }
   .create-quiz {
     color: white;
-    font-family: JejuGothic, sans-serif;
-    font-size: 45px;
-    margin-left: -2rem;
-    margin-top: 2rem;
+    font-family: 'JejuGothic', sans-serif;
+    font-size: 36px; /* Adjust the font size as needed */
     text-align: center;
+    margin-top: 60px; /* Adjust the top margin to fit your design */
   }
   h5 {
     color: rgb(216, 53, 53);
@@ -686,6 +689,8 @@
     background-color: #6a27ce;
   }
 
+  
+
   @media screen and (min-width: 769px) {
     .btn {
       padding: 10px;
@@ -701,6 +706,10 @@
     }
   }
   @media (max-width: 768px) {
+    .container, #inside-box, .quiz-editor {
+        width: 90%; /* Take up most of the screen on smaller devices */
+        margin: 0 auto; /* Center the containers */
+    }
     input,
     button {
       padding: 10px;
@@ -721,4 +730,5 @@
       margin: 4px 20px; /* Adjusted margin for larger screens */
     }
   }
+
 </style>
