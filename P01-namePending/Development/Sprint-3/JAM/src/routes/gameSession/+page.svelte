@@ -386,7 +386,7 @@
   body {
     margin: 0;
     padding: 0;
-    height: 100vh;
+    height: 120vh;
     background: #7801a8;
     font-family: "JejuGothic", sans-serif;
     flex-direction: column;
