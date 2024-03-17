@@ -59,7 +59,7 @@ socket.on("reconnect", (data) => {
 
 socket.on("late-connect", (quiz, options) => {
   console.log("late-connect");
-  roomEvents.update(() => ({ lateConnect: { quiz: quiz, options: options }}));
+  roomEvents.update(() => ({ lateConnect: { quiz: quiz, options: options } }));
 });
 
 socket.on("room-deleted", () => {
@@ -73,6 +73,7 @@ socket.on("timeout", (question) => {
 
 socket.on("scores-till-question", (scores, display_time) => {
   console.log("scores-till-question");
+  console.log(scores);
   gameEvents.update(() => ({
     scoresTillQuestion: scores,
     display_time: display_time,
@@ -81,12 +82,12 @@ socket.on("scores-till-question", (scores, display_time) => {
 
 socket.on("timer-paused", () => {
   console.log("pauseTimer");
-  gameEvents.update(() => ({pauseTimer: true}));
-})
+  gameEvents.update(() => ({ pauseTimer: true }));
+});
 
 socket.on("timer-resumed", () => {
   console.log("resumeTimer");
-  gameEvents.update(() => ({resumeTimer: true}));
+  gameEvents.update(() => ({ resumeTimer: true }));
 });
 
 // socket.on

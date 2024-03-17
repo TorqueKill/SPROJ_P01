@@ -17,7 +17,7 @@
   let maxPlayers;
   let roomSettings = {
     maxPlayers: MIN_PLAYERS,
-    reportScores: -1, //means report scores at the end
+    reportScores: 1, //means report scores at the end
     displayQuestion: false,
   };
 
@@ -94,7 +94,7 @@
       roomsettings.reportScores > MAX_REPORT_SCORES
     ) {
       alert("report scores must be between -1 and 5");
-      roomsettings.reportScores = -1;
+      roomsettings.reportScores = 1;
       return;
     }
 

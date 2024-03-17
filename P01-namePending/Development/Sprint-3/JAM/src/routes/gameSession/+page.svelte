@@ -104,7 +104,8 @@
 
     if (events.scoresTillQuestion) {
       sessionScores = events.scoresTillQuestion;
-      sessionScores.sort(sortByScore);
+      sessionScores = calculateScore(sessionScores);
+      console.log(sessionScores);
       scoreDisplayCheck = true;
       scoreDisplayTimer = events.display_time;
       events.scoresTillQuestion = null;
@@ -190,6 +191,23 @@
 
   //quiz format: refer to dummyQuiz.js in lib folder
 
+  //format given : scores = [{name: "name", scores: [0, 1, 0, 1, 1, 0, 1, 0, 1, 1], responseTimes: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], avatarIndex: 0}, ...]
+  //given an array of list of scores, responseTimes and usernames, return a list with usernames, scores(0/1 * responseTimes)
+  const calculateScore =(scores) => {
+    let scoreList = [];
+    for (let i = 0; i < scores.length; i++) {
+      let score = 0;
+      for (let j = 0; j < scores[i].scores.length; j++) {
+        //make sure to convert the responseTimes to integer from float
+        score += scores[i].scores[j] * Math.floor(scores[i].responseTimes[j]);
+      }
+      scoreList.push({name: scores[i].name, scores: score, avatarIndex: scores[i].avatarIndex});
+    }
+    //sort the list by score
+    scoreList.sort((a, b) => b.scores - a.scores);
+    return scoreList;
+  }
+
   const sendAnswer = (answerIdx, questionIdx) => {
     if (isAnswerSubmitted || ispauseTimer) {
       return;
@@ -266,7 +284,7 @@
               class="player-avatar"
             />
             <p class="player-name">
-              {ps.name} score: {playerScore(ps.scores)}
+              {ps.name} score: {ps.scores}
             </p>
           </div>
         {/each}
