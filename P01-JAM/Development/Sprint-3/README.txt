@@ -105,16 +105,16 @@ Complete backend file/code refactor	(Muiz)
 HOW TO ACCESS THE SYSTEM
 
 
-Access web app: https://p01-jam.vercel.app/
+Access web app: https://p1-jam.vercel.app/
 
 Test Locally:
 
-Use the branch: sprint2_dev_muiz (LATEST)
+Use the branch: sprint3_dev_muiz (LATEST)
 
 goto main dir, should be P01-ProjectNamePending 
 open two terminals
-terminal 1: cd P01-namePending\\Development\\Sprint-1\\backend & npm i
-terminal 2: cd P01-namePending\\Development\\Sprint-1\\JAM && npm i
+terminal 1: cd P01-namePending\\Development\\Sprint-3\\backend & npm i
+terminal 2: cd P01-namePending\\Development\\Sprint-3\\JAM && npm i
 
 terminal 1: npm run start
 terminal 2: npm run dev
