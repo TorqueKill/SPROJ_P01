@@ -208,16 +208,21 @@ function handleAnswer(
     let choicesIdx = answer;
 
     if (room) {
+      let quiz;
+      if (room.quiz.quiz) {
+        quiz = room.quiz.quiz;
+      }
+
       if (!room.answers[socketid]) {
         //
-        room.answers[socketid] = makeDummyStringList(room.quiz.length);
+        room.answers[socketid] = makeDummyStringList(quiz.length);
       }
 
       if (!room.responseTimes[socketid]) {
-        room.responseTimes[socketid] = makeDummyStringList(room.quiz.length);
+        room.responseTimes[socketid] = makeDummyStringList(quiz.length);
       }
 
-      let answer = room?.quiz[questionIndex]?.choices[choicesIdx];
+      let answer = quiz[questionIndex]?.choices[choicesIdx];
 
       //if answer is undefined, set answer to a default value
       if (!answer) {
@@ -230,7 +235,7 @@ function handleAnswer(
         console.log("time remaining: ", responseTime);
       } else {
         // player answered so repsonse time is time limit - timeAnswered
-        responseTime = room.quiz[questionIndex].timeLimit - timeAnswered;
+        responseTime = quiz[questionIndex].timeLimit - timeAnswered;
         room.responseTimes[socketid][questionIndex] = responseTime;
         console.log("time remaining: ", responseTime);
       }
@@ -338,7 +343,7 @@ function getScoresTillQuestion(roomid, questionIndex, socketid, rooms) {
       //return scores for user with socketid, till questionIndex
       for (let i = 0; i < questionIndex; i++) {
         if (room.answers[socketid]) {
-          if (room.quiz[i].answer === room.answers[socketid][i]) {
+          if (room.quiz.quiz[i].answer === room.answers[socketid][i]) {
             scores.push(1);
           } else {
             scores.push(0);
@@ -362,7 +367,7 @@ function getFinalScores(roomid, socketid, rooms) {
     let scores = [];
     if (room) {
       if (room.answers[socketid]) {
-        let quiz = room.quiz;
+        let quiz = room.quiz.quiz;
         let answers = room.answers[socketid];
         for (let i = 0; i < quiz.length; i++) {
           if (quiz[i].answer === answers[i]) {
@@ -527,7 +532,7 @@ function reconnectionInit(
         room.answers[socketid] = answers;
         delete room.answers[user.socketid];
       } else {
-        room.answers[socketid] = makeDummyStringList(room.quiz.length);
+        room.answers[socketid] = makeDummyStringList(room.quiz.quiz.length);
       }
 
       //update response times
@@ -537,7 +542,9 @@ function reconnectionInit(
         room.responseTimes[socketid] = responseTimes;
         delete room.responseTimes[user.socketid];
       } else {
-        room.responseTimes[socketid] = makeDummyStringList(room.quiz.length);
+        room.responseTimes[socketid] = makeDummyStringList(
+          room.quiz.quiz.length
+        );
       }
 
       //update avatar index in users
@@ -601,7 +608,7 @@ function lateConnectionInit(
         room.answers[socketid] = answers;
         delete room.answers[user.socketid];
       } else {
-        room.answers[socketid] = makeDummyStringList(room.quiz.length);
+        room.answers[socketid] = makeDummyStringList(room.quiz.quiz.length);
       }
 
       // room.answers[socketid] = answers;
@@ -614,7 +621,9 @@ function lateConnectionInit(
         room.responseTimes[socketid] = responseTimes;
         delete room.responseTimes[user.socketid];
       } else {
-        room.responseTimes[socketid] = makeDummyStringList(room.quiz.length);
+        room.responseTimes[socketid] = makeDummyStringList(
+          room.quiz.quiz.length
+        );
       }
 
       //update avatar index in users
@@ -653,6 +662,7 @@ function checkSessionLoaded(roomid, rooms, users) {
       // print all the user names and vegetative state of users in the room
 
       for (let i = 0; i < room.users.length; i++) {
+        console.log("Len: " + room.users.length);
         console.log(
           "User: " +
             room.users[i] +

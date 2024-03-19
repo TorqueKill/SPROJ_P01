@@ -2,7 +2,7 @@
   // @ts-nocheck
 
   import { goto } from "$app/navigation";
-  import { quiz1, quiz2, quiz3 } from "$lib/dummyQuiz.js";
+  import { quiz1, quiz2, quiz3 } from "$lib/dummyQuiz2.js";
   import { onMount } from "svelte";
   import { user } from "$lib/userStore.js";
 
@@ -67,7 +67,7 @@
 
   function displayQuiz(quiz, idx) {
     //console.log(quizzes);
-    quizToDisplay = sugarQuiz(quiz);
+    quizToDisplay = sugarQuiz(quiz.quiz);
     displayQuizCheck = true;
     quizIdx = idx;
   }
@@ -149,6 +149,29 @@
     URL.revokeObjectURL(url);
   }
 
+  function downloadQuizAsJSON(idx) {
+    const quizObject = quizzes[idx];
+
+    // Convert the quiz object to a JSON string
+    const jsonString = JSON.stringify(quizObject, null, 2); // Beautify the JSON output
+
+    // Blob and URL.createObjectURL for download
+    const blob = new Blob([jsonString], { type: "application/json;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    // Temporary link to trigger download
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `quiz_${idx + 1}.json`);
+    document.body.appendChild(link);
+    link.click();
+
+    // Clean up the URL after download
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+
   function importQuiz(event) {
     const file = event.target.files[0];
     if (file) {
@@ -164,10 +187,6 @@
         //force svelte to update
         quizzes = [...quizzes];
 
-        // displayQuiz(
-        //   quizzes[quizzes.length - parsedQuiz.length],
-        //   quizzes.length - parsedQuiz.length
-        // );
       };
       reader.readAsText(file);
     }
@@ -226,6 +245,25 @@
 
     return quiz;
   }
+
+  function importAsJSON(event){
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target.result;
+      const parsedQuiz = JSON.parse(content);
+      console.log("Parsed: \n");
+      console.log(parsedQuiz);
+
+      //save to quizzes
+      quizzes.push(parsedQuiz);
+      //force svelte to update
+      quizzes = [...quizzes];
+    };
+    reader.readAsText(file);
+  }
+}
 </script>
 
 <nav>
@@ -263,13 +301,13 @@
             <button
               class="btn btn-primary btn-block"
               id="quizNo"
-              on:click={() => displayQuiz(quiz, idx)}>Quiz {idx + 1}</button
+              on:click={() => displayQuiz(quiz, idx)}>{quiz.title}</button
             >
           {/each}
         {/if}
 
-        <label for="inputQuiz" class="file-upload-btn">Upload Quiz CSV</label>
-        <input type="file" accept=".csv" on:change={importQuiz} id="inputQuiz" class="file-input"/>
+        <label for="inputQuiz" class="file-upload-btn">Upload Quiz JSON</label>
+        <input type="file" accept=".json" on:change={importAsJSON} id="inputQuiz" class="file-input"/>
 
         {#if isQuizSelected}
           <button
@@ -356,7 +394,7 @@
 
         <button
           class="btn btn-tertiary"
-          on:click={() => downloadQuizAsCSV(quizIdx)}>Download</button
+          on:click={() => downloadQuizAsJSON(quizIdx)}>Download</button
         >
         <button class="btn btn-secondary" on:click={() => closeQuiz()}
           >Close</button

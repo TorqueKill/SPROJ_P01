@@ -20,9 +20,10 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
   socket.on("resume-timer", (roomid, questionIndex) => {
     let room = gameManager.getRoom(roomid, rooms);
     if (room) {
-      let quiz = gameManager.getRoomQuiz(roomid, rooms);
+      let quizObj = gameManager.getRoomQuiz(roomid, rooms);
       // finding remaining time
-      let timeLimit = quiz[questionIndex].timeLimit - room.pauseTimerTime;
+      let timeLimit =
+        quizObj.quiz[questionIndex].timeLimit - room.pauseTimerTime;
 
       let timeoutId = setTimeout(() => {
         console.log("timeout for question: " + questionIndex);
@@ -81,7 +82,7 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
 
         if (
           questionIndex ===
-          gameManager.getRoomQuiz(roomid, rooms).length - 1
+          gameManager.getRoomQuiz(roomid, rooms).quiz.length - 1
         ) {
           //emit final scores for each player (not host)
           for (let i = 0; i < room.users.length; i++) {
@@ -169,8 +170,8 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
             clearTimeout(room.timeOutIds[questionIndex]);
 
             //handle timeout for next question here
-            let quiz = gameManager.getRoomQuiz(roomid, rooms);
-            let timeLimit = quiz[questionIndex + 1].timeLimit;
+            let quizObj = gameManager.getRoomQuiz(roomid, rooms);
+            let timeLimit = quizObj.quiz[questionIndex + 1].timeLimit;
 
             let timeoutId = setTimeout(() => {
               console.log("timeout for question: " + (questionIndex + 1));
@@ -191,8 +192,8 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
           clearTimeout(room.timeOutIds[questionIndex]);
 
           //handle timeout for next question here
-          let quiz = gameManager.getRoomQuiz(roomid, rooms);
-          let timeLimit = quiz[questionIndex + 1].timeLimit;
+          let quizObj = gameManager.getRoomQuiz(roomid, rooms);
+          let timeLimit = quizObj.quiz[questionIndex + 1].timeLimit;
 
           let timeoutId = setTimeout(() => {
             console.log("timeout for question: " + (questionIndex + 1));

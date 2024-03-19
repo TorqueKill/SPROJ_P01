@@ -67,16 +67,10 @@
   //note local history has the format:
   //{email: , username : , gameHistory: [{quiz: quiz, scores: playerScores}]}
 
-  /**
-   * @param {string} userEmail
-   */
   function togglePlayerHistory(userEmail) {
     showPlayerHistory = !showPlayerHistory;
     if (showPlayerHistory) {
-      /**
-     * @type {{ quiz: string; details: ({ question: string; providedAnswer: string; 
-    correctAnswer: string; wasCorrect: boolean; } | null)[]; }[]}
-     */
+
       let playerHistory = [];
 
       let localGameHistory = localPlayerHistory.find(
@@ -97,7 +91,7 @@
         let playerRecord = quizHistory.scores.find(
           (player) => player.name = userEmail
         );
-        let currentQuiz = games[index].quiz;
+        let currentQuiz = games[index].quiz.quiz;
         //console.log("currentQuiz:", currentQuiz);
         //console.log("playerRecord:", playerRecord);
         if (playerRecord && currentQuiz) {
@@ -131,9 +125,6 @@
   function toggleHostHistory() {
     showHostHistory = !showHostHistory;
     if (showHostHistory) {
-      /**
-       * @type {{ quiz: string; players: { name: string; score: string; }[]; }[]}
-       */
       let history = [];
 
       let localGameHistory = localHostHistory.find(

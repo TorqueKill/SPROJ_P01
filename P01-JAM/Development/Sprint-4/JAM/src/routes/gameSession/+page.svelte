@@ -27,7 +27,7 @@
   let displayQuestionForPlayers = false;
 
   onMount(() => {
-    quiz = $user.quiz;
+    quiz = $user.quiz.quiz;
     isHost = $user.isHost; //hosts will display the question
     displayQuestionForPlayers = $user.displayQuestion;
     currentQuestion = -1;

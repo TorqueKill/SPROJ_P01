@@ -6,7 +6,7 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
   const DEFAUL_PLAYER_NAME = config.DEFAUL_PLAYER_NAME;
   const REPORT_DISPLAY_TIME = config.REPORT_DISPLAY_TIME;
 
-  socket.on("create-room", (quiz, roomSettings, userData) => {
+  socket.on("create-room", (quizObj, roomSettings, userData) => {
     // create room and add user to it, check if room already exists then create new room and remove user from old room
 
     //first check if host already has a room
@@ -25,7 +25,7 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
     let roomid = gameManager.makeid(6, rooms);
     socket.join(roomid);
     gameManager.addUserToRoom(roomid, socket.id, rooms, rooms);
-    gameManager.setRoomQuiz(roomid, quiz, rooms);
+    gameManager.setRoomQuiz(roomid, quizObj, rooms);
     gameManager.setRoomMaxPlayers(roomid, roomSettings.maxPlayers, rooms);
     gameManager.setQuestionsPerReport(roomid, roomSettings.reportScores, rooms);
     gameManager.setRoomDisplayQuestion(
@@ -36,7 +36,7 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
     gameManager.setUser(socket.id, roomid, name, email, 0, rooms, users); //default avatar index is 0
     socket.emit("room-created", roomid);
     console.log("user created room: " + roomid);
-    console.log("Quiz received, first question: " + quiz[0].question);
+    console.log("Quiz received, first question: " + quizObj.quiz[0].question);
   });
 
   socket.on("join-room", (roomid, userData) => {
@@ -94,9 +94,9 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
       console.log("avatarIndex: " + avatarIndex);
       socket.join(roomid);
       //get room quiz
-      let quiz = gameManager.getRoomQuiz(roomid, rooms);
+      let quizObj = gameManager.getRoomQuiz(roomid, rooms);
       let data = {
-        quiz: quiz,
+        quiz: quizObj,
         currentQuestion: gameManager.getRoom(roomid, rooms).currentQuestion,
       };
 
@@ -233,7 +233,7 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
           rooms,
           users
         );
-        gameManager.addUserToRoom(roomid, dummyUser, rooms.socketid);
+        gameManager.addUserToRoom(roomid, dummyUser.socketid, rooms);
       }
 
       io.to(roomid).emit(
@@ -274,8 +274,8 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
             timeDiff;
 
           //get room quiz and timeLimit for first question
-          let quiz = gameManager.getRoomQuiz(roomid, rooms);
-          let timeLimit = quiz[0].timeLimit;
+          let quizObj = gameManager.getRoomQuiz(roomid, rooms);
+          let timeLimit = quizObj.quiz[0].timeLimit;
 
           //timeout for the first question
           let timeoutId = setTimeout(() => {

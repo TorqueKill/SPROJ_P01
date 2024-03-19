@@ -138,6 +138,22 @@
     return quiz;
   }
 
+  function quizWrapper(quiz){
+    let title = "Quiz";
+    let type = "4-choices";
+    let otherDetails = {}
+
+    let quizObj ={
+      title: title,
+      type: type,
+      quiz: quiz,
+      otherDetails: otherDetails
+    }
+
+    return quizObj;
+    
+  }
+
   function increaseTime(questionIndex) {
     if (quiz1[questionIndex].timeLimit < MAX_TIME_LIMIT) {
       quiz1[questionIndex].timeLimit += 5;
@@ -147,10 +163,11 @@
   function saveQuiz() {
     let saveingQuiz = quiz1;
     populateIfBlank(saveingQuiz);
-    console.log(saveingQuiz);
-    localStorage.setItem("Quiz", JSON.stringify([quiz1]));
+    let quizObj = quizWrapper(saveingQuiz);
+    console.log(quizObj);
+    localStorage.setItem("Quiz", JSON.stringify([quizObj]));
     // goto("/createRoom");
-    $user.hostQuiz = saveingQuiz;
+    $user.hostQuiz = quizObj;
     quizChosen = true;
     isQuizSelected = true;
   }
