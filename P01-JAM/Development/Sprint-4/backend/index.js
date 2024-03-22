@@ -3,21 +3,18 @@ const app = express();
 const http = require("http");
 const server = http.createServer(app);
 const Server = require("socket.io").Server;
+const mongoose = require("mongoose");
 const socketController = require("./socket-controller/socketManager");
 
-// creating supabase client
-const { createClient } = require("@supabase/supabase-js");
+let uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}${process.env.MONGO_URI}`;
+
 const cors = require("cors");
 const userAuth = require("./controller/userAuth");
 const devRoutes = require("./controller/devAuth");
 
 const _consts = require("./config/config");
 
-const supabaseUrl = _consts.SUPABASE_URL;
-const supabaseKey = _consts.SUPABASE_KEY;
 const port = _consts.PORT;
-
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 let corsOptions = {
   origin: "*",
@@ -38,16 +35,23 @@ const bodyParser = require("body-parser");
 
 app.use(bodyParser.json());
 
-app.use("/dev", devRoutes, cors(corsOptions));
+mongoose
+  .connect(uri)
+  .then(() => {
+    console.log("Connected to Database");
+    app.use("/dev", devRoutes, cors(corsOptions));
+    app.use("/auth", userAuth(), cors(corsOptions));
 
-app.use("/auth", userAuth(supabase), cors(corsOptions));
+    socketController(server);
 
-socketController(server);
-
-server.listen(port || 3001, () => {
-  if (port) {
-    console.log("listening on port " + port);
-  } else {
-    console.log("listening on port 3001");
-  }
-});
+    server.listen(port || 3001, () => {
+      if (port) {
+        console.log("listening on port " + port);
+      } else {
+        console.log("listening on port 3001");
+      }
+    });
+  })
+  .catch((err) => {
+    console.log(err);
+  });

@@ -1,76 +1,71 @@
 const express = require("express");
+const User = require("../models/User");
+const bcrypt = require("bcrypt");
 
 const router = express.Router();
 
-module.exports = function (supabase) {
-  // Signup route
+module.exports = function () {
   router.post("/signup", async (req, res) => {
-    const { email, password } = req.body;
-
-    console.log("In sign up route");
-    console.log(email, password);
-
+    console.log("Signup request received");
     try {
-      const { user, error } = await supabase.auth.signUp({
+      const { username, email, password } = req.body;
+      // Check if the user already exists
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(409).send("User already exists");
+      }
+
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Create a new user instance
+      const user = new User({
+        username,
         email,
-        password,
+        password: hashedPassword,
       });
 
-      if (error) {
-        return res.status(400).json({ error: error.message });
-      }
+      // Save the new user
+      const result = await user.save();
+      console.log("User registered", result);
 
-      return res.status(200).json({ user });
-    } catch (error) {
-      console.error("Error:", error.message);
-      return res.status(500).json({ error: "Internal Server Error" });
+      let response = {
+        username: user.username,
+        email: user.email,
+        message: "User registered",
+        result: result,
+      };
+
+      res.status(201).send(response);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("Error registering user");
     }
   });
 
-  // Signin route
-  router.post("/signin", async (req, res) => {
-    console.log("In sign in route");
-    const { email, password } = req.body;
-    // const email = "rafaeharoon8@gmail.com";
-    // const password = "abc123"
-
-    console.log(email, password);
-
+  router.post("/login", async (req, res) => {
     try {
-      const { user, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const user = await User.findOne({
+        email: req.body.email,
       });
 
-      if (error) {
-        console.log(error);
-        return res.status(401).json({ error: "Invalid credentials" });
+      if (!user) {
+        return res.status(404).send("User not found");
       }
 
-      console.log("User signed in");
-      return res.status(200).json({ user });
-    } catch (error) {
-      console.error("Error:", error.message);
-      return res.status(500).json({ error: "Internal Server Error" });
-    }
-  });
-
-  // Signout route
-  router.post("/signout", async (req, res) => {
-    try {
-      const { error } = await supabase.auth.signOut();
-
-      if (error) {
-        console.error("Error signing out:", error.message);
-        return res.status(500).json({ error: "Internal Server Error" });
+      const validPassword = await bcrypt.compare(
+        req.body.password,
+        user.password
+      );
+      if (!validPassword) {
+        return res.status(401).send("Invalid password");
       }
 
-      return res.status(200).json({ message: "User signed out successfully" });
-    } catch (error) {
-      console.error("Error:", error.message);
-      return res.status(500).json({ error: "Internal Server Error" });
+      res.status(200).send("User logged in");
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("Error logging in");
     }
   });
-
   return router;
 };
