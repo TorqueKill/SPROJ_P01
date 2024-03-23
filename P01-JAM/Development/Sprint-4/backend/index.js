@@ -11,6 +11,7 @@ let uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}${pr
 const cors = require("cors");
 const userAuth = require("./controller/userAuth");
 const devRoutes = require("./controller/devAuth");
+const gameRoutes = require("./controller/gameAPI");
 
 const _consts = require("./config/config");
 
@@ -41,6 +42,7 @@ mongoose
     console.log("Connected to Database");
     app.use("/dev", devRoutes, cors(corsOptions));
     app.use("/auth", userAuth(), cors(corsOptions));
+    app.use("/game", gameRoutes(), cors(corsOptions));
 
     socketController(server);
 

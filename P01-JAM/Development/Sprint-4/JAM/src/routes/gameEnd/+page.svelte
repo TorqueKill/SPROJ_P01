@@ -4,6 +4,7 @@
   import { user } from "$lib/userStore.js";
   import { socket, roomEvents } from "$lib/socketStore.js";
   import { goto } from "$app/navigation";
+  import { saveHistory } from "$lib/API/gameAPI";
 
   import { onMount } from "svelte";
 
@@ -52,7 +53,7 @@
     return playerScore(b.scores) - playerScore(a.scores);
   };
 
-  const saveHistory = () => {
+  const _saveHistory = async () => {
     //check if the user is host or player
     //further check if its a dev account or not
 
@@ -108,6 +109,22 @@
     let userGame = { email: $user.email, gameHistory: [game] };
 
     let found = false;
+
+    //if $user.email is '@dev.test', then save the history in local storage
+    //else save it using API : saveHistory
+
+    if (!userGame.email.includes("@dev")) {
+      try {
+        let type = $user.isHost ? "host" : "player";
+        let res = await saveHistory(userGame.email, userGame.gameHistory, type);
+        console.log(res);
+
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
 
     for (let i = 0; i < localGames.length; i++) {
       if (localGames[i].email == $user.email) {
@@ -178,14 +195,17 @@
         <button
           class="btn btn-primary btn-block"
           id="hist"
-          on:click={() => {
-            if (saveHistory()) {
+          on:click={async () => {
+            const result = await _saveHistory();
+            if (result) {
               $user.gameid = null;
               $user.quiz = null;
               $user.isHost = false;
               $user.userDecided = false;
-
+        
               goto("/viewHistory");
+            }else{
+              alert("There was an error saving the history. Please try again!");
             }
           }}>Save history</button
         >

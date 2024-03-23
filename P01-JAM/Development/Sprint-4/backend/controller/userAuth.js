@@ -9,6 +9,7 @@ module.exports = function () {
     console.log("Signup request received");
     try {
       const { username, email, password } = req.body;
+      console.log(username, email, password);
       // Check if the user already exists
       const existingUser = await User.findOne({ email });
       if (existingUser) {
@@ -43,11 +44,13 @@ module.exports = function () {
     }
   });
 
-  router.post("/login", async (req, res) => {
+  router.post("/signin", async (req, res) => {
     try {
       const user = await User.findOne({
         email: req.body.email,
       });
+
+      console.log(user);
 
       if (!user) {
         return res.status(404).send("User not found");
@@ -62,6 +65,7 @@ module.exports = function () {
       }
 
       res.status(200).send("User logged in");
+      console.log("User logged in");
     } catch (err) {
       console.log(err);
       res.status(500).send("Error logging in");

@@ -5,6 +5,7 @@
   import {SESSION_TIMEOUT} from "$lib/config.js";
   import {BACKEND_URL} from "$lib/config.js";
   import { user } from "$lib/userStore.js";
+  import { signin } from "$lib/API/userAPI.js";
 
   let signupVisible = false;
   let signinVisible = false;
@@ -29,44 +30,29 @@
     //check if user has @dev in their email
     //if they do, send req for /dev/auth/signin
 
-    const normalFetch = `${BACKEND_URL}/auth/signin`
-    const devFetch = `${BACKEND_URL}/dev/auth/signin`
+      try {
 
-    let fetchUrl = normalFetch;
-
-    if (email.includes("@dev")) {
-      fetchUrl = devFetch;
-    }
-
-    try {
-        const response = await fetch(fetchUrl, {
-          method: "POST",
-          headers: new Headers({
-            "Content-Type": "application/json",
-          }),
-          body: JSON.stringify({
-            email: email,
-            password: password,
-          }),
-          // mode: "no-cors",
-        });
-
-        console.log(response);
-        const data = await response.json();
+        let data = await signin(email, password);
         console.log(data);
 
-        if (data.error) {
-          let error = data.error;
-          console.log(error);
-          loadingUserSession = false;
-          return;
-        } else {
-          $user.email = email;
-          //redirect to the appropriate page
-          goto("/hostOrPlayer");
-        }
+        $user.email = email;
+        sessionStorage.setItem("user", JSON.stringify($user));
+
+        //create obj to store email, password, timestamp and user data
+        let userObj = {
+          email: email,
+          password: password,
+          timestamp: Date.now(),
+          userData: {},
+        };
+
+        //save user to local storage
+        localStorage.setItem("user-session", JSON.stringify(userObj));
+
+        goto("/hostOrPlayer");
+
       } catch (err) {
-        console.log(err);
+        console.log(err?.response?.data || "An error occurred while signing in!");
         loadingUserSession = false;
         return;
       }
@@ -74,7 +60,7 @@
 
 
 
-  onMount(() => {
+  onMount(async() => {
     console.log("Landing page mounted");
     loadingUserSession = true;
     //try to load user from local storage
@@ -91,7 +77,7 @@
       } else {
         //call api to login the user (async)
         //if successful, redirect to the appropriate page
-        loginUserSession(user.email, user.password);
+        await loginUserSession(user.email, user.password);
       }
     } else {
       loadingUserSession = false;

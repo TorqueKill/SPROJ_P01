@@ -38,4 +38,5 @@ export const SESSION_TIMEOUT = 604800000;
 
 export const BACKEND_URL = "http://localhost:3001"; // || process.env.BACKEND_URL;
 
+
 //https://boiling-beyond-93888-265de2b70712.herokuapp.com/

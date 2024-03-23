@@ -1,10 +1,10 @@
 <script>
   // @ts-nocheck
-
   import { goto } from "$app/navigation";
   // importing userStore.js
   import { user } from "$lib/userStore.js";
   import {BACKEND_URL} from "$lib/config.js";
+  import {signin} from "$lib/API/userAPI.js";
 
   let email = "";
   let password = "";
@@ -19,61 +19,30 @@
       //     error = "Invalid email or password.";
     } else {
       // Api call to sign in
-
-      const normalFetch = `${BACKEND_URL}/auth/signin`
-      const devFetch = `${BACKEND_URL}/dev/auth/signin`
-
-      let fetchUrl = normalFetch;
-
-      if (email.includes("@dev")) {
-        fetchUrl = devFetch;
-      }
-
       try {
-        const response = await fetch(fetchUrl, {
-          method: "POST",
-          headers: new Headers({
-            "Content-Type": "application/json",
-          }),
-          body: JSON.stringify({
-            email: email,
-            password: password,
-          }),
-          // mode: "no-cors",
-        });
 
-        console.log(response);
-
-        const data = await response.json();
+        let data = await signin(email, password);
         console.log(data);
 
-        if (data.error) {
-          error = data.error;
-          return;
-        } else {
-          // console.log(data);
-          // console.log(data.token);
+        $user.email = email;
+        sessionStorage.setItem("user", JSON.stringify($user));
 
-          $user.email = email;
-          //$user.password = password;
-          //save user to session storage but incoorporate timestamps to determine staleness/ timeout for session
-          sessionStorage.setItem("user", JSON.stringify($user));
+        //create obj to store email, password, timestamp and user data
+        let userObj = {
+          email: email,
+          password: password,
+          timestamp: Date.now(),
+          userData: {},
+        };
 
-          //create obj to store email, password, timestamp and user data
-          let userObj = {
-            email: email,
-            password: password,
-            timestamp: Date.now(),
-            userData: {},
-          };
+        //save user to local storage
+        localStorage.setItem("user-session", JSON.stringify(userObj));
 
-          //save user to local storage
-          localStorage.setItem("user-session", JSON.stringify(userObj));
+        goto("/hostOrPlayer");
 
-          goto("/hostOrPlayer");
-        }
       } catch (err) {
-        error = "There was an error. Please try gain!";
+        console.log(err);
+        error = err?.response?.data || "An error occurred while signing in!";
         return;
       }
 

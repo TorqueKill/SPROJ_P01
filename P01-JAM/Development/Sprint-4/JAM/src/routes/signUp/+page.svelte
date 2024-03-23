@@ -1,10 +1,25 @@
-<script lang="js">
+
+<script>
+  //@ts-nocheck
   import { goto } from "$app/navigation";
   import {BACKEND_URL} from "$lib/config.js"
+  import {signup} from "$lib/API/userAPI.js"
 
   let email = "";
   let password = "";
   let error = "";
+
+  function makeid(length) {
+    let result = "";
+    let characters = "0123456789";
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+    return result;
+  }  
+
+  let userName = "User" + makeid(4);
+  
 
   async function handleSignUp() {
     // Implement your sign-up logic here
@@ -21,32 +36,9 @@
       // Api call to sign up
 
       try {
-        const response = await fetch(`${BACKEND_URL}/auth/signup`, {
-          method: "POST",
-          headers: new Headers({
-            "Content-Type": "application/json",
-          }),
-          body: JSON.stringify({
-            email: email,
-            password: password,
-          }),
-          // mode: "no-cors",
-        });
-
+        const response = await signup(userName, email, password);
         console.log(response);
-
-        const data = await response.json();
-        console.log(data);
-
-        if (data.error) {
-          error = data.error;
-          return;
-        } else {
-          // console.log(data);
-          // console.log(data.token);
-
-          goto("/");
-        }
+        goto("/");
       } catch (err) {
         error = "There was an error. Please try gain!";
         return;
