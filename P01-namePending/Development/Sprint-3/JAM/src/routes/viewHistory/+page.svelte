@@ -225,6 +225,9 @@
           </ul>
         {/each}
       {/if}
+
+      <button on:click={() => goto('/gameStats')}>View Game Stats</button>
+
     </div>
   </body>
 </main>
