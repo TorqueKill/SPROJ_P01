@@ -466,7 +466,8 @@
     background-color: #e3f2fd; /* Light blue background color */
     padding: 2px;
     position: fixed;
-    width: 100%;
+    width: 100vw;
+    left: 0;
     top: 0;
     z-index: 1000;
   }

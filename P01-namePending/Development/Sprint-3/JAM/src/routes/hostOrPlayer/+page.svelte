@@ -376,7 +376,8 @@
     background-color: #e3f2fd; /* Light blue background color */
     padding: 2px;
     position: fixed;
-    width: 100%;
+    width: 100vw;
+    left: 0;
     top: 0;
     z-index: 1000;
   }
@@ -388,7 +389,7 @@
     margin: 0;
     padding: 0;
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
   }
   .logo {
     color: rgb(214, 81, 209);
