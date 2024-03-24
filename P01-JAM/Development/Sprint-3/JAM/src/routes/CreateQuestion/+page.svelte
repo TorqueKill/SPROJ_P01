@@ -170,6 +170,7 @@
 
 <nav>
   <div class="logo">JAM</div>
+  <div class="logo">{ $user.userName }</div>
   <ul>
     <li><button class="nav_button" on:click={() => goto("/")}>Home</button></li>
     <li>

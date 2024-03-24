@@ -319,6 +319,7 @@
 <nav>
   <ul>
       <li class="logo">JAM</li>
+      <div class="logo">{ $user.userName }</div>
       <li><button class="nav_button" on:click={() => goto("/")}>Home</button></li>
       <li><button class="nav_button" on:click={() => goto("/viewHistory")}>History</button></li>
       <li><button class="nav_button" on:click={logout}>Logout</button></li>
