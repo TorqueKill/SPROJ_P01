@@ -27,6 +27,7 @@ Complete overhaul for creating quiz UI	(Bisma)
 UI Adjustments				(Bisma, Muiz)
 Recording & Saving Response times	(Rafae, Muiz)
 Response Time Based Scoring 		(Muiz)
+Stats Page Frontend           (Hafsa)
 
 Integrating & Deployment 		(Muiz)
 Complete backend file/code refactor	(Muiz)
