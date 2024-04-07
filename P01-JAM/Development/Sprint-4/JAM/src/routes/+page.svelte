@@ -88,6 +88,9 @@
 <main>
   <body>
     <div class="landing-page">
+      <h1 class="text-3xl font-bold underline">
+        Hello world!
+      </h1>
     {#if !loadingUserSession}
       <h1>Welcome to JAM!</h1>
       <!-- <p>A brief description of your app and its benefits.</p> -->
@@ -119,7 +122,7 @@
   </body>
 </main>
 
-<style>
+<style lang="postcss">
   .landing-page {
     display: flex;
     flex-direction: column;
