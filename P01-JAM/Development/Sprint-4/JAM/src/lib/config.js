@@ -33,6 +33,8 @@ export const AVATARS = [
   "woman5.png",
 ];
 
+export const QUIZ_DISPLAY_PAGINATION = 13;
+
 //1 week
 export const SESSION_TIMEOUT = 604800000;
 
