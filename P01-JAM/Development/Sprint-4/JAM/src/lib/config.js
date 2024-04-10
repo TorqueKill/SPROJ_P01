@@ -18,6 +18,7 @@ export const GAME_SETTINGS = {
   MAX_TIME_PER_QUESTION: 30,
   MAX_TIME_PER_REPORT: 10,
   MAX_TIME_PER_GAME: 1800,
+  LEADERBOARD_SIZE: 5,
 };
 
 export const AVATARS = [
@@ -39,6 +40,5 @@ export const QUIZ_DISPLAY_PAGINATION = 13;
 export const SESSION_TIMEOUT = 604800000;
 
 export const BACKEND_URL = "http://localhost:3001"; // || process.env.BACKEND_URL;
-
 
 //https://boiling-beyond-93888-265de2b70712.herokuapp.com/

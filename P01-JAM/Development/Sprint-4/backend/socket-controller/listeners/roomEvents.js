@@ -5,6 +5,7 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
   const LAG_BIAS = config.LAG_BIAS; //seconds
   const DEFAUL_PLAYER_NAME = config.DEFAUL_PLAYER_NAME;
   const REPORT_DISPLAY_TIME = config.REPORT_DISPLAY_TIME;
+  const QUESTION_TITLE_TIME = config.QUESTION_TITLE_TIME; //seconds
 
   socket.on("create-room", (quizObj, roomSettings, userData) => {
     // create room and add user to it, check if room already exists then create new room and remove user from old room
@@ -281,7 +282,7 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
           let timeoutId = setTimeout(() => {
             console.log("timeout for question: " + 0);
             io.to(roomid).emit("timeout", 1);
-          }, (timeLimit + LAG_BIAS + timeDiff) * 1000);
+          }, (timeLimit + LAG_BIAS + timeDiff + QUESTION_TITLE_TIME) * 1000);
 
           //set timeout id
           gameManager.setQuestionTimeOut(roomid, timeoutId, rooms);

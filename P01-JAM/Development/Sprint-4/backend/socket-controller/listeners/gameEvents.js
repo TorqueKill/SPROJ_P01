@@ -5,6 +5,7 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
   const LAG_BIAS = config.LAG_BIAS; //seconds
   const DEFAUL_PLAYER_NAME = config.DEFAUL_PLAYER_NAME;
   const REPORT_DISPLAY_TIME = config.REPORT_DISPLAY_TIME;
+  const QUESTION_TITLE_TIME = config.QUESTION_TITLE_TIME; //seconds
 
   socket.on("pause-timer", (roomid, questionIndex) => {
     let room = gameManager.getRoom(roomid, rooms);
@@ -176,7 +177,7 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
             let timeoutId = setTimeout(() => {
               console.log("timeout for question: " + (questionIndex + 1));
               io.to(roomid).emit("timeout", questionIndex + 1);
-            }, (timeLimit + LAG_BIAS + room.ROOM_LAG_BIAS) * 1000);
+            }, (timeLimit + LAG_BIAS + room.ROOM_LAG_BIAS + QUESTION_TITLE_TIME) * 1000);
 
             //set timeout id
             gameManager.setQuestionTimeOut(roomid, timeoutId, rooms);
@@ -198,7 +199,7 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
           let timeoutId = setTimeout(() => {
             console.log("timeout for question: " + (questionIndex + 1));
             io.to(roomid).emit("timeout", questionIndex + 1);
-          }, (timeLimit + LAG_BIAS + room.ROOM_LAG_BIAS) * 1000);
+          }, (timeLimit + LAG_BIAS + room.ROOM_LAG_BIAS + QUESTION_TITLE_TIME) * 1000);
 
           //set timeout id
           gameManager.setQuestionTimeOut(roomid, timeoutId, rooms);

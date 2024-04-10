@@ -55,7 +55,7 @@
       console.log($user);
 
       events.gameStarted = null;
-      goto("/gameSession");
+      goto("/gameSession_");
     }
 
     if (events.reconnect) {
@@ -67,7 +67,7 @@
       //will use data.currentQuestion in the future
 
       socket.emit("reconnected", $user.gameid);
-      goto("/gameSession");
+      goto("/gameSession_");
     }
 
     if (events.lateConnect) {
@@ -82,7 +82,7 @@
 
       events.gameStarted = null;
 
-      goto("/gameSession");
+      goto("/gameSession_");
     }
   }
 </script>

@@ -4,6 +4,7 @@ const TIME_PER_QUESTION = 30; //seconds
 const LAG_BIAS = 3; //seconds
 const DEFAUL_PLAYER_NAME = "Player";
 const REPORT_DISPLAY_TIME = 10;
+const QUESTION_TITLE_TIME = 5; //seconds
 
 let devAccounts = [
   {

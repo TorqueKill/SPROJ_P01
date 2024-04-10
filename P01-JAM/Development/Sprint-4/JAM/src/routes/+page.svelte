@@ -77,7 +77,8 @@
       } else {
         //call api to login the user (async)
         //if successful, redirect to the appropriate page
-        await loginUserSession(user.email, user.password);
+        //await loginUserSession(user.email, user.password);
+        loadingUserSession = false;
       }
     } else {
       loadingUserSession = false;
