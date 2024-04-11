@@ -311,9 +311,16 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
     let _users = gameManager.getAllUsers(roomid, false, rooms, users);
     io.to(roomid).emit("user-left", socket.id, playernum, _users);
 
+    //remember to remove the timeouts from the room
+
     //if host left, delete room
     let room = gameManager.getRoom(roomid, rooms);
     if (room) {
+      //remove timeouts for room
+      for (let i = 0; i < room.timeOutIds.length; i++) {
+        clearTimeout(room.timeOutIds[i]);
+      }
+
       if (room.host === socket.id) {
         gameManager.removeRoom(roomid, rooms);
       }

@@ -68,6 +68,7 @@
   //MAKE SURE TO SAVE QUIZ FROM THE OG QUIZ ARRAY
   const chooseQuiz = () => {
     $user.hostQuiz = quizzes[quizIdx];
+    console.log("Chosen quiz: ", $user.hostQuiz);
     quizChosen = true;
     displayQuizCheck = false;
     isQuizSelected = true;

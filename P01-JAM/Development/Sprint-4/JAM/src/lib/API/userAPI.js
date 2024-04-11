@@ -31,12 +31,13 @@ async function signin(email, password) {
   const devFetch = `${BACKEND_URL}/dev/auth/signin`;
 
   let fetchUrl = normalFetch;
+  console.log("Email", email)
 
   if (email.includes("@dev")) {
     fetchUrl = devFetch;
   }
   try {
-    const response = await axios.post("/auth/signin", { email, password });
+    const response = await axios.post(fetchUrl, { email, password });
     console.log("User logged in successfully", response);
     return response.data;
   } catch (error) {

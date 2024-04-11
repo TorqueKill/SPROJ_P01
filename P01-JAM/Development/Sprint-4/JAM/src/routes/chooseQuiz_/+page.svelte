@@ -4,15 +4,24 @@
     // This is a placeholder for your quizzes and selectedQuiz.
     // In a real app, this might come from a store or an API.
     import { quizzes_ } from "$lib/dummyQuiz3.js"
+    import { quiz1, quiz2, quiz3 } from "$lib/dummyQuiz2.js"
     import { onMount } from "svelte";
     import { QUIZ_DISPLAY_PAGINATION } from "$lib/config.js"
     import { writable } from 'svelte/store';
+    import { getQuiz, saveQuiz, updateQuiz } from "$lib/API/gameAPI.js"
+    import { user } from "$lib/userStore.js";
+    import { goto } from "$app/navigation";
+
+    
+
 
     const pageloading = writable(true);
     const paginationloading = writable(false);
+    const cloudloading = writable(false);
 
     let quizzes = []
     let paginatedQuizzes = [];
+    let totalQuizzes = 0;
     
     let selectedQuiz = 0
     let currentPage = 1;
@@ -58,6 +67,7 @@
           quizzes.push(parsedQuiz);
           //force svelte to update
           quizzes = [...quizzes];
+          paginate();
         };
         reader.readAsText(file);
       }
@@ -71,13 +81,13 @@
     // Pagination for quizzes, add timeout to emulate API call
     async function fetchQuizzes(page) {
       paginationloading.set(true);
-      // Simulate an asynchronous API call with a delay
-      return new Promise(resolve => {
-        setTimeout(() => {
-          const startIndex = (page - 1) * quizzesPerPage;
-          resolve(quizzes.slice(startIndex, startIndex + quizzesPerPage));
-        }, 1000); // Delay of 1 second
-      });
+      //call API, return promise
+      let res = await getQuiz(user.email, page, quizzesPerPage);
+      if (res.quizzes.length === 0) {
+        return loadDefaultPagination(page);
+      }
+      return extractQuizzes(res.quizzes);
+
     }
 
     async function nextPage() {
@@ -129,29 +139,89 @@
 
     function saveQuestion(question, property, value) {
         question[property] = value;
+        console.log(quizzes)
         editingQuestionId = null;
         editingImageUrlId = null;
     }
+    function extractQuizzes(quizzesArray) {
+      return quizzesArray.map((quizItem) => quizItem.quiz);
+    }
   
     // Placeholder functions for upload, download, and choose quiz.
-    function uploadQuiz() { /* upload logic */ }
     function downloadQuiz(selectedQuiz) { 
       downloadQuizAsJSON(selectedQuiz);
     } 
-    function chooseQuiz() { /* TODO LATER */ }
+    function chooseQuiz() { 
+      $user.hostQuiz = quizzes[selectedQuiz];
+      console.log($user.hostQuiz);
+      goto("/createRoom")
 
+     }
+    async function uploadQuiz(selectedQuiz) {
+      //check if it does not have _id then save to cloud else update
+      cloudloading.set(true);
+      pageloading.set(true);
+      let quiz = quizzes[selectedQuiz];
+      console.log(quiz);
+      if (!quiz._id) {
+        let res = await saveQuiz($user.email, quiz);
+      } else {
+        await updateQuiz($user.email, quiz, quiz._id);
+      }
+      cloudloading.set(false);
+      pageloading.set(false);
+    }
 
-    onMount(() => {
+    function loadDefault(){
+      quizzes = quizzes_;
+      totalQuizzes = quizzes.length;
+      paginate();
+      pageloading.set(false);
+    }
+
+    function loadDefaultPagination(page){
+      return new Promise(resolve => {
         setTimeout(() => {
-          pageloading.set(false); // Set loading to false after data is 'fetched'\
-          quizzes = quizzes_;
-          paginate(); // Assuming you have a paginate function ready
-        }, 1000); // 1 second delay
+          const startIndex = (page - 1) * quizzesPerPage;
+          resolve(quizzes.slice(startIndex, startIndex + quizzesPerPage));
+        }, 1000); // Delay of 1 second
+      });
+
+    }
+
+
+    onMount(async() => {
+        //if user does not have email, use dummy data
+
+        //intial fetch
+        //set paginationQuizzes, totalQuizzes = {quizzes, total} from API
+        //set pageloading = false
+
+        console.log($user.email);
+        if (!$user.email) {
+          loadDefault();
+        } else {
+          let res = await getQuiz($user.email, 0, quizzesPerPage);
+          if (res.quizzes.length === 0) {
+            loadDefault();
+          } else {
+            quizzes = extractQuizzes(res.quizzes);
+            totalQuizzes = res.total;
+            paginate();
+            pageloading.set(false);
+          }
+        }
+
+        // setTimeout(() => {
+        //   pageloading.set(false); // Set loading to false after data is 'fetched'\
+        //   quizzes = quizzes_;
+        //   paginate(); // Assuming you have a paginate function ready
+        // }, 1000); // 1 second delay
     });
   </script>
 
     {#if $pageloading}
-      <div class="fixed inset-0 bg-purple-500 flex justify-center items-center">
+      <div class="fixed inset-0 {$cloudloading ? "bg-opacity-10" : "bg-opacity-100"} bg-purple-500 flex justify-center items-center">
         <div class="loader"></div> <!-- Custom spinner -->
       </div>
     {:else}
@@ -175,14 +245,14 @@
         {/if}
     
         <!--Pagination for smaller screens-->
-        {#if quizzes.length>quizzesPerPage}
+        {#if totalQuizzes>quizzesPerPage}
           <div class="md:hidden bg-purple-900 p-4 text-indigo-200 font-bold flex justify-between">
             <button class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out" on:click={previousPage}>
               Previous
             </button>
             <span class="text-white font-bold">{currentPage}</span>
             <span class="text-white font-bold">/</span>
-            <span class="text-white font-bold">{Math.ceil(quizzes.length / quizzesPerPage)}</span>
+            <span class="text-white font-bold">{Math.ceil(totalQuizzes / quizzesPerPage)}</span>
             <button class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out" on:click={nextPage}>
               Next
             </button>
@@ -198,21 +268,22 @@
               <!-- svelte-ignore a11y-click-events-have-key-events -->
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <div 
-                class="p-3 hover:bg-gray-700 cursor-pointer rounded transition duration-150 ease-in-out"
+                class="p-3 hover:bg-gray-700 cursor-pointer rounded transition duration-150 ease-in-out
+                {selectedQuiz === idx + (currentPage - 1) * quizzesPerPage ? 'bg-gray-500' : ''}"
                 on:click={() => selectQuiz( idx + (currentPage - 1) * quizzesPerPage)}>
                 {quiz.title}
               </div>
             {/each}
           {/if}
           <!--Pagination for larger screens-->
-          {#if quizzes.length > quizzesPerPage}
+          {#if totalQuizzes > quizzesPerPage}
             <div class="flex justify-between mt-4">
               <button class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out" on:click={previousPage}>
                 Prev
               </button>
               <span class="text-white font-bold">{currentPage}</span>
               <span class="text-white font-bold">/</span>
-              <span class="text-white font-bold">{Math.ceil(quizzes.length / quizzesPerPage)}</span>
+              <span class="text-white font-bold">{Math.ceil(totalQuizzes / quizzesPerPage)}</span>
               <button class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out" on:click={nextPage}>
                 Next
               </button>
@@ -228,21 +299,25 @@
                 <button class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out" on:click={()=>{downloadQuiz(selectedQuiz)}}>
                     Download
                 </button>
-                <button class="hidden md:block bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out" on:click={uploadQuiz}>
-                    Import JSON
-                </button>
-                <button class="hidden md:block bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out" on:click={uploadQuiz}>
+                <label class="hidden md:block bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out cursor-pointer">
+                  Import JSON
+                  <input type="file" accept=".json" on:change={importAsJSON} id="inputQuiz" class="hidden" />
+                </label>
+                <button class="hidden md:block bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out" on:click={()=>{uploadQuiz(selectedQuiz)}}>
                     Save to Cloud
                 </button>
-                <button class="md:hidden bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out" on:click={uploadQuiz}>
+                <label class="md:hidden bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out">
                   Import
-                </button>
-                <button class="md:hidden bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out" on:click={uploadQuiz}>
+                  <input type="file" accept=".json" on:change={importAsJSON} id="inputQuiz" class="hidden" />
+                </label>
+                <button class="md:hidden bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out" on:click={()=>{uploadQuiz(selectedQuiz)}}>
                     Save
                 </button>
-                <button class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out" on:click={()=>{chooseQuiz(selectedQuiz)}}>
-                    Choose
-                </button>
+                {#if selectedQuiz !== null}
+                    <button class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out" on:click={()=>{chooseQuiz(selectedQuiz)}}>
+                        Choose
+                    </button>
+                {/if}
             </div>
             
             <!-- Quiz editor -->

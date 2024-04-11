@@ -234,7 +234,7 @@
                 type="button"
                 class="btn btn-tertiary btn-block"
                 on:click={() => {
-                  goto("/chooseQuiz");
+                  goto("/chooseQuiz_");
                 }}>Choose Quiz</button
               >
             </p>

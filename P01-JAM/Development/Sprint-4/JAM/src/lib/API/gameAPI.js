@@ -25,13 +25,26 @@ async function saveQuiz(email, quiz) {
 }
 
 // Get the quiz from the database
-async function getQuiz(email) {
+async function getQuiz(email, page, pageSize) {
   try {
-    const response = await axios.get("/game/getQuiz", { params: { email } });
+    const response = await axios.get("/game/getQuiz", {
+      params: { email, page, pageSize },
+    });
     console.log("Quiz fetched successfully", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching quiz", error);
+    throw error;
+  }
+}
+
+async function updateQuiz(email, quiz, id) {
+  try {
+    const response = await axios.put("/game/updateQuiz", { email, quiz, id });
+    console.log("Quiz updated successfully", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating quiz", error);
     throw error;
   }
 }
@@ -64,4 +77,4 @@ async function getHistory(email) {
   }
 }
 
-export { saveQuiz, getQuiz, saveHistory, getHistory };
+export { saveQuiz, getQuiz, saveHistory, getHistory, updateQuiz };

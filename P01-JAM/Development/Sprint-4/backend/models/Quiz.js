@@ -7,6 +7,8 @@ const quizQuestionSchema = new Schema({
   answer: String,
   choices: [String],
   timeLimit: Number,
+  //optional 'imageUrl' field
+  imageUrl: String,
 });
 
 // Define the Quiz schema

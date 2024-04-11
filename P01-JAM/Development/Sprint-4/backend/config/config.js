@@ -46,4 +46,5 @@ module.exports = {
   SUPABASE_KEY: process.env.SUPABASE_KEY,
   PORT: process.env.PORT,
   DEV_ACCOUNTS: devAccounts,
+  QUESTION_TITLE_TIME: QUESTION_TITLE_TIME,
 };
