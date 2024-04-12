@@ -20,7 +20,7 @@
   </script>
   
   <!-- Some basic UI for switching between dummy pages -->
-  <div class="flex justify-center space-x-4 bg-gray-500">
+  <div class="flex flex-col md:flex-row justify-center space-x-4 bg-gray-500">
     <button class="border" on:click={() => showComponent(DmyBg)}>Background</button>
     <button class="border" on:click={() => showComponent(DmyBg2)}>Background2</button>
     <button class="border" on:click={() => showComponent(DmyBg3)}>Background3</button>

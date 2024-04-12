@@ -3,6 +3,9 @@
 
     import {SCREENS, GAME_SETTINGS, AVATARS} from "$lib/config.js"
     import { onMount } from "svelte";
+
+    export let selectedBgColor; // This will be a string with the class names for the gradient
+    export let selectedBgMusic; // This will be a string with the path to the music file
     
 
     //game logic:
@@ -140,6 +143,10 @@
         currentQuestion = -1
         isAsnwerSubmitted = false;
         answerSubmitted = "";
+
+        selectedBgColor ? selectedBgColor : selectedBgColor = "bg-gradient-to-br from-purple-400 via-purple-500 via-20% to-purple-900 to-80%"
+        selectedBgMusic ? selectedBgMusic : selectedBgMusic = "/music/1.mp3"
+
 
         setTimeout(() => {
             currentQuestion = 0;
@@ -310,8 +317,16 @@
 
 
     //on page load, play audio
-    $: if(audioRef) {
-        audioRef.play();
+    $: if (audioRef && selectedBgMusic) {
+        //check if selectedBgMusic = '-1' then don't play music
+        if (selectedBgMusic !== "-1") {
+            audioRef.src = selectedBgMusic; // Update the source
+            audioRef.load(); // Load the new music source
+            audioRef.play(); // Play the music
+        }else{
+            //remove the audio
+            audioRef.src = "";
+        }
     }
 
 </script>
@@ -335,19 +350,7 @@
         <div class="loader"></div> <!-- Custom spinner -->
     </div>
 {:else}
-    <div class="relative min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 via-20% to-purple-900 text-white flex justify-center items-center">
-
-        <!-- SVG container with absolute positioning -->
-        <div class="absolute inset-0 overflow-hidden">
-
-            {#each Array(10) as _, i}
-                <img src={svg} class="absolute animate-float" style="top: {Math.random() * 100}%; left: {Math.random() * 100}%; width: {(Math.random() * 100)+50 % 100}px; height: {(Math.random() * 100)+50 % 100}px;" />
-            {/each}
-
-        </div>
-    
-        <!-- positioned above the floating SVGs -->
-        <div class="z-10 w-full max-w-4xl">
+    <div class="relative min-h-screen {selectedBgColor} text-white flex justify-center items-center">
             
                 <!-- Question Title Flash -->
                 {#if isQuestionTitleVisible}
@@ -454,14 +457,10 @@
                     
                 {/if}
         
-        
-                
-
-        </div>
     
     </div>
 
-    <audio src="/music/2.mp3" bind:this={audioRef} loop={true} preload="auto">
+    <audio bind:this={audioRef} loop={true} preload="auto">
         Your browser does not support the audio element.
     </audio>
 {/if}
@@ -483,14 +482,6 @@
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
-    }
-
-    @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
-    }
-    .animate-float {
-        animation: float 6s ease-in-out infinite;
     }
 
 
