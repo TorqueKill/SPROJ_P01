@@ -10,13 +10,13 @@
   let localHostHistory;
 
 
-  // onMount(() => {
-  //   if ($user.email == null || $user.email == "") {
-  //     alert("Must be logged in to view history");
-  //     goto("/");
-  //   }
+  onMount(() => {
+    if ($user.email == null || $user.email == "") {
+      alert("Must be logged in to view history");
+      goto("/");
+    }
 
-  // });
+  });
 
   const logout = async () => {
   try {
@@ -51,7 +51,7 @@
       <!-- right aligned items -->
       <div class = "flex items-center space-x-12">
         <a href = '/' class = "hover:text-white">Home</a>
-        <button onclick="logout()" class="hover:text-white">Logout</button>
+        <button onclick={logout} class="hover:text-white">Logout</button>
       </div>
      
     </div>

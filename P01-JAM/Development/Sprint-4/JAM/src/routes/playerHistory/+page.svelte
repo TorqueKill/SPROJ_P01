@@ -18,10 +18,10 @@
   let localPlayerHistory;
 
   onMount(() => {
-    // if ($user.email == null || $user.email == "") {
-    //   alert("Must be logged in to view history");
-    //   goto("/");
-    // }
+    if ($user.email == null || $user.email == "") {
+      alert("Must be logged in to view history");
+      goto("/");
+    }
 
     localPlayerHistory = JSON.parse(localStorage.getItem("playerGameHistory"));
     if (localPlayerHistory == null) {
@@ -31,45 +31,17 @@
     console.log("localPlayerHistory:", localPlayerHistory);
   });
 
-  //note local history has the format:
-  //{email: , username : , gameHistory: [{quiz: quiz, scores: playerScores}]}
+  const logout = async () => {
+  try {
+      // Call the logout method from your authentication service
+      //await authService.logout();
 
-  detailedPlayerHistory.set([
-  {
-    quiz: "Quiz 1",
-    details: [
-      {
-        question: "What is your name?",
-        providedAnswer: "Liqa",
-        correctAnswer: "Hafsa",
-        wasCorrect: true
-      },
-      {
-        question: "Question 2",
-        providedAnswer: "Provided Answer 2",
-        correctAnswer: "Correct Answer 2",
-        wasCorrect: false
-      },
-      // Add more detail objects as needed
-    ]
-  },
-  {
-    quiz: "Quiz 2",
-    details: [
-      {
-        question: "Question 1",
-        providedAnswer: "Provided Answer 1",
-        correctAnswer: "Correct Answer 1",
-        wasCorrect: false
-      },
-      {
-        question: "Question 2",
-        providedAnswer: "Provided Answer 2",
-        correctAnswer: "Correct Answer 2",
-        wasCorrect: true
-      },
-    ]
-  }])
+      // Redirect to the login page or any other desired page after logout
+      goto('/signIn');
+  } catch (error) {
+      console.error('Logout failed:', error);
+  }
+  };
 
   function togglePlayerHistory(userEmail) {
     showPlayerHistory = !showPlayerHistory;
@@ -99,6 +71,7 @@
         //console.log("currentQuiz:", currentQuiz);
         //console.log("playerRecord:", playerRecord);
         if (playerRecord && currentQuiz) {
+          let quizScore = playerRecord.scores.reduce((acc, score) => acc + score, 0);
           let quizDetails = playerRecord.scores.map((score, questionIndex) => {
             let questionItem = currentQuiz[questionIndex];
             //console.log("questionItem:", questionItem);
@@ -115,53 +88,14 @@
           //console.log("quizDetails:", quizDetails);
           playerHistory.push({
             quiz: `Quiz ${index + 1}`,
+            quizScore: quizScore,
             details: quizDetails.filter((detail) => detail !== null),
           });
         }
       });
       // @ts-ignore
-      // detailedPlayerHistory.set(playerHistory);
-
-      // dummy player history 
-
-    const detailedPlayerHistory = [
-  {
-    quiz: "Quiz 1",
-    details: [
-      {
-        question: "Question 1",
-        providedAnswer: "Provided Answer 1",
-        correctAnswer: "Correct Answer 1",
-        wasCorrect: true
-      },
-      {
-        question: "Question 2",
-        providedAnswer: "Provided Answer 2",
-        correctAnswer: "Correct Answer 2",
-        wasCorrect: false
-      },
-      // Add more detail objects as needed
-    ]
-  },
-  {
-    quiz: "Quiz 2",
-    details: [
-      {
-        question: "Question 1",
-        providedAnswer: "Provided Answer 1",
-        correctAnswer: "Correct Answer 1",
-        wasCorrect: false
-      },
-      {
-        question: "Question 2",
-        providedAnswer: "Provided Answer 2",
-        correctAnswer: "Correct Answer 2",
-        wasCorrect: true
-      },
-    ]
-  }]
-
-}}
+     detailedPlayerHistory.set(playerHistory);
+    }}
  
   function deleteHistory() {
     detailedPlayerHistory.set([]);
@@ -176,6 +110,7 @@
 
   window.onload = function() {
       togglePlayerHistory();};
+      
 </script>
 
 <main>
@@ -197,29 +132,31 @@
         <!-- right aligned items -->
         <div class = "flex items-center space-x-12">
           <a href = '/' class = "hover:text-white">Home</a>
-          <button onclick="logout()" class="hover:text-white">Logout</button>
+          <button onclick={logout} class="hover:text-white">Logout</button>
         </div>
         
       </div>
     </div>
     
     <div class = "mr-12 mt-8 flex flex-col items-center h-screen">
-      <!-- {#if showPlayerHistory} -->
+      {#if showPlayerHistory}
+      <!-- each quiz box -->
         {#each $detailedPlayerHistory as quiz (quiz.quiz)}
         <div class="w-full md:w-1/2 mb-8"> 
-          <div class="bg-white p-4 rounded shadow-md">
-            <h3 class="text-2xl font-bold mb-12">{quiz.quiz}</h3>
-            <ul ol class="list-decimal pl-4">
+          <div class="bg-purple-100 p-4 rounded shadow-md">
+            <h3 class="text-2xl font-bold mb-6">{quiz.quiz}</h3>
+            <span>You Scored: <span class = "font-bold">{quiz.quizScore}</span>
+            <ul ol class="mt-8 list-decimal pl-4">
+              <!-- each quiz question -->
               {#each quiz.details as detail}
                 <li class="mb-6">
-                  <span class="font-bold">{detail.question}</span> 
-                  
-                  <div class="{detail.wasCorrect ? 'bg-green-400' : 'bg-red-400'} p-2 rounded"> 
+                  <span class = "text-lg ">{detail.question}</span> 
+                  <div class="{detail.wasCorrect ? 'bg-green-400' : 'bg-red-400'} py-2 rounded mt-2"> 
                     <span class="ml-2">
                       {detail.providedAnswer}
                     </span>
                   </div>
-                  <span class="font-bold">Solution: {detail.correctAnswer}</span> 
+                  <span class = "ml-2">Solution: <span class="font-bold">{detail.correctAnswer}</span></span>
                 </li>
               {/each}
             </ul>
@@ -227,7 +164,7 @@
         </div>
         {/each}
         <button onclick = "deleteHistory()" class = "bg-red-700 hover:bg-red-500 text-white py-2 px-2 text-lg rounded transition duration-150 ease-in-out">Delete History</button>
-      <!-- {/if} -->
+      {/if}
     </div>
   </body>
 </main>
