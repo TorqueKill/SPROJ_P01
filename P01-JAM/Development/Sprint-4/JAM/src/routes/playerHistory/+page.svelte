@@ -163,7 +163,7 @@
           </div>
         </div>
         {/each}
-        <button onclick = "deleteHistory()" class = "bg-red-700 hover:bg-red-500 text-white py-2 px-2 text-lg rounded transition duration-150 ease-in-out">Delete History</button>
+        <button onclick = {deleteHistory} class = "bg-red-700 hover:bg-red-500 text-white py-2 px-2 text-lg rounded transition duration-150 ease-in-out">Delete History</button>
       {/if}
     </div>
   </body>
