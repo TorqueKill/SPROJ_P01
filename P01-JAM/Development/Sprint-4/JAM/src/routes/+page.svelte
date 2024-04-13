@@ -144,7 +144,7 @@
           >Sign Up</button
         >
         <button
-          on:click={toggleSignup}
+          on:click={toggleSignin}
           class="bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105 shadow-lg w-full max-w-xs"
           >Sign In</button
         >
