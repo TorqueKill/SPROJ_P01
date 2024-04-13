@@ -118,43 +118,42 @@
 
 <main
   class="bg-cover bg-center min-h-screen flex flex-col items-center justify-center p-4"
-  style="background-image: url('/img.png');"
+  style="background-image: url('/img.png'); filter: brightness(75%);"
 >
   {#if !loadingUserSession}
     <div
       class="bg-black bg-opacity-80 p-8 rounded-lg shadow-2xl text-center max-w-2xl mx-auto"
     >
       <h1
-        class="text-5xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300"
+        class="text-6xl font-extrabold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300"
       >
-        Engage in Knowledge Battles
+        JAM
       </h1>
       <p class="mb-6 text-lg font-medium text-gray-300">
-        Embark on an interactive quiz-based journey inspired by the dynamics of
-        Kahoot!. Perfect for educators, students, and trivia enthusiasts eager
-        to challenge and learn.
+        Dive into the thrill of learning with JAM - a dynamic quiz platform that challenges your knowledge and reasoning.
       </p>
-      <h2 class="text-2xl font-semibold italic mb-8 text-purple-200">
+      <h3 class="text-2xl font-semibold italic mb-8 text-purple-200">
         "Learning made thrilling - one quiz at a time!"
-      </h2>
+      </h3>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 place-items-center">
         <button
           on:click={toggleSignup}
           class="bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105 shadow-lg w-full max-w-xs"
-          >Sign Up</button
         >
+          Sign Up
+        </button>
         <button
           on:click={toggleSignin}
           class="bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105 shadow-lg w-full max-w-xs"
-          >Sign In</button
         >
+          Sign In
+        </button>
         <button
-          on:click={() => {
-            goto("/hostOrPlayer");
-          }}
+          on:click={() => goto("/hostOrPlayer")}
           class="bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105 shadow-lg w-full max-w-xs"
-          >Join Anonymously</button
         >
+          Join Anonymously
+        </button>
       </div>
     </div>
   {:else}
@@ -163,3 +162,4 @@
     </div>
   {/if}
 </main>
+
