@@ -33,4 +33,6 @@ export const user = writable({
   currentQuestion: -1,
   displayQuestion: false,
   avatarIndex: 0, //default avatar
+  bgColor: -1, //default bg color
+  bgMusic: -1, //default bg music
 });

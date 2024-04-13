@@ -1,15 +1,17 @@
 <script>
     // @ts-nocheck
     import DmyGame from '$lib/dummyPages/dmyGame/+page.svelte'
-    import {ROOM_SETTINGS, DEFAULT_ROOM_SETTINGS} from '$lib/config.js'
+    import { socket } from "$lib/socketStore.js";
+    import { DEFAULT_ROOM_SETTINGS, ROOM_SETTINGS } from "$lib/config";
+    import { user } from "$lib/userStore.js";
+    import { goto } from "$app/navigation";
+    import { onMount } from "svelte";
 
     const bgMusic = ROOM_SETTINGS.BG_MUSIC;
     const bgColors = ROOM_SETTINGS.BG_COLORS;
 
     const noMusicIcon = "https://www.svgrepo.com/show/95663/muted-music-notes.svg";
 
-    let participants = ROOM_SETTINGS.MIN_PLAYERS;
-    let scoreDisplay = 1; // Number of questions after which score is displayed, by default 1 (after every question)
     let bgColorIdx = DEFAULT_ROOM_SETTINGS.DEFAULT_BG_COLOR_INDEX;
     let bgMusicIdx = DEFAULT_ROOM_SETTINGS.DEFAULT_BG_MUSIC_INDEX;
     let displayQuestionOnPlayer = DEFAULT_ROOM_SETTINGS.DEFAULT_QUESTION_ON_PLAYER_SCREEN;
@@ -31,31 +33,7 @@
     let showAdvancedSettings = false;
     let scoreDisplaySliderValue = DEFAULT_ROOM_SETTINGS.DEFAULT_QUESTION_PER_REPORT; // Slider value mapped to actual scoreDisplay
 
-    function createRoom(roomsettings) {
-        if (
-            roomsettings.maxPlayers < ROOM_SETTINGS.MIN_PLAYERS ||
-            roomsettings.maxPlayers > ROOM_SETTINGS.MAX_PLAYERS
-        ) {
-            alert("max players must be between 2 and 10");
-            roomSettings.maxPlayers = ROOM_SETTINGS.MIN_PLAYERS;
-            return;
-        }
 
-        if (
-            roomsettings.reportScores < ROOM_SETTINGS.MIN_QUESTIONS_PER_REPORT ||
-            roomsettings.reportScores > ROOM_SETTINGS.MAX_QUESTIONS_PER_REPORT
-        ) {
-            alert("report scores must be between 0 and 5");
-            roomSettings.reportScores = DEFAULT_ROOM_SETTINGS.DEFAULT_QUESTION_ON_PLAYER_SCREEN;
-            return;
-        }
-
-        roomsettings.bgColor = selectedBgColor;
-        roomsettings.bgMusic = selectedBgMusic;
-        roomsettings.displayQuestion = displayQuestionOnPlayer;
-
-        console.log("Creating room with settings: ", roomsettings);
-    }
 
     function selectBgMusic(index) {
         bgMusicIdx = index;
@@ -78,6 +56,51 @@
     $: selectedBgColor = bgColors[bgColorIdx];
     $: selectedBgMusic = bgMusic[bgMusicIdx];
     $: roomSettings.reportScores = scoreDisplaySliderValue === 0 ? -1 : scoreDisplaySliderValue;
+
+
+
+    const createRoom = (soc, roomsettings) => {
+        if (
+            roomsettings.maxPlayers < ROOM_SETTINGS.MIN_PLAYERS ||
+            roomsettings.maxPlayers > ROOM_SETTINGS.MAX_PLAYERS
+        ) {
+            alert("max players must be between 2 and 10");
+            roomSettings.maxPlayers = ROOM_SETTINGS.MIN_PLAYERS;
+            return;
+        }
+
+        if (
+            roomsettings.reportScores < ROOM_SETTINGS.MIN_QUESTIONS_PER_REPORT ||
+            roomsettings.reportScores > ROOM_SETTINGS.MAX_QUESTIONS_PER_REPORT
+        ) {
+            alert("report scores must be between 0 and 5");
+            roomSettings.reportScores = DEFAULT_ROOM_SETTINGS.DEFAULT_QUESTION_ON_PLAYER_SCREEN;
+            return;
+        }
+
+        let userData = {
+            username: $user.userName,
+            email: $user.email,
+        };
+
+        roomsettings.bgColor = selectedBgColor;
+        roomsettings.bgMusic = selectedBgMusic;
+        roomsettings.displayQuestion = displayQuestionOnPlayer;
+
+
+        soc.emit("create-room", $user.hostQuiz, roomsettings, userData);
+        console.log("createRoom", roomsettings);
+        $user.isHost = true;
+
+        goto("/waitLobby");
+    };
+
+    onMount(() => {
+        $user.id = socket.id;
+
+        console.log($user);
+    });
+
 
 </script>
 
@@ -178,7 +201,7 @@
             {/if}
 
             <!-- Create Room Button -->
-            <button class="h-20 w-2/3 py-2 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" on:click={()=>{createRoom(roomSettings)}}>
+            <button class="h-20 w-2/3 py-2 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" on:click={()=>{createRoom(socket,roomSettings)}}>
                 Create Room
             </button>
         </div>

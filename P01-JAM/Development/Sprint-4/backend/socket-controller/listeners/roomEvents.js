@@ -22,6 +22,8 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
     let name = userData.username;
     let email = userData.email;
 
+    console.log("Room settings: ", roomSettings);
+
     //create new room
     let roomid = gameManager.makeid(6, rooms);
     socket.join(roomid);
@@ -29,6 +31,12 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
     gameManager.setRoomQuiz(roomid, quizObj, rooms);
     gameManager.setRoomMaxPlayers(roomid, roomSettings.maxPlayers, rooms);
     gameManager.setQuestionsPerReport(roomid, roomSettings.reportScores, rooms);
+    gameManager.setRoomMusicAndBgColor(
+      roomid,
+      roomSettings.bgMusic,
+      roomSettings.bgColor,
+      rooms
+    );
     gameManager.setRoomDisplayQuestion(
       roomid,
       roomSettings.displayQuestion,
@@ -96,9 +104,12 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
       socket.join(roomid);
       //get room quiz
       let quizObj = gameManager.getRoomQuiz(roomid, rooms);
+      let musicAndColor = gameManager.getRoomMusicAndBgColor(roomid, rooms);
       let data = {
         quiz: quizObj,
         currentQuestion: gameManager.getRoom(roomid, rooms).currentQuestion,
+        bgColor: musicAndColor.bgColor,
+        bgMusic: musicAndColor.bgMusic,
       };
 
       socket.emit("reconnect", data);
@@ -127,14 +138,17 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
         console.log("late connection process started: " + socket.id + email);
         socket.join(roomid);
         //get room quiz
-        let quiz = gameManager.getRoomQuiz(roomid, rooms);
-        socket.emit("late-connect", quiz);
-        // let data = {
-        //   quiz: quiz,
-        //   currentQuestion: gameManager.getRoom(roomid, rooms).currentQuestion,
-        // };
+        let quizObj = gameManager.getRoomQuiz(roomid, rooms);
+        //socket.emit("late-connect", quiz);
+        let musicAndColor = gameManager.getRoomMusicAndBgColor(roomid, rooms);
+        let data = {
+          quiz: quizObj,
+          currentQuestion: gameManager.getRoom(roomid, rooms).currentQuestion,
+          bgColor: musicAndColor.bgColor,
+          bgMusic: musicAndColor.bgMusic,
+        };
 
-        // socket.emit("late-connect", data);
+        socket.emit("late-connect", data);
         return;
       }
 
@@ -185,8 +199,11 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
       //start measuring lag bias as send this to all users
       rooms[gameManager.getRoomIndex(roomid, rooms)].ROOM_LAG_BIAS = Date.now();
 
+      let musicAndColor = gameManager.getRoomMusicAndBgColor(roomid, rooms);
       roomSettings = {
         displayQuestion: gameManager.getRoom(roomid, rooms).displayQuestion,
+        bgColor: musicAndColor.bgColor,
+        bgMusic: musicAndColor.bgMusic,
       };
 
       io.to(roomid).emit(

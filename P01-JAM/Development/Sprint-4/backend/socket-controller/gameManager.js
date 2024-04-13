@@ -38,6 +38,8 @@ function addUserToRoom(roomid, socketid, rooms) {
         ROOM_LAG_BIAS: 0,
         currentQuestion: -1,
         displayQuestion: false,
+        bgColor: -1, // default background color index
+        bgMusic: -1, // default background music index
       });
     }
   } catch (e) {
@@ -146,6 +148,23 @@ function setQuestionsPerReport(roomid, questionsPerReport, rooms) {
   let room = getRoom(roomid, rooms);
   if (room) {
     room.questionsPerReport = questionsPerReport;
+  }
+}
+
+function setRoomMusicAndBgColor(roomid, bgMusic, bgColor, rooms) {
+  let room = getRoom(roomid, rooms);
+  if (room) {
+    room.bgMusic = bgMusic;
+    room.bgColor = bgColor;
+  }
+}
+
+function getRoomMusicAndBgColor(roomid, rooms) {
+  let room = getRoom(roomid, rooms);
+  if (room) {
+    return { bgMusic: room.bgMusic, bgColor: room.bgColor };
+  } else {
+    return { bgMusic: -1, bgColor: -1 };
   }
 }
 
@@ -759,6 +778,7 @@ module.exports = {
   setQuestionTimeOut,
   setRoomMaxPlayers,
   setQuestionsPerReport,
+  setRoomMusicAndBgColor,
   getRoomMaxPlayers,
   setRoomCurrentQuestion,
   getRoomCurrentQuestion,
@@ -769,6 +789,7 @@ module.exports = {
   getPeopleWhoAnswered,
   getScoresTillQuestion,
   getFinalScores,
+  getRoomMusicAndBgColor,
   setUser,
   setDummyUser,
   removeName,

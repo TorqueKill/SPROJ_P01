@@ -154,7 +154,7 @@
     function chooseQuiz() { 
       $user.hostQuiz = quizzes[selectedQuiz];
       console.log($user.hostQuiz);
-      goto("/createRoom")
+      goto("/createRoom_")
 
      }
     async function uploadQuiz(selectedQuiz) {

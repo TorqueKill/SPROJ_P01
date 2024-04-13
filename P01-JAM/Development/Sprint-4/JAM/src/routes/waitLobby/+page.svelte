@@ -51,6 +51,8 @@
       console.log(events.gameStarted);
       $user.quiz = events.gameStarted.quiz;
       $user.displayQuestion = events?.gameStarted?.options?.displayQuestion;
+      $user.bgColor = events?.gameStarted?.options?.bgColor || -1; //default color
+      $user.bgMusic = events?.gameStarted?.options?.bgMusic || -1; //default music
 
       console.log($user);
 
@@ -64,6 +66,9 @@
       $user.currentSession = SCREENS.GAME;
       $user.reconnected = true;
 
+      $user.bgColor = data?.bgColor || -1; //default color
+      $user.bgMusic = data?.bgMusic || -1; //default music
+
       //will use data.currentQuestion in the future
 
       socket.emit("reconnected", $user.gameid);
@@ -72,11 +77,14 @@
 
     if (events.lateConnect) {
       console.log(events.lateConnect);
-      $user.quiz = events.lateConnect.quiz;
+      $user.quiz = events.lateConnect.data.quiz;
       console.log($user.quiz);
       $user.displayQuestion = events?.lateConnect?.options?.displayQuestion;
       $user.currentSession = SCREENS.GAME;
       $user.lateConnected = true;
+
+      $user.bgColor = data?.bgColor || -1; //default color
+      $user.bgMusic = data?.bgMusic || -1; //default music
 
       socket.emit("late-connected", $user.gameid);
 

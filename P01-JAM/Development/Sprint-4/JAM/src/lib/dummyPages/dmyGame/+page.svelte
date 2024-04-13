@@ -6,6 +6,8 @@
 
     export let selectedBgColor; // This will be a string with the class names for the gradient
     export let selectedBgMusic; // This will be a string with the path to the music file
+    export let showToggleQuestionDisplay = true;
+    export let displayQuestionOnPlayer = false;
     
 
     //game logic:
@@ -27,7 +29,7 @@
         choices: ["London", "Berlin", "Madrid", "Paris"],
         timeLimit: 30,
         imageUrl:
-          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARMAAAC3CAMAAAAGjUrGAAAAFVBMVEX///8AJlTOESYAGU16gpXefILNABnwlnA6AAAA/klEQVR4nO3QSQ0AIAADsHH6l4yKPUhaCc2oWTs9586aOHHixIkTJ06cOHHixIkTJ06cOHHixIkTJ06cOHHixIkTJ06cOHHixIkTJ06cOHHixIkTJ06cOHHixIkTJ06cOHHixIkTJ06cOHHixIkTJ06cOHHixIkTJ06cOHHixIkTJ06cOHHixIkTJ06cOHHixIkTJ06cOHHixIkTJ06cOHHixIkTJ06cOHHixIkTJ06cOHHixIkTJ06cOHHixIkTJ06cOHHixIkTJ06cOHHixIkTJ06cOHHixIkTJ06cOHHixIkTJ06cOHHixIkTJ06cOHHixIkTJ06cOHHy4ckD5KrN4eD2boIAAAAASUVORK5CYII=",
+          "https://www.travelandleisure.com/thmb/9xr8CFGR14sLvR4IhLwKV64fEV0=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/TAL-Eiffel-Tower-BESTFRANCE0323-dada0673f8764c099b68d01695ef8057.jpg",
       },
       {
         question: "Which planet is known as the Red Planet?",
@@ -117,6 +119,7 @@
     let isAsnwerSubmitted = false;
     let answerSubmitted;
     let sessionScores = dummyPlayers;
+    let displayToggleQuestionDisplay;
 
     let audioRef
 
@@ -137,12 +140,14 @@
 
 
     onMount(() => {
-        isHost = true
+        isHost = false
         playerDisplay = !isHost
         showQuestionOnPlayerDisplay = false
         currentQuestion = -1
         isAsnwerSubmitted = false;
         answerSubmitted = "";
+
+        displayToggleQuestionDisplay = showToggleQuestionDisplay;
 
         selectedBgColor ? selectedBgColor : selectedBgColor = "bg-gradient-to-br from-purple-400 via-purple-500 via-20% to-purple-900 to-80%"
         selectedBgMusic ? selectedBgMusic : selectedBgMusic = "/music/1.mp3"
@@ -342,7 +347,9 @@
     <button on:click={() => {displayScore()}}>Show Score</button>
     <button on:click={() => {displayHost()}}>Host</button>
     <button on:click={() => {displayPlayer()}}>Player</button>
-    <button on:click={() => {showQuestionOnPlayerDisplay = !showQuestionOnPlayerDisplay}}>Toggle Question Display</button>
+    {#if displayToggleQuestionDisplay}
+        <button on:click={() => {showQuestionOnPlayerDisplay = !showQuestionOnPlayerDisplay}}>Toggle Question Display</button>
+    {/if}
 </div>
 
 {#if currentQuestion === -1}
@@ -371,7 +378,7 @@
                                     <div class="bg-purple-900 p-6 rounded-lg shadow-lg w-full">
                                         <h2 class="text-3xl font-bold mb-4 text-center">{quiz.quiz[currentQuestion].question}</h2>
                                         {#if quiz.quiz[currentQuestion].imageUrl}
-                                            <img src={quiz.quiz[currentQuestion].imageUrl} alt="img" class="mx-auto h-auto rounded-md mb-4" />
+                                            <img src={quiz.quiz[currentQuestion].imageUrl} alt="img" class="mx-auto h-60 rounded-md mb-4" />
                                         {/if}
                                         <!-- Choices (Display only) GRID -->
                                         <div class="grid grid-cols-2 gap-4">
@@ -401,10 +408,10 @@
                             <div class="flex flex-col items-center space-y-4">
                                 {#if currentQuestion >= 0}
                                     <div class="bg-purple-900 p-6 rounded-lg shadow-lg max-w-2xl w-full">
-                                        {#if showQuestionOnPlayerDisplay}
+                                        {#if showQuestionOnPlayerDisplay || displayQuestionOnPlayer}
                                             <h2 class="text-2xl font-bold mb-4 text-center">{quiz.quiz[currentQuestion].question}</h2>
                                             {#if quiz.quiz[currentQuestion].imageUrl}
-                                                <img src={quiz.quiz[currentQuestion].imageUrl} alt="img" class="mx-auto h-auto rounded-md mb-4" />
+                                                <img src={quiz.quiz[currentQuestion].imageUrl} alt="img" class="mx-auto h-40 rounded-md mb-4" />
                                             {/if}
                                         {/if}
                                         <div class="space-y-2 mt-4">

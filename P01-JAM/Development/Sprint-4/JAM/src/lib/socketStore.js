@@ -34,6 +34,7 @@ socket.on("room-full", () => {
 });
 
 socket.on("game-start", (quiz, options) => {
+  console.log("game start", quiz, options);
   roomEvents.update(() => ({
     gameStarted: { quiz: quiz, options: options },
   }));
@@ -53,13 +54,13 @@ socket.on("game-end", () => {
 });
 
 socket.on("reconnect", (data) => {
-  console.log("reconnect");
+  console.log("reconnect", data);
   roomEvents.update(() => ({ reconnect: data }));
 });
 
-socket.on("late-connect", (quiz, options) => {
-  console.log("late-connect");
-  roomEvents.update(() => ({ lateConnect: { quiz: quiz, options: options } }));
+socket.on("late-connect", (data) => {
+  console.log("late-connect", data);
+  roomEvents.update(() => ({ lateConnect: data }));
 });
 
 socket.on("room-deleted", () => {
