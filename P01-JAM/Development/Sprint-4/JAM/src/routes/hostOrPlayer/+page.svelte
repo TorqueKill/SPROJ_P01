@@ -164,10 +164,22 @@
   function closeModal() {
     showModal = false;
   }
+
+  function handleHost() {
+    user.isHost = true;
+    user.userDecided = true;
+    goto("/CreateQuestion");
+    // Your logic to handle 'createRoom' if needed
+  }
+
+  function handleJoin() {
+    user.userDecided = true;
+    joinRoom(socket, roomid, user.userName);
+  }
 </script>
 
 <!-- As a heading -->
-<nav>
+<!-- <nav>
   <div class="logo">JAM</div>
   <ul>
     <li><button class="nav_button" on:click={() => goto("/")}>Home</button></li>
@@ -177,8 +189,8 @@
       >
     </li>
     {#if $user.isHost}
-      <!-- Show Host Settings button only if the user is a host -->
-      <li>
+       Show Host Settings button only if the user is a host -->
+<!-- <li>
         <button class="nav_button" on:click={openHostSettingsModal}
           >Host Settings</button
         >
@@ -186,15 +198,36 @@
     {/if}
     <li><button class="nav_button" on:click={logout}>Logout</button></li>
   </ul>
-</nav>
+</nav> -->
 
-<main>
+<!-- <nav class="bg-gradient-to-r from-purple-900 via-purple-700 to-purple-500 p-2 fixed top-0 w-full z-10 flex justify-between items-center">
+  <div class="text-xl font-bold text-white ml-4">JAM</div>
+  <ul class="flex list-none m-0 p-0 items-center">
+    <li><button class="text-white py-2 px-4 hover:bg-purple-600 transition-colors" on:click={() => goto("/")}>Home</button></li>
+    <li>
+    <button class="text-white py-2 px-4 hover:bg-purple-600 transition-colors" on:click={() => goto("/viewHistory")}
+      >History</button
+    >
+  </li>
+  {#if $user.isHost}
+     Show Host Settings button only if the user is a host -->
+<!-- <li>
+      <button class="text-white py-2 px-4 hover:bg-purple-600 transition-colors" on:click={openHostSettingsModal}
+        >Host Settings</button
+      >
+    </li>
+  {/if}
+  <li><button class="text-white py-2 px-4 hover:bg-purple-600 transition-colors" on:click={logout}>Logout</button></li>
+  </ul>
+</nav> -->
+
+<!-- <main>
   <body>
     <div class="container">
       <div>
-        <!--ask if host or player-->
-        <!--if host, show create room button else show joing room-->
-        {#if !$user.userDecided}
+        <ask if host or player-->
+<!--if host, show create room button else show joing room-->
+<!-- {#if !$user.userDecided}
           <p>
             <button
               type="button"
@@ -238,8 +271,8 @@
                 }}>Choose Quiz</button
               >
             </p>
-          </div>
-          <!-- <p>
+          </div> -->
+<!-- <p>
             <button
               type="button"
               on:click={() => createRoom(socket, roomSettings)}
@@ -256,7 +289,7 @@
             bind:value={roomSettings.maxPlayers}
           /> -->
 
-          <p />
+<!-- <p />
           <button
             type="button"
             class="btn btn-secondary btn-block"
@@ -613,4 +646,236 @@
       margin: 4px 20px; /* Adjusted margin for larger screens */
     }
   }
-</style>
+</style> -->
+
+<nav
+  class="bg-gradient-to-r from-purple-900 via-purple-700 to-purple-500 p-4 fixed top-0 w-full z-50 shadow-lg font-garamond"
+>
+  <div class="container mx-auto flex justify-between items-center">
+    <div class="text-2xl font-bold text-white">JAM</div>
+    <ul class="flex space-x-4">
+      <li>
+        <button
+          class="bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-2 px-4 rounded-full transition duration-300 transform hover:scale-105 shadow-lg focus:outline-none focus:ring focus:ring-purple-500 focus:ring-opacity-50"
+          on:click={() => goto("/")}
+        >
+          Home
+        </button>
+      </li>
+      <li>
+        <button
+          class="bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-2 px-4 rounded-full transition duration-300 transform hover:scale-105 shadow-lg focus:outline-none focus:ring focus:ring-purple-500 focus:ring-opacity-50"
+          on:click={() => goto("/viewHistory")}
+        >
+          History
+        </button>
+      </li>
+      {#if $user.isHost}
+        <li>
+          <button
+            class="bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-2 px-4 rounded-full transition duration-300 transform hover:scale-105 shadow-lg focus:outline-none focus:ring focus:ring-purple-500 focus:ring-opacity-50"
+            on:click={openHostSettingsModal}>Host Settings</button
+          >
+        </li>
+      {/if}
+      <li>
+        <button
+          class="bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-2 px-4 rounded-full transition duration-300 transform hover:scale-105 shadow-lg focus:outline-none focus:ring focus:ring-purple-500 focus:ring-opacity-50"
+          on:click={logout}
+        >
+          Logout
+        </button>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<main
+  class="pt-20 min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-900 via-purple-700 to-purple-500 font-garamond"
+>
+  <div
+    class="bg-black bg-opacity-80 p-8 rounded-lg shadow-2xl text-center max-w-2xl mx-auto"
+  >
+    {#if !$user.userDecided}
+      <h1
+        class="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300"
+      >
+        Host or Play
+      </h1>
+      <p class="mb-6 text-lg font-medium text-gray-300">
+        Are you ready to host or join a quiz battle? Choose your role.
+      </p>
+      <div class="flex gap-4 justify-center">
+        <button
+          class="bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105 shadow-lg"
+          on:click={() => {
+            $user.isHost = true;
+            $user.userDecided = true;
+          }}>Host</button
+        >
+        <button
+          class="bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105 shadow-lg"
+          on:click={() => {
+            $user.userDecided = true;
+            closeHostSettingsModal();
+          }}>Join</button
+        >
+      </div>
+    {:else if $user.isHost}
+      <div>
+        <p>
+          <button
+            type="button"
+            class="btn btn-tertiary btn-block"
+            on:click={() => {
+              goto("/CreateQuestion");
+            }}>Create Quiz</button
+          >
+        </p>
+
+        <p>
+          <button
+            type="button"
+            class="btn btn-tertiary btn-block"
+            on:click={() => {
+              goto("/chooseQuiz_");
+            }}>Choose Quiz</button
+          >
+        </p>
+      </div>
+      <p>
+        <button type="button" on:click={() => createRoom(socket, roomSettings)}
+          >Create Room</button
+        >
+      </p>
+
+      <h2>Number of participants</h2>
+      <input
+        type="number"
+        class="form-control"
+        id="participants"
+        placeholder="Total participants"
+        bind:value={roomSettings.maxPlayers}
+      />
+
+      <p />
+      <button
+        type="button"
+        class="btn btn-secondary btn-block"
+        on:click={() => {
+          $user.isHost = false;
+          $user.userDecided = false;
+        }}>Go Back</button
+      >
+    {:else}
+      <h2>Enter roomID and username</h2>
+      <div class="user-input-container">
+        <input
+          type="text"
+          class="form"
+          id="roomId"
+          placeholder="Enter room ID"
+          bind:value={roomid}
+        />
+        <input
+          type="text"
+          class="form"
+          id="roomId"
+          placeholder="Enter username"
+          bind:value={_userName}
+        />
+        {#if $user.avatarIndex !== null}
+          <div class="avatar-container">
+            <img
+              class="player-avatar"
+              src={`/avatars/${AVATARS[$user.avatarIndex]}`}
+              alt="Avatar"
+            />
+          </div>
+        {/if}
+      </div>
+      <p />
+      <button
+        type="button"
+        class="btn btn-tertiary btn-block"
+        on:click={() => {
+          setUserName(_userName);
+        }}>Save username</button
+      >
+      <p />
+      <button
+        type="button"
+        class="btn btn-tertiary btn-block"
+        on:click={() => {
+          openModal();
+        }}>Choose avatar</button
+      >
+
+      {#if showModal}
+        <div class="modal-overlay">
+          <div class="modal-content">
+            <button
+              on:click={closeModal}
+              class="btn btn-secondary btn-block modal-button">Go Back</button
+            >
+            <AvatarMenu selectAvatar={handleAvatarSelection} />
+          </div>
+        </div>
+      {/if}
+      <p />
+      <p />
+      <button
+        type="button"
+        class="btn btn-tertiary btn-block"
+        on:click={() => joinRoom(socket, roomid, $user.userName)}
+        >Join Room</button
+      >
+      <p />
+      <button
+        type="button"
+        class="btn btn-secondary btn-block"
+        on:click={() => {
+          $user.isHost = false;
+          $user.userDecided = false;
+        }}>Go Back</button
+      >
+    {/if}
+
+    {#if showHostSettingsModal}
+      <div class="modal-overlay">
+        <div class="modal-content">
+          <button
+            on:click={closeHostSettingsModal}
+            class="modal-button"
+            style="margin-left: -3%; margin-top: -3%;">Go Back</button
+          >
+          <h2 style="font-size: 28px;">Host Settings</h2>
+          <div style="background: #690092;">
+            <div>
+              <h3>Report scores in between</h3>
+              <input
+                type="number"
+                id="participants"
+                placeholder="Enter total number of participants"
+                bind:value={roomSettings.reportScores}
+              />
+              <p id="report">-1: Report at the end</p>
+            </div>
+            <div>
+              <h3>Display question on Players</h3>
+              <input
+                type="checkbox"
+                id="participants"
+                placeholder="Enter total number of participants"
+                bind:checked={roomSettings.displayQuestion}
+              />
+            </div>
+          </div>
+          <button type="button" on:click={closeHostSettingsModal}
+            >Save Settings</button
+          >
+        </div>
+      </div>
+    {/if}
+  </div>
+</main>

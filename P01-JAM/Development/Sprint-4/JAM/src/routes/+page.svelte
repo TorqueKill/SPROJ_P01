@@ -82,7 +82,6 @@
   });
 </script>
 
-
 <!-- <main>
   <body>
     <div class="landing-page">
@@ -117,7 +116,7 @@
 <!-- </main> -->
 
 <main
-  class="bg-cover bg-center min-h-screen flex flex-col items-center justify-center p-4"
+  class="bg-cover bg-center min-h-screen flex flex-col items-center justify-center p-4 font-garamond"
   style="background-image: url('/img.png'); filter: brightness(75%);"
 >
   {#if !loadingUserSession}
@@ -130,7 +129,8 @@
         JAM
       </h1>
       <p class="mb-6 text-lg font-medium text-gray-300">
-        Dive into the thrill of learning with JAM - a dynamic quiz platform that challenges your knowledge and reasoning.
+        Dive into the thrill of learning with JAM - a dynamic quiz platform that
+        challenges your knowledge and reasoning.
       </p>
       <h3 class="text-2xl font-semibold italic mb-8 text-purple-200">
         "Learning made thrilling - one quiz at a time!"
@@ -162,4 +162,3 @@
     </div>
   {/if}
 </main>
-

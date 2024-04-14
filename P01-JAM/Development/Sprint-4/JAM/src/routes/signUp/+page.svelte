@@ -190,7 +190,7 @@
 </style> -->
 
 <main
-  class="bg-cover bg-center min-h-screen flex items-center justify-center p-4"
+  class="bg-cover bg-center min-h-screen flex items-center justify-center p-4 font-garamond"
   style="background-image: url('/img.png'); filter: brightness(75%);"
 >
   <div

@@ -3,6 +3,9 @@ export default {
   content: ["./src/**/*.{html,js,svelte,ts}"],
   theme: {
     extend: {
+      fontFamily: {
+        'garamond': ['"Garamond"'],
+      },
       animation: {
         // Floating animations with various amplitudes and speeds
         'float-slow': 'floatSlow 5s ease-in-out infinite',
