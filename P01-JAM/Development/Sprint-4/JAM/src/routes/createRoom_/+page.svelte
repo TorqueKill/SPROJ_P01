@@ -92,7 +92,7 @@
         console.log("createRoom", roomsettings);
         $user.isHost = true;
 
-        goto("/waitLobby");
+        goto("/waitLobby_");
     };
 
     onMount(() => {

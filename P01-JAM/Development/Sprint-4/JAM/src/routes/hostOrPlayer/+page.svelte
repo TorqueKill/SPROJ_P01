@@ -113,7 +113,7 @@
     console.log("createRoom", roomSettings);
     $user.isHost = true;
 
-    goto("/waitLobby");
+    goto("/waitLobby_");
   };
 
   const joinRoom = (soc, roomid, username) => {
@@ -134,7 +134,7 @@
 
       if (!isRoomFull) {
         $user.gameid = roomid;
-        goto("/waitLobby");
+        goto("/waitLobby_");
       }
     } else {
       alert("please enter a room id");
