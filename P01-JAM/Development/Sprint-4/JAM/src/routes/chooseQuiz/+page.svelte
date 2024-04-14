@@ -5,6 +5,7 @@
   import { quiz1, quiz2, quiz3 } from "$lib/dummyQuiz2.js";
   import { onMount } from "svelte";
   import { user } from "$lib/userStore.js";
+  import { testGetQuiz } from "$lib/TestingAPI/testAPI_1.js";
 
   let quizzes;
   let displayQuizCheck;
@@ -31,6 +32,7 @@
     quizzes = [quiz1, quiz2, quiz3, ...savedQuizzes];
     displayQuizCheck = false;
     console.log("Loaded quizzes:", quizzes);
+    testGetQuiz();
   });
 
   //need to sugar quiz if its in the format of quiz1,2,3

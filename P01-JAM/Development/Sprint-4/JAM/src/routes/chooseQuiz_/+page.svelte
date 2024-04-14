@@ -11,6 +11,8 @@
     import { getQuiz, saveQuiz, updateQuiz } from "$lib/API/gameAPI.js"
     import { user } from "$lib/userStore.js";
     import { goto } from "$app/navigation";
+    // import { testQuiz } from "$lib/TestingAPI/testAPI_1.js";
+    import { testGetHistory, testSaveHistory } from "$lib/TestingAPI/testAPI_2.js";
 
     
 
@@ -211,6 +213,11 @@
             pageloading.set(false);
           }
         }
+        console.log("Testing");
+        //testQuiz();
+        testGetHistory();
+        console.log("Testing2");
+        testSaveHistory();
 
         // setTimeout(() => {
         //   pageloading.set(false); // Set loading to false after data is 'fetched'\

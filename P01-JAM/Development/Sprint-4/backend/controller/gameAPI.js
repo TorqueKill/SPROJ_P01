@@ -30,6 +30,7 @@ module.exports = function () {
     try {
       const { email, page, pageSize } = req.query;
 
+      console.log("In GetQuiz");
       console.log(email, page, pageSize);
 
       // Convert page and pageSize to numbers, providing default values if necessary

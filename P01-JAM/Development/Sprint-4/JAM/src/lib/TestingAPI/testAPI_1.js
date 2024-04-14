@@ -17,6 +17,16 @@ let quiz = quiz3;
 let page = 0;
 let pagesize = 13;
 
+function extractQuizzes(quizzesArray) {
+  return quizzesArray.map((quizItem) => quizItem.quiz);
+}
+
+export function testQuiz(email, page, pagesize) {
+  console.log("Testing quiz functions");
+  testSaveQuiz(email, quiz);
+  testGetQuiz(email, page, pagesize);
+}
+
 function testSaveQuiz(email, quiz) {
   console.log("Testing saveQuiz");
   saveQuiz(email, quiz)
@@ -28,15 +38,10 @@ function testSaveQuiz(email, quiz) {
     });
 }
 
-function extractQuizzes(quizzesArray) {
-  return quizzesArray.map((quizItem) => quizItem.quiz);
-}
-
 function testGetQuiz(email, page, pagesize) {
   console.log("Testing getQuiz");
   getQuiz(email, page, pagesize)
     .then((response) => {
-      //console.log("Quiz retrieved successfully", response);
       let quizzes = extractQuizzes(response.quizzes);
       console.log("Quizzes", quizzes);
       console.log("Total quizzes", response.total);
@@ -51,17 +56,3 @@ function testGetQuiz(email, page, pagesize) {
       console.error("Error retrieving quiz", error);
     });
 }
-
-function testUpateQuiz(email, quiz, id) {
-  console.log("Testing updateQuiz");
-  updateQuiz(email, quiz, id)
-    .then((response) => {
-      console.log("Quiz updated successfully", response);
-    })
-    .catch((error) => {
-      console.error("Error updating quiz", error);
-    });
-}
-
-//testSaveQuiz(email, quiz);
-testGetQuiz(email, page, pagesize);
