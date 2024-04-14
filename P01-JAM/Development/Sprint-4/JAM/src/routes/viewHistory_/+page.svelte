@@ -11,10 +11,7 @@
 
 
   onMount(() => {
-    if ($user.email == null || $user.email == "") {
-      alert("Must be logged in to view history");
-      goto("/");
-    }
+
 
   });
 

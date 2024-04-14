@@ -2,7 +2,7 @@
     // @ts-nocheck
   
     import { writable } from "svelte/store";
-    import { gameHistory } from "$lib/dummyGames";
+    import { gameHistory, gameHistHost } from "$lib/dummyGames";
     import { user } from "$lib/userStore.js";
     import { quiz1, quiz2, quiz3, quiz4, quiz5 } from "$lib/dummyQuiz";
     import { onMount } from "svelte";
@@ -10,24 +10,27 @@
   
    
     // @ts-ignore
+
+    const DUMMY_EMAIL = "example@example.com"
+
     const hostHistory = writable([]);
     let showHostHistory = true;
-    let playerEmail = $user.email;
+    let playerEmail = DUMMY_EMAIL
   
-  
+
     let localHostHistory;
   
   
     onMount(() => {
-      if ($user.email == null || $user.email == "") {
-        alert("Must be logged in to view history");
-        goto("/");
-      }
   
      
       localHostHistory = JSON.parse(localStorage.getItem("hostGameHistory"));
       if (localHostHistory == null) {
         localHostHistory = [];
+      }
+
+      if (localHostHistory.length == 0) {
+        localHostHistory = gameHistHost;
       }
   
       console.log("localHostHistory:", localHostHistory);
