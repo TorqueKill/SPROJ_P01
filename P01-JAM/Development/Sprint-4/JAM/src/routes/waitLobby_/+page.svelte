@@ -117,9 +117,9 @@
         {/if}
 
         {#if players.length > 0}
-          <div class="player-list bg-purple-600 rounded-lg p-4 mb-4">
+          <div class="player-list bg-purple-600 rounded-lg p-4 mb-4 flex flex-wrap justify-center">
             {#each players as { name, avatarIndex }}
-              <div class="player-item">
+              <div class="player-item mx-2 mb-2">
                 <p class="player-name text-white">{name}</p>
                 <img
                   class="player-avatar w-12 h-12 rounded-full"
@@ -161,5 +161,16 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+  }
+
+  .player-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .player-item {
+    text-align: center;
+    margin: 0 0.5rem;
   }
 </style>
