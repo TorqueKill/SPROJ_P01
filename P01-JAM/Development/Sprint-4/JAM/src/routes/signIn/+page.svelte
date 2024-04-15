@@ -171,19 +171,19 @@
 
 <main
   class="bg-cover bg-center min-h-screen flex items-center justify-center p-4 font-garamond"
-  style="background-image: url('/img.png'); filter: brightness(75%)"
+  style="background-image: url('/purple_image.png'); filter: brightness(70%)"
 >
   <div
-    class="bg-black bg-opacity-80 p-8 rounded-lg shadow-2xl text-center max-w-md w-full mx-auto"
+    class="bg-white bg-opacity-80 p-8 rounded-lg shadow-2xl text-center max-w-md w-full mx-auto"
   >
     <h1
-      class="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300"
+      class="text-4xl font-bold mb-6 bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300"
     >
       Sign In
     </h1>
-    <form class="flex flex-col gap-4" on:submit={handleSignIn}>
+    <form class="flex flex-col gap-4 " on:submit={handleSignIn}>
       <div class="flex flex-col">
-        <label for="email" class="text-lg font-medium text-gray-300 mb-2"
+        <label for="email" class="text-lg font-medium from-purple-300 to-pink-300 mb-2"
           >Email</label
         >
         <input
@@ -191,12 +191,12 @@
           id="email"
           bind:value={email}
           placeholder="Enter your email"
-          class="bg-gray-700 text-white rounded-full py-2 px-4 border-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          class="bg-gray-400 rounded-full py-2 px-4 border-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
         />
       </div>
 
       <div class="flex flex-col">
-        <label for="password" class="text-lg font-medium text-gray-300 mb-2"
+        <label for="password" class="text-lg font-medium from-purple-300 to-pink-300 mb-2"
           >Password</label
         >
         <input
@@ -204,7 +204,7 @@
           id="password"
           bind:value={password}
           placeholder="Enter your password"
-          class="bg-gray-700 text-white rounded-full py-2 px-4 border-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          class="bg-gray-400 rounded-full py-2 px-4 border-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
         />
       </div>
 

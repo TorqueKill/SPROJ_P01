@@ -117,22 +117,22 @@
 
 <main
   class="bg-cover bg-center min-h-screen flex flex-col items-center justify-center p-4 font-garamond"
-  style="background-image: url('/img.png'); filter: brightness(75%);"
+  style="background-image: url('/purple_image.png'); filter: brightness(70%);"
 >
   {#if !loadingUserSession}
     <div
-      class="bg-black bg-opacity-80 p-8 rounded-lg shadow-2xl text-center max-w-2xl mx-auto"
+      class="bg-white bg-opacity-80 p-8 rounded-lg shadow-2xl text-center max-w-2xl mx-auto"
     >
       <h1
-        class="text-6xl font-extrabold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300"
+        class="text-6xl font-extrabold mb-2 bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300"
       >
         JAM
       </h1>
-      <p class="mb-6 text-lg font-medium text-gray-300">
+      <p class="mb-6 text-lg font-medium black">
         Dive into the thrill of learning with JAM - a dynamic quiz platform that
         challenges your knowledge and reasoning.
       </p>
-      <h3 class="text-2xl font-semibold italic mb-8 text-purple-200">
+      <h3 class="text-2xl font-semibold italic mb-8 black">
         "Learning made thrilling - one quiz at a time!"
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 place-items-center">
