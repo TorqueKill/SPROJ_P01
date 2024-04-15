@@ -115,9 +115,8 @@
 <!-- </body> -->
 <!-- </main> -->
 
-<main
-  class="bg-cover bg-center min-h-screen flex flex-col items-center justify-center p-4 font-garamond"
-  style="background-image: url('/purple_image.png'); filter: brightness(70%);"
+<!-- <main
+  class="min-h-screen flex bg-gradient-to-r from-purple-900 via-purple-700 to-purple-500 font-garamond overflow-hidden"
 >
   {#if !loadingUserSession}
     <div
@@ -161,4 +160,85 @@
       <p>Loading...</p>
     </div>
   {/if}
+</main> -->
+
+<main
+  class="min-h-screen flex bg-gradient-to-r from-purple-900 via-purple-700 to-purple-500 font-garamond overflow-hidden"
+>
+  <!-- Content container -->
+  {#if !loadingUserSession}
+    <div class="flex-1 flex items-center justify-center p-10">
+      <div class="max-w-md text-center">
+        <h1
+          class="text-7xl font-extrabold mb-2 bg-clip-text bg-gradient-to-r text-purple-400"
+        >
+          JAM
+        </h1>
+        <h1 class="text-6xl font-bold text-white mb-4">
+          "Learning made thrilling - one quiz at a time!"
+        </h1>
+        <p class="text-lg text-white mb-6">
+          Dive into the thrill of learning with JAM - a dynamic quiz platform
+          that challenges your knowledge and reasoning.
+        </p>
+        <div class="flex justify-center gap-5">
+          <button
+            on:click={() => goto("/hostOrPlayer")}
+            class="bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105 shadow-lg"
+          >
+            Join Anonymously
+          </button>
+          <button
+            on:click={toggleSignin}
+            class="bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105 shadow-lg"
+          >
+            Sign In
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex-1">
+      <div class="w-full h-full flex justify-center items-center">
+        <div
+          class="w-3/4 h-2/4 bg-pink-300 rounded-full"
+          style="clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);"
+        >
+          <!-- svelte-ignore a11y-img-redundant-alt -->
+          <img
+            src="real_jam.png"
+            alt="Image"
+            class="object-cover w-full h-full"
+            style="clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="absolute top-10 right-20">
+      <button
+        on:click={toggleSignup}
+        class="bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105 shadow-lg"
+        >Sign Up</button
+      >
+    </div>
+  {:else}
+    <div class="text-center">
+      <p>Loading...</p>
+    </div>
+  {/if}
+
+  <div class="flex w-full absolute bottom-12 left-20">
+    <div class="flex space-x-1">
+      <div class="w-8 h-8 bg-yellow-700 rounded-full" />
+      <div class="w-8 h-8 bg-purple-300 rounded-full" />
+      <div class="w-8 h-8 bg-violet-500 rounded-full" />
+    </div>
+    <div class="text-white ml-6">
+      <span class="font-bold">Our Happy Students around the world!</span>
+      <div class="flex items-center">
+        <span class="ml-1">4.5 (1k Reviews)</span>
+      </div>
+    </div>
+  </div>
 </main>
