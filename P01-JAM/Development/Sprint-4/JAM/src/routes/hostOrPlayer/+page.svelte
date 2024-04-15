@@ -167,7 +167,7 @@
 </script>
 
 <!-- As a heading -->
-<nav>
+<!-- <nav>
   <div class="logo">JAM</div>
   <ul>
     <li><button class="nav_button" on:click={() => goto("/")}>Home</button></li>
@@ -177,8 +177,8 @@
       >
     </li>
     {#if $user.isHost}
-      <!-- Show Host Settings button only if the user is a host -->
-      <li>
+       Show Host Settings button only if the user is a host -->
+<!-- <li>
         <button class="nav_button" on:click={openHostSettingsModal}
           >Host Settings</button
         >
@@ -186,15 +186,36 @@
     {/if}
     <li><button class="nav_button" on:click={logout}>Logout</button></li>
   </ul>
-</nav>
+</nav> -->
 
-<main>
+<!-- <nav class="bg-gradient-to-r from-purple-900 via-purple-700 to-purple-500 p-2 fixed top-0 w-full z-10 flex justify-between items-center">
+  <div class="text-xl font-bold text-white ml-4">JAM</div>
+  <ul class="flex list-none m-0 p-0 items-center">
+    <li><button class="text-white py-2 px-4 hover:bg-purple-600 transition-colors" on:click={() => goto("/")}>Home</button></li>
+    <li>
+    <button class="text-white py-2 px-4 hover:bg-purple-600 transition-colors" on:click={() => goto("/viewHistory")}
+      >History</button
+    >
+  </li>
+  {#if $user.isHost}
+     Show Host Settings button only if the user is a host -->
+<!-- <li>
+      <button class="text-white py-2 px-4 hover:bg-purple-600 transition-colors" on:click={openHostSettingsModal}
+        >Host Settings</button
+      >
+    </li>
+  {/if}
+  <li><button class="text-white py-2 px-4 hover:bg-purple-600 transition-colors" on:click={logout}>Logout</button></li>
+  </ul>
+</nav> -->
+
+<!-- <main>
   <body>
     <div class="container">
       <div>
-        <!--ask if host or player-->
-        <!--if host, show create room button else show joing room-->
-        {#if !$user.userDecided}
+        <ask if host or player-->
+<!--if host, show create room button else show joing room-->
+<!-- {#if !$user.userDecided}
           <p>
             <button
               type="button"
@@ -238,8 +259,8 @@
                 }}>Choose Quiz</button
               >
             </p>
-          </div>
-          <!-- <p>
+          </div> -->
+<!-- <p>
             <button
               type="button"
               on:click={() => createRoom(socket, roomSettings)}
@@ -256,7 +277,7 @@
             bind:value={roomSettings.maxPlayers}
           /> -->
 
-          <p />
+<!-- <p />
           <button
             type="button"
             class="btn btn-secondary btn-block"
@@ -613,4 +634,434 @@
       margin: 4px 20px; /* Adjusted margin for larger screens */
     }
   }
-</style>
+</style> -->
+
+<nav
+  class="bg-gradient-to-r from-purple-900 via-purple-700 to-purple-500 p-4 fixed top-0 w-full z-50 shadow-lg font-garamond"
+>
+  <div class="container mx-auto flex justify-between items-center">
+    <div class="text-2xl font-bold text-white">JAM</div>
+    <ul class="flex space-x-4">
+      <li>
+        <button
+          class="bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-2 px-4 rounded-full transition duration-300 transform hover:scale-105 shadow-lg focus:outline-none focus:ring focus:ring-purple-500 focus:ring-opacity-50"
+          on:click={() => goto("/")}
+        >
+          Home
+        </button>
+      </li>
+      <li>
+        <button
+          class="bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-2 px-4 rounded-full transition duration-300 transform hover:scale-105 shadow-lg focus:outline-none focus:ring focus:ring-purple-500 focus:ring-opacity-50"
+          on:click={() => goto("/viewHistory")}
+        >
+          History
+        </button>
+      </li>
+      {#if $user.isHost}
+        <li>
+          <button
+            class="bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-2 px-4 rounded-full transition duration-300 transform hover:scale-105 shadow-lg focus:outline-none focus:ring focus:ring-purple-500 focus:ring-opacity-50"
+            on:click={openHostSettingsModal}>Host Settings</button
+          >
+        </li>
+      {/if}
+      <li>
+        <button
+          class="bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-2 px-4 rounded-full transition duration-300 transform hover:scale-105 shadow-lg focus:outline-none focus:ring focus:ring-purple-500 focus:ring-opacity-50"
+          on:click={logout}
+        >
+          Logout
+        </button>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<main
+  class="pt-20 min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-900 via-purple-700 to-purple-500 font-garamond"
+>
+  <div
+    class="bg-black bg-opacity-80 p-8 rounded-lg shadow-2xl text-center max-w-2xl mx-auto"
+  >
+    {#if !$user.userDecided}
+      <h1
+        class="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300"
+      >
+        Host or Play
+      </h1>
+      <p class="mb-6 text-lg font-medium text-gray-300">
+        Are you ready to host or join a quiz battle? Choose your role.
+      </p>
+      <div class="flex gap-4 justify-center">
+        <button
+          class="bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105 shadow-lg"
+          on:click={() => {
+            $user.isHost = true;
+            $user.userDecided = true;
+          }}>Host</button
+        >
+        <button
+          class="bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105 shadow-lg"
+          on:click={() => {
+            $user.userDecided = true;
+            closeHostSettingsModal();
+          }}>Join</button
+        >
+      </div>
+    {:else if $user.isHost}
+      <div>
+        <div
+          class="w-full p-4 md:max-w-md lg:max-w-lg bg-black bg-opacity-80 rounded-lg shadow-2xl space-y-4"
+        >
+          <button
+            class="w-full px-4 py-2 font-bold text-white bg-purple-600 rounded-full hover:bg-purple-700 focus:outline-none focus:shadow-outline transition duration-300 transform hover:scale-105 shadow-lg"
+            on:click={() => goto("/CreateQuestion")}
+          >
+            Create Quiz
+          </button>
+          <button
+            class="w-full px-4 py-2 font-bold text-white bg-purple-600 rounded-full hover:bg-purple-700 focus:outline-none focus:shadow-outline transition duration-300 transform hover:scale-105 shadow-lg"
+            on:click={() => goto("/chooseQuiz_")}
+          >
+            Choose Quiz
+          </button>
+          <button
+            class="w-full px-4 py-2 font-bold text-white bg-gray-500 rounded-full hover:bg-gray-600 focus:outline-none focus:shadow-outline transition duration-300 transform hover:scale-105 shadow-lg"
+            on:click={() => {
+              $user.isHost = false;
+              $user.userDecided = false;
+            }}
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+
+      <!-- {:else}
+      <h2>Enter roomID and username</h2>
+      <div class="user-input-container">
+        <input
+          type="text"
+          class="form"
+          id="roomId"
+          placeholder="Enter room ID"
+          bind:value={roomid}
+        />
+        <input
+          type="text"
+          class="form"
+          id="roomId"
+          placeholder="Enter username"
+          bind:value={_userName}
+        />
+        {#if $user.avatarIndex !== null}
+          <div class="avatar-container">
+            <img
+              class="player-avatar"
+              src={`/avatars/${AVATARS[$user.avatarIndex]}`}
+              alt="Avatar"
+            />
+          </div>
+        {/if}
+      </div>
+      <p />
+      <button
+        on:click={() => {
+          setUserName(_userName);
+        }}>Save username</button
+      >
+      <p />
+      <button
+        on:click={() => {
+          openModal();
+        }}>Choose avatar</button
+      >
+      {#if showModal}
+        <div class="modal-overlay">
+          <div class="modal-content">
+            <button on:click={closeModal}>Go Back</button>
+            <AvatarMenu selectAvatar={handleAvatarSelection} />
+          </div>
+        </div>
+      {/if}
+      <p />
+      <p />
+      <button on:click={() => joinRoom(socket, roomid, $user.userName)}
+        >Join Room</button
+      >
+      <p />
+      <button
+        on:click={() => {
+          $user.isHost = false;
+          $user.userDecided = false;
+        }}>Go Back</button
+      >
+    {/if} -->
+    {:else}
+      <div
+        class="flex flex-col items-center p-8 bg-black bg-opacity-80 rounded-lg shadow-2xl"
+      >
+        <h2 class="text-2xl font-bold text-white mb-4">
+          Enter Room ID and Username
+        </h2>
+        <div class="w-full max-w-xs space-y-4">
+          <input
+            type="text"
+            class="w-full px-4 py-2 leading-tight text-gray-700 bg-gray-200 border rounded-full shadow appearance-none focus:outline-none focus:bg-white focus:border-purple-500"
+            id="roomId"
+            placeholder="Enter room ID"
+            bind:value={roomid}
+          />
+          <input
+            type="text"
+            class="w-full px-4 py-2 leading-tight text-gray-700 bg-gray-200 border rounded-full shadow appearance-none focus:outline-none focus:bg-white focus:border-purple-500"
+            id="username"
+            placeholder="Enter username"
+            bind:value={_userName}
+          />
+          {#if $user.avatarIndex !== null}
+            <div class="flex justify-center">
+              <img
+                class="w-24 h-24 rounded-full"
+                src={`/avatars/${AVATARS[$user.avatarIndex]}`}
+                alt="Avatar"
+              />
+            </div>
+          {/if}
+          <button
+            class="w-full px-4 py-2 font-bold text-white bg-purple-600 rounded-full hover:bg-purple-700 focus:outline-none focus:shadow-outline transition duration-300 transform hover:scale-105 shadow-lg"
+            on:click={() => setUserName(_userName)}
+          >
+            Save username
+          </button>
+          <button
+            class="w-full px-4 py-2 font-bold text-white bg-purple-600 rounded-full hover:bg-purple-700 focus:outline-none focus:shadow-outline transition duration-300 transform hover:scale-105 shadow-lg"
+            on:click={openModal}
+          >
+            Choose avatar
+          </button>
+          <button
+            class="w-full px-4 py-2 font-bold text-white bg-purple-600 rounded-full hover:bg-purple-700 focus:outline-none focus:shadow-outline transition duration-300 transform hover:scale-105 shadow-lg"
+            on:click={() => joinRoom(socket, roomid, $user.userName)}
+          >
+            Join Room
+          </button>
+          <button
+            class="w-full px-4 py-2 font-bold text-white bg-gray-500 rounded-full hover:bg-gray-600 focus:outline-none focus:shadow-outline transition duration-300 transform hover:scale-105 shadow-lg"
+            on:click={() => {
+              $user.isHost = false;
+              $user.userDecided = false;
+            }}
+          >
+            Go Back
+          </button>
+        </div>
+
+        {#if showModal}
+          <div
+            class="fixed inset-0 bg-purple-900 bg-opacity-90 px-4 py-20 flex items-center justify-center z-50"
+          >
+            <div
+              class="bg-black bg-opacity-80 shadow-2xl rounded-lg max-w-lg mx-auto p-6 md:max-w-2xl"
+            >
+              <h2 class="text-2xl text-white font-bold mb-4">
+                Choose your avatar
+              </h2>
+              <div class="grid grid-cols-3 gap-4 md:grid-cols-4 lg:grid-cols-5">
+                {#each AVATARS as avatar, index}
+                  <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+                  <!-- svelte-ignore a11y-click-events-have-key-events -->
+                  <img
+                    class="w-full h-auto rounded-full cursor-pointer hover:opacity-50 transition-opacity"
+                    src={`/avatars/${avatar}`}
+                    alt={`Avatar ${index}`}
+                    on:click={() => handleAvatarSelection(index)}
+                  />
+                {/each}
+              </div>
+              <div class="mt-4">
+                <button
+                  class="w-full px-4 py-2 font-bold text-white bg-gray-500 rounded-full hover:bg-gray-600 focus:outline-none focus:shadow-outline transition duration-300 transform hover:scale-105 shadow-lg"
+                  on:click={closeModal}
+                >
+                  Go Back
+                </button>
+              </div>
+            </div>
+          </div>
+        {/if}
+      </div>
+    {/if}
+
+    {#if showHostSettingsModal}
+      <div class="modal-overlay">
+        <div class="modal-content">
+          <button
+            on:click={closeHostSettingsModal}
+            class="modal-button"
+            style="margin-left: -3%; margin-top: -3%;">Go Back</button
+          >
+          <h2 style="font-size: 28px;">Host Settings</h2>
+          <div style="background: #690092;">
+            <div>
+              <h3>Report scores in between</h3>
+              <input
+                type="number"
+                id="participants"
+                placeholder="Enter total number of participants"
+                bind:value={roomSettings.reportScores}
+              />
+              <p id="report">-1: Report at the end</p>
+            </div>
+            <div>
+              <h3>Display question on Players</h3>
+              <input
+                type="checkbox"
+                id="participants"
+                placeholder="Enter total number of participants"
+                bind:checked={roomSettings.displayQuestion}
+              />
+            </div>
+            <button type="button" on:click={closeHostSettingsModal}
+              >Save Settings</button
+            >
+          </div>
+        </div>
+      </div>
+    {/if}
+  </div>
+</main>
+
+<!-- <style>
+  .player-avatar {
+    width: 50px;
+    height: 50px;
+    margin-top: -115px;
+    border-radius: 50%; /* Optional: makes the avatar circular */
+  }
+  .avatar-container {
+    display: flex;
+    align-items: center;
+    margin-left: 300px;
+  }
+  .modal-overlay {
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+  }
+
+</style> -->
+
+<!-- <main
+  class="pt-20 min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-900 via-purple-700 to-purple-500"
+>
+  <div
+    class="bg-black bg-opacity-80 p-8 rounded-lg shadow-2xl text-center max-w-md mx-auto"
+  >
+    <h2
+      class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300 mb-4"
+    >
+      Enter Room ID and Username
+    </h2>
+    <div class="space-y-4">
+      <input
+        type="text"
+        class="text-input bg-gray-700 text-white rounded-full py-2 px-4 border-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent w-full"
+        placeholder="Enter room ID"
+        bind:value={roomid}
+      />
+      <input
+        type="text"
+        class="text-input bg-gray-700 text-white rounded-full py-2 px-4 border-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent w-full"
+        placeholder="Enter username"
+        bind:value={_userName}
+      />
+      {#if $user.avatarIndex !== null}
+        <div class="avatar-container mx-auto">
+          <img
+            class="player-avatar rounded-full w-24 h-24 object-cover"
+            src={`/avatars/${AVATARS[$user.avatarIndex]}`}
+            alt="Avatar"
+          />
+        </div>
+      {/if}
+      <button
+        class="btn bg-purple-800 hover:bg-purple-900 text-white font-bold py-2 px-4 rounded-full transition duration-300 transform hover:scale-105 shadow-lg w-full"
+        on:click={() => setUserName(_userName)}>Save username</button
+      >
+      <button
+        class="btn bg-purple-800 hover:bg-purple-900 text-white font-bold py-2 px-4 rounded-full transition duration-300 transform hover:scale-105 shadow-lg w-full"
+        on:click={openModal}>Choose avatar</button
+      >
+      <button
+        class="btn bg-purple-800 hover:bg-purple-900 text-white font-bold py-2 px-4 rounded-full transition duration-300 transform hover:scale-105 shadow-lg w-full"
+        on:click={() => joinRoom(socket, roomid, $user.userName)}
+        >Join Room</button
+      >
+      <button
+        class="btn bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full transition duration-300 transform hover:scale-105 shadow-lg w-full"
+        on:click={() => {
+          $user.isHost = false;
+          $user.userDecided = false;
+        }}>Go Back</button
+      >
+    </div>
+    {#if showModal}
+      Modal content -->
+<!-- <div class="modal-overlay">
+        <div class="modal-content">
+          <button
+            on:click={closeModal}
+            class="btn btn-secondary btn-block modal-button">Go Back</button
+          >
+          <AvatarMenu selectAvatar={handleAvatarSelection} />
+        </div>
+      </div>
+    {/if}
+    {#if showHostSettingsModal}
+      <!-- Host settings modal content -->
+<!-- <div class="modal-overlay">
+        <div class="modal-content">
+          <button
+            on:click={closeHostSettingsModal}
+            class="modal-button"
+            style="margin-left: -3%; margin-top: -3%;">Go Back</button
+          >
+          <h2 style="font-size: 28px;">Host Settings</h2>
+          <div style="background: #690092;">
+            <div>
+              <h3>Report scores in between</h3>
+              <input
+                type="number"
+                id="participants"
+                placeholder="Enter total number of participants"
+                bind:value={roomSettings.reportScores}
+              />
+              <p id="report">-1: Report at the end</p>
+            </div>
+            <div>
+              <h3>Display question on Players</h3>
+              <input
+                type="checkbox"
+                id="participants"
+                placeholder="Enter total number of participants"
+                bind:checked={roomSettings.displayQuestion}
+              />
+            </div>
+          </div>
+          <button type="button" on:click={closeHostSettingsModal}
+            >Save Settings</button
+          >
+        </div>
+      </div>
+    {/if}
+  </div>
+</main> -->

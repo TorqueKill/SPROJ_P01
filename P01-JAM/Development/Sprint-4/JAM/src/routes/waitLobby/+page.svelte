@@ -95,238 +95,165 @@
   }
 </script>
 
-<main>
-  <body>
-    <div class="container">
-      <h1>Loading...</h1>
+<!-- <main>
+  <body
+    class="pt-20 min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-900 via-purple-700 to-purple-500 font-garamond"
+  >
+    <div class="container flex justify-center items-center">
+      <h1 class="text-white text-3xl font-bold mb-8">Loading...</h1>
 
-      <div id="inside-box">
-        <div class="player-div">
+      <div
+        id="inside-box"
+        class="w-80 bg-purple-800 rounded-lg p-4 flex flex-col justify-between"
+      >
+        <div class="player-div bg-purple-600 rounded-lg p-4 mb-4">
           <div>
-            <p id="players-ready">Players Ready</p>
-            <p id="player-number">{playersReady}</p>
+            <p id="players-ready" class="text-white text-sm font-semibold">
+              Players Ready
+            </p>
+            <p id="player-number" class="text-white">{playersReady}</p>
           </div>
         </div>
         {#if $user.isHost}
-          <!-- <h4>Host id: {$user.gameid}</h4> -->
-          <div class="player-div">
+          <div class="player-div bg-purple-600 rounded-lg p-4 mb-4">
             <div>
-              <p id="host-id">Host ID</p>
-              <p id="game-id">{$user.gameid}</p>
-              <!-- <p id="game-id">1234345</p> -->
+              <p id="host-id" class="text-white text-sm font-semibold">
+                Host ID
+              </p>
+              <p id="game-id" class="text-white">{$user.gameid}</p>
             </div>
           </div>
         {/if}
 
-        {#each players as { name, avatarIndex }}
-          <div class="player-item">
-            <p class="player-name">{name}</p>
-            <img
-              class="player-avatar"
-              src={`/avatars/${AVATARS[avatarIndex]}`}
-              alt="Avatar"
-            />
-          </div>
-        {/each}
-
-        <!-- Force start the quiz atleast one player has joined -->
-        {#if $user.isHost && playersReady >= 1}
-          <button
-            class="btn btn-tertiary btn-block"
-            on:click={() => {
-              socket.emit("force-start-game", $user.gameid);
-            }}>Start Quiz</button
+        {#if players.length > 0}
+          <div
+            class="player-list bg-purple-600 rounded-lg p-4 mb-4 flex flex-wrap justify-center"
           >
+            {#each players as { name, avatarIndex }}
+              <div class="player-item mx-2 mb-2">
+                <p class="player-name text-white">{name}</p>
+                <img
+                  class="player-avatar w-12 h-12 rounded-full"
+                  src={`/avatars/${AVATARS[avatarIndex]}`}
+                  alt="Avatar"
+                />
+              </div>
+            {/each}
+          </div>
         {/if}
 
-        <!--Go back to menu, disconnect-->
-        <button
-          class="btn btn-secondary btn-block"
-          id="createQuiz"
-          on:click={() => {
-            socket.disconnect();
-            socket.connect();
-            goto("/");
-          }}>Leave room</button
-        >
+         Force start the quiz atleast one player has joined -->
+<!-- <div>
+          {#if $user.isHost && playersReady >= 1}
+            <button
+              class="w-full bg-purple-600 text-white font-bold py-2 rounded-full hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition duration-300 ease-in-out"
+              on:click={() => {
+                socket.emit("force-start-game", $user.gameid);
+              }}>Start Quiz</button
+            >
+          {/if}
+        </div>
+
+        Go back to menu, disconnect-->
+<!-- <div>
+          <button
+            class="w-full bg-gray-500 text-white font-bold py-2 rounded-full hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50 transition duration-300 ease-in-out"
+            id="createQuiz"
+            on:click={() => {
+              socket.disconnect();
+              socket.connect();
+              goto("/");
+            }}>Leave room</button
+          >
+        </div>
       </div>
+    </div> -->
+<!-- </body> -->
+<!-- </main> -->
+
+<main class="flex justify-center items-center min-h-screen bg-purple-500">
+  <div class="w-full max-w-md p-4 bg-purple-800 rounded-lg shadow-lg">
+    <h1 class="text-3xl font-bold text-white text-center mb-8">Loading...</h1>
+    <div class="space-y-4">
+      <div class="bg-purple-600 rounded-lg p-4 text-center">
+        <p class="text-sm font-semibold text-white">Players Ready</p>
+        <p class="text-white">{playersReady}</p>
+      </div>
+      {#if $user.isHost}
+        <div class="bg-purple-600 rounded-lg p-4 text-center">
+          <p class="text-sm font-semibold text-white">Host ID</p>
+          <p class="text-white">{$user.gameid}</p>
+        </div>
+      {/if}
+
+      <!-- Players list here -->
+      {#if players.length > 0}
+        <div
+          class="player-list bg-purple-600 rounded-lg p-4 mb-4 flex flex-wrap justify-center"
+        >
+          {#each players as { name, avatarIndex }}
+            <div class="player-item mx-2 mb-2">
+              <p class="player-name text-white">{name}</p>
+              <img
+                class="player-avatar w-12 h-12 rounded-full"
+                src={`/avatars/${AVATARS[avatarIndex]}`}
+                alt="Avatar"
+              />
+            </div>
+          {/each}
+        </div>
+      {/if}
+
+      {#if $user.isHost && playersReady >= 1}
+        <button
+          class="w-full bg-purple-600 text-white font-bold py-2 rounded-full hover:bg-purple-700 focus:outline-none focus:shadow-outline transition duration-300 transform hover:scale-105 shadow-lg"
+          on:click={() => {
+            socket.emit("force-start-game", $user.gameid);
+          }}>Start Quiz</button
+        >
+      {/if}
+      <button
+        class="w-full bg-gray-500 text-white font-bold py-2 rounded-full hover:bg-gray-600 focus:outline-none focus:shadow-outline transition duration-300 transform hover:scale-105 shadow-lg"
+        on:click={() => {
+          socket.disconnect();
+          socket.connect();
+          goto("/");
+        }}
+        >Leave room
+      </button>
     </div>
-  </body>
+  </div>
 </main>
 
 <style>
-  .btn-tertiary {
-    background: #00a59b;
-    border: None;
-    margin-top: 1rem;
-    margin-left: 4.5rem;
-    font-size: 20px;
-    color: white;
-    width: 12rem;
-    font-family: JejuGothic, sans-serif;
-  }
-
-  .btn-tertiary:hover {
-    background-color: #c49eff;
-  }
-  body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    padding: 0;
-    background: #7801a8;
-  }
-
   .container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    width: 100%;
-    max-width: 20rem;
-    padding: 2rem;
-    background: #018198;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-    border-radius: 51px;
-    margin: 1rem auto;
-    transition: height 0.3s ease;
   }
 
-  #inside-box {
-    width: 80%;
-    background: #018198;
-    border-radius: 51px;
+  .player-list {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.25rem;
-  }
-
-  #players-ready {
-    color: white;
-    font-size: 15px;
-    font-family: JejuGothic, sans-serif;
-    font-weight: 400;
-    margin-left: -4rem;
-    transform: translate(0, 75%);
-  }
-  #player-number {
-    text-align: center;
-    transform: translate(0, -110%);
-    color: white;
-    margin-left: 9rem;
-    align-content: center;
-  }
-  .player-div {
-    width: 100%;
-    background: #c49eff;
-    text-align: center;
-    border-radius: 12px;
-    margin: 0.5rem 0;
-    transition: transform 0.3s ease;
-  }
-  .btn {
-    margin-top: 5rem;
-    margin-right: 6rem;
-    width: 10rem;
-    border: None;
-    font-family: JejuGothic, sans-serif;
-    border-radius: 12px;
-    height: 3rem;
-    font-size: 20px;
-    max-width: 100%;
-    padding: 5px;
-  }
-  .btn:active {
-    background-color: #7801a8;
-    color: #f0e9e9;
-  }
-  .btn-secondary {
-    background: #c70000;
-    color: #ccc;
-    border: none;
-    margin-top: 1rem;
-    width: 10.5rem;
-    padding: 10px;
-    border-radius: 12px;
-    transition: background-color 0.3s ease;
-  }
-
-  .btn-secondary:hover {
-    background: #810101;
-    color: #ccc;
-  }
-
-  #host-id {
-    color: white;
-    font-size: 15px;
-    font-family: JejuGothic, sans-serif;
-    font-weight: 400;
-    margin-left: -7rem;
-    transform: translate(0, 75%);
-  }
-  #game-id {
-    color: white;
-    text-align: center;
-    transform: translate(0, -110%);
-    margin-left: 7rem;
-  }
-  h1 {
-    color: white;
-    font-size: 36px;
-    font-family: JejuGothic;
-    font-weight: 400;
-    font-weight: bold;
-    text-align: center;
+    flex-wrap: wrap;
     justify-content: center;
   }
 
   .player-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    text-align: center;
+    margin: 0 0.5rem;
   }
-
-  .player-name {
-    margin: 0;
-    color: white;
-  }
-
-  .player-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%; /* Optional: makes the avatar circular */
-  }
-
+  /* Styles for small screens (phones) */
   @media screen and (max-width: 768px) {
-    .container {
-      margin: 0;
-      padding: 0.2rem;
-      width: 50%;
-      max-width: none;
-    }
-
-    .btn {
-      padding: 5px;
-      font-size: 0.8em;
-      margin: 0.5rem 0;
+    .player-list {
+      flex-direction: column; /* Grow players vertically */
+      align-items: center;
     }
   }
 
+  /* Styles for large screens (desktops) */
   @media screen and (min-width: 769px) {
-    .container {
-      max-width: 20rem;
-    }
-
-    .btn {
-      padding: 10px 28px;
-      font-size: 1em;
-      margin-left: 6rem;
-      text-align: center;
-      justify-content: center;
+    .player-list {
+      flex-direction: row; /* Grow players horizontally */
     }
   }
 </style>

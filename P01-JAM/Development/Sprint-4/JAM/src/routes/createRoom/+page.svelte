@@ -1,100 +1,81 @@
-<script lang="js">
+<script>
   // @ts-nocheck
-
-  import { socket, roomEvents } from "$lib/socketStore.js";
-  import { ROOM_SETTINGS } from "$lib/config";
+  import DmyGame from "$lib/dummyPages/dmyGame/+page.svelte";
+  import { socket } from "$lib/socketStore.js";
+  import { DEFAULT_ROOM_SETTINGS, ROOM_SETTINGS } from "$lib/config";
   import { user } from "$lib/userStore.js";
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
 
-  const MIN_PLAYERS = ROOM_SETTINGS.MIN_PLAYERS;
-  const MAX_PLAYERS = ROOM_SETTINGS.MAX_PLAYERS;
-  const MAX_REPORT_SCORES = ROOM_SETTINGS.MAX_QUESTIONS_PER_REPORT;
+  const bgMusic = ROOM_SETTINGS.BG_MUSIC;
+  const bgColors = ROOM_SETTINGS.BG_COLORS;
 
-  let roomid;
-  let isRoomFull = false;
+  const noMusicIcon =
+    "https://www.svgrepo.com/show/95663/muted-music-notes.svg";
 
-  let maxPlayers;
+  let bgColorIdx = DEFAULT_ROOM_SETTINGS.DEFAULT_BG_COLOR_INDEX;
+  let bgMusicIdx = DEFAULT_ROOM_SETTINGS.DEFAULT_BG_MUSIC_INDEX;
+  let displayQuestionOnPlayer =
+    DEFAULT_ROOM_SETTINGS.DEFAULT_QUESTION_ON_PLAYER_SCREEN;
+
   let roomSettings = {
-    maxPlayers: MIN_PLAYERS,
-    reportScores: 1, //means report scores at the end
-    displayQuestion: false,
+    maxPlayers: ROOM_SETTINGS.MIN_PLAYERS,
+    reportScores: DEFAULT_ROOM_SETTINGS.DEFAULT_QUESTION_PER_REPORT,
+    bgColor: DEFAULT_ROOM_SETTINGS.DEFAULT_BG_COLOR,
+    bgMusic: DEFAULT_ROOM_SETTINGS.DEFAULT_BG_MUSIC,
+    displayQuestion: DEFAULT_ROOM_SETTINGS.DEFAULT_QUESTION_ON_PLAYER_SCREEN,
   };
 
-  let _userName;
+  const showToggleQuestionDisplay = false;
+  const maxQuestionsToReport = ROOM_SETTINGS.MAX_QUESTIONS_PER_REPORT; //dummy value for now
 
-  let selectedAvatarIndex = null;
-  let showModal = false;
-  let showHostSettingsModal = false;
+  let selectedBgColor = bgColors[bgColorIdx];
+  let selectedBgMusic = bgMusic[bgMusicIdx];
 
-  const openHostSettingsModal = () => {
-    showHostSettingsModal = true;
-  };
+  let showAdvancedSettings = false;
+  let scoreDisplaySliderValue =
+    DEFAULT_ROOM_SETTINGS.DEFAULT_QUESTION_PER_REPORT; // Slider value mapped to actual scoreDisplay
 
-  const closeHostSettingsModal = () => {
-    showHostSettingsModal = false;
-  };
-
-  onMount(() => {
-    $user.id = socket.id;
-    maxPlayers = 2;
-    _userName = $user.userName;
-
-    console.log($user);
-  });
-
-  //----------------------------REACTIVE CHANGES-------------------------
-
-  $: {
-    const events = $roomEvents;
-    console.log(events);
-
-    if (events.roomCreated) {
-      $user.gameid = events.roomCreated;
-
-      events.roomCreated = null;
-    }
-
-    if (events.roomFull) {
-      //alert
-      alert("Room Full");
-      isRoomFull = true;
-      roomid = "";
-
-      events.roomFull = null;
-    }
+  function selectBgMusic(index) {
+    bgMusicIdx = index;
+    selectedBgMusic = bgMusic[bgMusicIdx];
   }
 
-  //-------------------------------FUNCTIONS---------------------------------
+  function selectBgColor(index) {
+    bgColorIdx = index;
+    selectedBgColor = bgColors[bgColorIdx];
+  }
 
-  const logout = async () => {
-    try {
-      // Call the logout method from your authentication service
-      //await authService.logout();
+  function toggleDisplayQuestionOnPlayer(e) {
+    displayQuestionOnPlayer = e.target.checked;
+  }
 
-      // Redirect to the login page or any other desired page after logout
-      goto("/signIn");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
+  function toggleAdvancedSettings() {
+    showAdvancedSettings = !showAdvancedSettings;
+  }
+
+  $: selectedBgColor = bgColors[bgColorIdx];
+  $: selectedBgMusic = bgMusic[bgMusicIdx];
+  $: roomSettings.reportScores =
+    scoreDisplaySliderValue === 0 ? -1 : scoreDisplaySliderValue;
 
   const createRoom = (soc, roomsettings) => {
     if (
-      roomsettings.maxPlayers < MIN_PLAYERS ||
-      roomsettings.maxPlayers > MAX_PLAYERS
+      roomsettings.maxPlayers < ROOM_SETTINGS.MIN_PLAYERS ||
+      roomsettings.maxPlayers > ROOM_SETTINGS.MAX_PLAYERS
     ) {
       alert("max players must be between 2 and 10");
-      maxPlayers = MIN_PLAYERS;
+      roomSettings.maxPlayers = ROOM_SETTINGS.MIN_PLAYERS;
       return;
     }
 
     if (
-      roomsettings.reportScores < -1 ||
-      roomsettings.reportScores > MAX_REPORT_SCORES
+      roomsettings.reportScores < ROOM_SETTINGS.MIN_QUESTIONS_PER_REPORT ||
+      roomsettings.reportScores > ROOM_SETTINGS.MAX_QUESTIONS_PER_REPORT
     ) {
-      alert("report scores must be between -1 and 5");
-      roomsettings.reportScores = 1;
+      alert("report scores must be between 0 and 5");
+      roomSettings.reportScores =
+        DEFAULT_ROOM_SETTINGS.DEFAULT_QUESTION_ON_PLAYER_SCREEN;
       return;
     }
 
@@ -103,373 +84,240 @@
       email: $user.email,
     };
 
-    console.log(roomSettings);
+    roomsettings.bgColor = selectedBgColor;
+    roomsettings.bgMusic = selectedBgMusic;
+    roomsettings.displayQuestion = displayQuestionOnPlayer;
 
-    soc.emit("create-room", $user.hostQuiz, roomSettings, userData);
-    console.log("createRoom", roomSettings);
+    soc.emit("create-room", $user.hostQuiz, roomsettings, userData);
+    console.log("createRoom", roomsettings);
     $user.isHost = true;
 
     goto("/waitLobby");
   };
 
-  const joinRoom = (soc, roomid, username) => {
-    if (roomid) {
-      let userData = {
-        username: username,
-        email: $user.email,
-        avatarIndex: $user.avatarIndex,
-      };
+  onMount(() => {
+    $user.id = socket.id;
 
-      if ($user.email != "") {
-        soc.emit("join-room", roomid, userData);
-      } else {
-        soc.emit("join-room", roomid, userData);
-      }
-
-      console.log("joinRoom");
-
-      if (!isRoomFull) {
-        $user.gameid = roomid;
-        goto("/waitLobby");
-      }
-    } else {
-      alert("please enter a room id");
-    }
-  };
-
-  const setUserName = (userName) => {
-    if (userName) {
-      $user.userName = userName;
-      alert("Username Saved Successfully.");
-    } else {
-      alert("please enter a username");
-    }
-  };
-
-  const handleAvatarSelection = (index) => {
-    selectedAvatarIndex = index;
-    $user.avatarIndex = index;
-    console.log(`index of selected avatar: ${index + 1}`);
-    closeModal();
-  };
-
-  function openModal() {
-    showModal = true;
-  }
-
-  function closeModal() {
-    showModal = false;
-  }
+    console.log($user);
+  });
 </script>
 
-<!-- As a heading -->
-<nav>
-  <div class="logo">JAM</div>
-  <ul>
-    <li><button class="nav_button" on:click={() => goto("/")}>Home</button></li>
-    <li>
-      <button class="nav_button" on:click={() => goto("/viewHistory")}
-        >History</button
-      >
-    </li>
-    {#if $user.isHost}
-      <!-- Show Host Settings button only if the user is a host -->
-      <li>
-        <button class="nav_button" on:click={openHostSettingsModal}
-          >Host Settings</button
+<div class="flex flex-col md:flex-row min-h-screen font-garamond">
+  <!-- Container for user input box -->
+  <!-- Full-width container for the main content -->
+  <div
+    class="md:w-1/3 min-h-screen bg-purple-900 text-white flex flex-col justify-center items-center gap-6 p-6"
+  >
+    <!-- Centered container for inputs and create room button -->
+    <div
+      class="flex flex-col justify-around items-center w-full max-w-md space-y-8"
+    >
+      <!-- Number of Participants -->
+      <div class="flex flex-col items-center w-full">
+        <label for="participants" class="text-lg font-medium"
+          >Number of Participants:</label
         >
-      </li>
-    {/if}
-    <li><button class="nav_button" on:click={logout}>Logout</button></li>
-  </ul>
-</nav>
-
-<main>
-  <body>
-    <div class="container">
-      {#if $user.isHost}
-        <p>
-          <button
-            type="button"
-            class="btn btn-secondary btn-block btn-space ml-auto"
-            on:click={() => createRoom(socket, roomSettings)}
-            >Create Room</button
-          >
-        </p>
-
-        <h2>Number of participants</h2>
         <input
           type="number"
-          class="form-control"
           id="participants"
-          placeholder="Total participants"
           bind:value={roomSettings.maxPlayers}
+          class="w-2/3 text-black text-center px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-indigo-500 sm:text-sm"
+          placeholder="Enter number of participants"
         />
+      </div>
 
-        <p />
-      {/if}
+      <div class="w-full text-center my-4">
+        <button
+          class="px-4 py-2 h-15 w-2/3 font-bold text-white bg-purple-600 rounded-full hover:bg-purple-700 focus:outline-none focus:shadow-outline transition duration-300 transform hover:scale-105 shadow-lg"
+          on:click={toggleAdvancedSettings}
+        >
+          {showAdvancedSettings
+            ? "Hide Advanced Settings"
+            : "Show Advanced Settings"}
+        </button>
+      </div>
 
-      {#if showHostSettingsModal}
-        <div class="modal-overlay">
-          <div class="modal-content">
-            <button
-              on:click={closeHostSettingsModal}
-              class="modal-button"
-              style="margin-left: -3%; margin-top: -3%;">Go Back</button
-            >
-            <h2 style="font-size: 28px;">Host Settings</h2>
-            <div style="background: #690092;">
-              <div>
-                <h3>Report scores in between</h3>
-                <input
-                  type="number"
-                  id="participants"
-                  placeholder="Total participants"
-                  bind:value={roomSettings.reportScores}
-                />
-                <p id="report">-1: Report at the end</p>
-              </div>
-              <div>
-                <h3>Display question on Players</h3>
-                <input
-                  type="checkbox"
-                  id="participants"
-                  placeholder="Total participants"
-                  bind:checked={roomSettings.displayQuestion}
-                />
-              </div>
-            </div>
-            <button type="button" on:click={closeHostSettingsModal}
-              >Save Settings</button
-            >
+      {#if showAdvancedSettings}
+        <!-- Room Background Color Selector -->
+        <div class="flex flex-col items-center w-full">
+          <!-- svelte-ignore a11y-label-has-associated-control -->
+          <label class="text-lg font-medium">Room Background Color:</label>
+          <div
+            class="flex justify-center items-center gap-4 mt-2 w-2/3 space-x-6"
+          >
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            {#each bgColors as color, index}
+              <!-- svelte-ignore a11y-no-static-element-interactions -->
+              <div
+                on:click={() => selectBgColor(index)}
+                class="cursor-pointer w-10 h-10 shadow-lg {bgColors[
+                  index
+                ]} {index === bgColorIdx ? 'ring-2 ring-purple-600' : ''}"
+                title={color.name}
+              />
+            {/each}
           </div>
         </div>
+
+        <!-- Background Music Selector -->
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <div
+          class="flex justify-center items-center gap-4 mt-2 w-full space-x-4"
+        >
+          {#each bgMusic.slice(0, bgMusic.length - 1) as music, index}
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <div
+              on:click={() => selectBgMusic(index)}
+              class="cursor-pointer font-bold text-lg p-2 bg-purple-700 rounded {index ===
+              bgMusicIdx
+                ? 'ring-2 ring-purple-600'
+                : ''}"
+            >
+              {index + 1}
+            </div>
+          {/each}
+          <!-- svelte-ignore a11y-no-static-element-interactions -->
+          <div
+            on:click={() => selectBgMusic(bgMusic.length - 1)}
+            class="cursor-pointer font-bold text-lg p-2 bg-purple-700 rounded {bgMusicIdx ===
+            bgMusic.length - 1
+              ? 'ring-2 ring-purple-600'
+              : ''}"
+          >
+            <img src={noMusicIcon} class="h-6 w-6" alt="No Music" />
+          </div>
+        </div>
+
+        <!-- Score Display Frequency Slider -->
+        <div class="flex flex-col items-center w-full">
+          <label for="scoreDisplaySlider" class="text-lg font-medium"
+            >Score Display Frequency:</label
+          >
+          <input
+            type="range"
+            id="scoreDisplaySlider"
+            min="0"
+            max={maxQuestionsToReport}
+            bind:value={scoreDisplaySliderValue}
+            class="w-2/3 mt-2"
+          />
+          <span class="text-sm">
+            {roomSettings.reportScores === -1
+              ? "No score display during quiz"
+              : roomSettings.reportScores === 1
+              ? `After every ${roomSettings.reportScores} question`
+              : `After every ${roomSettings.reportScores} questions`}
+          </span>
+        </div>
+
+        <!-- Container for the Display Question on Player Toggle -->
+        <div class="flex items-center justify-center space-x-4 mb-4">
+          <label for="questionDisplayOnPlayer" class="text-lg font-medium mr-2">
+            Display Question on Player:
+          </label>
+          <label class="toggle">
+            <input
+              type="checkbox"
+              id="questionDisplayOnPlayer"
+              bind:checked={displayQuestionOnPlayer}
+              on:change={toggleDisplayQuestionOnPlayer}
+            />
+            <span class="slider round" />
+          </label>
+        </div>
       {/if}
+
+      <!-- Create Room Button -->
+      <button
+        class="px-4 py-2 h-15 w-2/3 font-bold text-white bg-purple-600 rounded-full hover:bg-purple-700 focus:outline-none focus:shadow-outline transition duration-300 transform hover:scale-105 shadow-lg"
+        on:click={() => {
+          createRoom(socket, roomSettings);
+        }}
+      >
+        Create Room
+      </button>
+      <button
+        class="px-4 py-2 h-15 w-2/3 font-bold text-white bg-gray-500 rounded-full hover:bg-gray-600 focus:outline-none focus:shadow-outline transition duration-300 transform hover:scale-105 shadow-lg"
+        on:click={() => {
+          goto("/hostOrPlayer");
+        }}
+      >
+        Go Back
+      </button>
     </div>
-  </body>
-</main>
+  </div>
+  <div class="md:w-2/3">
+    <DmyGame
+      {selectedBgColor}
+      {selectedBgMusic}
+      {showToggleQuestionDisplay}
+      {displayQuestionOnPlayer}
+    />
+  </div>
+</div>
 
 <style>
-  nav {
-    background-color: #690092; /* Purple background color */
-    padding: 0.5rem 1rem; /* Padding around the navbar */
-    position: fixed; /* Fix the position at the top */
-    width: 100%; /* Full width */
-    top: 0; /* Position at the top of the page */
-    z-index: 1000; /* Stack above other content */
-    display: flex; /* Use flexbox for positioning */
-    justify-content: space-between; /* Space between items */
-    align-items: center; /* Center items vertically */
-  }
+  /* ... other styles ... */
 
-  ul {
-    list-style: none; /* Remove list styling */
-    display: flex; /* Display as flex for inline positioning */
-    margin: 0;
-    padding: 0;
-    align-items: center; /* Center items vertically */
-  }
-
-  .logo {
-    flex-grow: 1; /* Allows the logo to grow and push the nav buttons to the right */
-    color: #c49eff; /* Logo text color */
-    font-size: 1.5rem; /* Logo text size */
-    font-weight: bold;
-    margin-left: 2rem;
-  }
-
-  .nav_button {
-    background-color: transparent; /* Transparent button background */
-    color: #c49eff; /* Button text color */
-    padding: 0.5rem 1rem; /* Padding inside buttons */
-    border: none; /* No border for buttons */
-    text-align: center; /* Center the text inside buttons */
-    text-decoration: none; /* No underline */
-    font-size: 1rem; /* Button text size */
-    cursor: pointer; /* Pointer cursor on hover */
-    border-radius: 0.25rem; /* Slightly rounded corners for buttons */
-    transition: color 0.3s ease, background-color 0.3s ease; /* Transition effect for hover */
-  }
-
-  .nav_button:hover {
-    background-color: #c49eff; /* Button background color on hover */
-    color: #690092; /* Button text color on hover */
-  }
-
-  /* Adjustments for mobile screens */
-  @media (max-width: 768px) {
-    .nav_button {
-      padding: 0.5rem; /* Smaller padding on mobile */
-      font-size: 0.875rem; /* Smaller text on mobile */
-    }
-  }
-
-  button {
-    background-color: #ccc;
-    border: none;
-    color: white;
-    padding: 5px 25px;
-    text-align: center;
-    text-decoration: none;
+  .toggle {
+    position: relative;
     display: inline-block;
-    font-size: 25px;
-    margin: 4px 140px;
+    width: 60px;
+    height: 34px;
+  }
+
+  .toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
     cursor: pointer;
-    border-radius: 5px;
-    transition: all 0.3s ease;
-    font-family: JejuGothic, sans-serif;
-  }
-
-  .btn:hover {
-    background-color: #c49eff;
-  }
-
-  body {
-    padding: 0;
-    height: 100%;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #7801a8;
-  }
-  .container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    padding: 2rem;
-    border-radius: 15px;
-    background-color: #018198;
-    color: #c49eff;
-    border: none;
-    margin-top: 15rem;
-  }
-
-  #report {
-    color: rgb(194, 12, 12);
-    text-align: center;
-    margin-top: -1rem;
-  }
-
-  input {
-    width: 30%;
-    padding: 10px;
-    margin-bottom: 1rem;
-    font-family: JejuGothic, sans-serif;
-    font-size: 18px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    display: flex;
-    flex-direction: column;
-  }
-
-  #participants {
-    border: None;
-    padding: 0.75rem;
-    background-color: #f0e9e9;
-    margin-bottom: 2rem;
-    border-radius: 12px;
-    text-align: center;
-    margin-left: 0rem;
-    align-items: center;
-    justify-content: center;
-  }
-  h2 {
-    font-family: JejuGothic, sans-serif;
-    font-size: 15px;
-    text-align: center;
-  }
-
-  #roomId {
-    border: None;
-    padding: 0.75rem;
-    background-color: #f0e9e9;
-    margin-bottom: 2rem;
-    border-radius: 12px;
-    margin-left: 8rem;
-  }
-  .form {
-    text-align: center;
-    margin-left: 21rem;
-    margin-top: 2rem;
-  }
-
-  #hostQuiz {
-    font-size: 28px;
-    text-align: center;
-    width: 30%;
-  }
-
-  .modal-overlay {
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 100;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
   }
 
-  .player-avatar {
-    width: 50px;
-    height: 50px;
-    margin-top: -115px;
-    border-radius: 50%; /* Optional: makes the avatar circular */
-  }
-  .avatar-container {
-    display: flex;
-    align-items: center;
-    margin-left: 300px;
-  }
-
-  .player-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
   }
 
-  .player-name {
-    margin: 0;
-    color: white;
+  input:checked + .slider {
+    background-color: #6200ea;
   }
 
-  .modal-content {
-    background-color: #8f00c7;
-    padding: 20px;
-    border-radius: 10px;
+  input:focus + .slider {
+    box-shadow: 0 0 1px #6200ea;
   }
 
-  .modal-button {
-    background-color: #c49eff;
-    color: white;
-    display: flex;
-    cursor: pointer;
+  input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
   }
 
-  @media (max-width: 768px) {
-    input,
-    button {
-      padding: 10px;
-      font-size: 14px;
-      border-radius: 10px;
-    }
-    .nav_button {
-      margin: 4px 20px; /* Adjusted margin for larger screens */
-    }
+  /* Rounded sliders */
+  .slider.round {
+    border-radius: 34px;
   }
 
-  @media (min-width: 769px) {
-    button {
-      padding: 10px 25px;
-      font-size: 18px;
-      border-radius: 20px;
-    }
-    .nav_button {
-      margin: 4px 20px; /* Adjusted margin for larger screens */
-    }
+  .slider.round:before {
+    border-radius: 50%;
   }
 </style>
