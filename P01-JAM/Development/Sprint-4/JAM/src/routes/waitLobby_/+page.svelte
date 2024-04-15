@@ -173,4 +173,18 @@
     text-align: center;
     margin: 0 0.5rem;
   }
+  /* Styles for small screens (phones) */
+  @media screen and (max-width: 768px) {
+    .player-list {
+      flex-direction: column; /* Grow players vertically */
+      align-items: center;
+    }
+  }
+
+  /* Styles for large screens (desktops) */
+  @media screen and (min-width: 769px) {
+    .player-list {
+      flex-direction: row; /* Grow players horizontally */
+    }
+  }
 </style>
