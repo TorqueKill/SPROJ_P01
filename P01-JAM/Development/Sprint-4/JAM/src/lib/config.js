@@ -1,3 +1,5 @@
+
+
 export const SCREENS = {
   HOME: 0,
   CREATE: 1,
@@ -10,7 +12,23 @@ export const SCREENS = {
 export const ROOM_SETTINGS = {
   MIN_PLAYERS: 2,
   MAX_PLAYERS: 10,
+  MIN_QUESTIONS_PER_REPORT: -1,
   MAX_QUESTIONS_PER_REPORT: 5,
+  BG_COLORS: [
+    "bg-gradient-to-br from-purple-400 via-purple-500 via-20% to-purple-900 to-80%",
+    "bg-gradient-to-br from-purple-600 via-purple-800 via-20% to-purple-950 to-80%",
+    "bg-gradient-to-br from-purple-400 via-violet-700 to-purple-900",
+  ],
+  BG_MUSIC: ["/music/1.mp3", "/music/2.mp3", "/music/3.mp3", "-1"],
+};
+
+export const DEFAULT_ROOM_SETTINGS = {
+  DEFAULT_QUESTION_PER_REPORT: -1,
+  DEFAULT_BG_COLOR: ROOM_SETTINGS.BG_COLORS[0],
+  DEFAULT_BG_MUSIC: ROOM_SETTINGS.BG_MUSIC[ROOM_SETTINGS.BG_MUSIC.length - 1],
+  DEFAULT_BG_COLOR_INDEX: 0,
+  DEFAULT_BG_MUSIC_INDEX: ROOM_SETTINGS.BG_MUSIC.length - 1,
+  DEFAULT_QUESTION_ON_PLAYER_SCREEN: false,
 };
 
 export const GAME_SETTINGS = {

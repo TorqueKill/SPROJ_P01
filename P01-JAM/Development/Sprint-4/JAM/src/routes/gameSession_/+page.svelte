@@ -1,7 +1,7 @@
 <script>
     //@ts-nocheck
 
-    import {SCREENS, GAME_SETTINGS, AVATARS} from "$lib/config.js"
+    import {SCREENS, GAME_SETTINGS, AVATARS, DEFAULT_ROOM_SETTINGS, ROOM_SETTINGS} from "$lib/config.js"
     import {user} from "$lib/userStore.js"
     import { socket, roomEvents, gameEvents } from "$lib/socketStore.js";
     import { onMount } from "svelte";
@@ -119,6 +119,8 @@
     let answerSubmitted;
     let sessionScores = dummyPlayers;
 
+    let audioRef
+
     let timerWidth = 100;
     let questionTimerWidth = 100;
     let scoreDisplayTimerWidth = 100;
@@ -133,6 +135,8 @@
     const timerDuration = 30;
     const questionTitleFlashDuration = 5;
     const LEADERBOARD_SIZE = GAME_SETTINGS.LEADERBOARD_SIZE;
+    let bgColor;
+    let bgMusic;
 
 
     onMount(() => {
@@ -143,6 +147,20 @@
         currentQuestion = -1
         isAsnwerSubmitted = false;
         answerSubmitted = "";
+
+        if ($user.bgColorIndex !== -1) {
+            bgColor = $user.bgColor;
+        } else {
+            bgColor = DEFAULT_ROOM_SETTINGS.BG_COLOR;
+        }
+
+        if ($user.bgMusicIndex !== -1) {
+            bgMusic = $user.bgMusic;
+        } else {
+            bgMusic = DEFAULT_ROOM_SETTINGS.BG_MUSIC;
+        }
+
+        console.log(bgColor, bgMusic)
 
         if ($user.currentSession != SCREENS.GAME) {
             $user.currentSession = SCREENS.GAME;
@@ -403,6 +421,19 @@
         socket.emit("resume-timer", $user.gameid, currentQuestion);
     }
 
+        //on page load, play audio
+    $: if (audioRef && bgMusic) {
+        //check if selectedBgMusic = '-1' then don't play music
+        if (bgMusic !== "-1") {
+            audioRef.src = bgMusic; // Update the source
+            audioRef.load(); // Load the new music source
+            audioRef.play(); // Play the music
+        }else{
+            //remove the audio
+            audioRef.src = "";
+        }
+    }
+
 </script>
 
 <!--uses tailwind css for all below-->
@@ -425,7 +456,7 @@
     </div>
 {:else}
     <!--Game session page-->
-    <div class="min-h-screen bg-purple-800 text-white flex justify-center items-center">
+    <div class="min-h-screen {bgColor} text-white flex justify-center items-center">
         <!-- Question Title Flash -->
         {#if isQuestionTitleVisible}
             <div class="flex flex-col items-center w-full px-4 py-8">
@@ -445,7 +476,7 @@
                             <div class="bg-purple-900 p-6 rounded-lg shadow-lg w-full">
                                 <h2 class="text-3xl font-bold mb-4 text-center">{quiz.quiz[currentQuestion].question}</h2>
                                 {#if quiz.quiz[currentQuestion].imageUrl}
-                                    <img src={quiz.quiz[currentQuestion].imageUrl} alt="img" class="mx-auto h-auto rounded-md mb-4" />
+                                    <img src={quiz.quiz[currentQuestion].imageUrl} alt="img" class="mx-auto h-60 rounded-md mb-4" />
                                 {/if}
                                 <!-- Choices (Display only) GRID -->
                                 <div class="grid grid-cols-2 gap-4">
@@ -478,7 +509,7 @@
                                 {#if showQuestionOnPlayerDisplay}
                                     <h2 class="text-2xl font-bold mb-4 text-center">{quiz.quiz[currentQuestion].question}</h2>
                                     {#if quiz.quiz[currentQuestion].imageUrl}
-                                        <img src={quiz.quiz[currentQuestion].imageUrl} alt="img" class="mx-auto h-auto rounded-md mb-4" />
+                                        <img src={quiz.quiz[currentQuestion].imageUrl} alt="img" class="mx-auto h-40 rounded-md mb-4" />
                                     {/if}
                                 {/if}
                                 <div class="space-y-2 mt-4">
@@ -531,6 +562,10 @@
             
         {/if}
     </div>
+
+    <audio bind:this={audioRef} loop={true} preload="auto">
+        Your browser does not support the audio element.
+    </audio>
 {/if}
 
 
