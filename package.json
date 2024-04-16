@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "startServer": "cd P01-JAM\\Development\\Sprint-1\\backend && node index.js",
-    "startClient": "cd P01-JAM\\Development\\Sprint-1\\JAM && npm run dev"
+    "initBackend": "cd P01-JAM\\Development\\Sprint-4\\backend && npm i && node index.js",
+    "initClient": "cd P01-JAM\\Development\\Sprint-4\\JAM && npm i && npm run dev",
+    "startServer": "cd P01-JAM\\Development\\Sprint-4\\backend && node index.js",
+    "startClient": "cd P01-JAM\\Development\\Sprint-4\\JAM && npm run dev"
   },
   "author": "",
   "license": "ISC",
