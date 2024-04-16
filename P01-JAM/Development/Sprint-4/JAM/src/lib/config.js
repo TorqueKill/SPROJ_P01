@@ -55,8 +55,8 @@ export const QUIZ_DISPLAY_PAGINATION = 13;
 //1 week
 export const SESSION_TIMEOUT = 604800000;
 
-export const BACKEND_URL = "http://localhost:3001"; // || process.env.BACKEND_URL;
+export const BACKEND_URL = "https://mysterious-retreat-98397-8a74f4ba2e1e.herokuapp.com"; // || process.env.BACKEND_URL;
 
-//https://boiling-beyond-93888-265de2b70712.herokuapp.com/
+//https://boiling-beyond-93888-265de2b70712.herokuapp.com
 
-//https://mysterious-retreat-98397-8a74f4ba2e1e.herokuapp.com/
+//https://mysterious-retreat-98397-8a74f4ba2e1e.herokuapp.com
