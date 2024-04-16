@@ -163,7 +163,7 @@
 </main> -->
 
 <main
-  class="min-h-screen flex bg-gradient-to-r from-purple-900 via-purple-700 to-purple-500 font-garamond overflow-hidden"
+  class="min-h-screen flex flex-col lg:flex-row bg-gradient-to-r from-purple-900 via-purple-700 to-purple-500 font-garamond overflow-hidden"
 >
   <!-- Content container -->
   {#if !loadingUserSession}
@@ -198,24 +198,24 @@
       </div>
     </div>
 
-    <div class="flex-1">
-      <div class="w-full h-full flex justify-center items-center">
-        <div
-          class="w-3/4 h-2/4 bg-pink-300 rounded-full"
+    <div
+      class="hidden lg:flex lg:flex-1 lg:justify-center lg:items-center p-10"
+    >
+      <div
+        class="w-3/4 h-2/4 bg-pink-300 rounded-full"
+        style="clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);"
+      >
+        <!-- svelte-ignore a11y-img-redundant-alt -->
+        <img
+          src="real_jam.png"
+          alt="Image"
+          class="object-cover w-full h-full"
           style="clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);"
-        >
-          <!-- svelte-ignore a11y-img-redundant-alt -->
-          <img
-            src="real_jam.png"
-            alt="Image"
-            class="object-cover w-full h-full"
-            style="clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);"
-          />
-        </div>
+        />
       </div>
     </div>
 
-    <div class="absolute top-10 right-20">
+    <div class="absolute top-10 right-10 lg:right-20">
       <button
         on:click={toggleSignup}
         class="bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105 shadow-lg"
@@ -228,7 +228,7 @@
     </div>
   {/if}
 
-  <div class="flex w-full absolute bottom-12 left-20">
+  <div class="fixed bottom-12 left-20 flex items-center space-x-4">
     <div class="flex space-x-1">
       <div class="w-8 h-8 bg-yellow-700 rounded-full" />
       <div class="w-8 h-8 bg-purple-300 rounded-full" />
