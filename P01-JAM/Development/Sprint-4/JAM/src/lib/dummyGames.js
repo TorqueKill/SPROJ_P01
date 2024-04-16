@@ -42,9 +42,6 @@ export const gameHistory = [
   ],
 ];
 
-//
-//each doc is : {email: string, gameHistory: [ {quiz: quiz, score: [{name: string, scores: [number, number, number...], responseTimes: [number, number, number...]} , {name: string, scores: [number, number, number...], responseTimes: [number, number, number...]}, ... ]} ], type: string}
-
 export const gameHistHost = [
   {
     email: "example@example.com",
