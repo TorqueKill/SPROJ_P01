@@ -239,7 +239,8 @@
         }
 
         if (events.gameEnd) {
-            goto("/gameEnd");
+            // goto("/gameEnd");
+            goto("/gameEnd_");
         }
     }
 
@@ -583,5 +584,10 @@
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
+    }
+
+    @keyframes podium-rise {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
 </style>
