@@ -9,7 +9,8 @@
     "initClient": "cd P01-JAM\\Development\\Sprint-4\\JAM && npm i && npm run dev",
     "startServer": "cd P01-JAM\\Development\\Sprint-4\\backend && node index.js",
     "startClient": "cd P01-JAM\\Development\\Sprint-4\\JAM && npm run dev",
-    "testAPI_1:": "cd P01-JAM\\Development\\Sprint-4\\JAM\\src\\lib\\TestingAPI && node testAPI_1.js"
+    "testAPI_1:": "cd P01-JAM\\Development\\Sprint-4\\JAM\\src\\lib\\TestingAPI && node testAPI_1.js",
+    "testAPI_3:": "cd P01-JAM\\Development\\Sprint-4\\JAM\\src\\lib\\TestingAPI && node testAPI_3.js"
   },
   "author": "",
   "license": "ISC",

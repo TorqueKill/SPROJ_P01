@@ -11,6 +11,7 @@
     // let playerScores = [];
     let totalQuestions = 0;
     let bgColor;
+    let savingHistoryToCloud = false;
 
     let dummyPlayers = [
         {
@@ -110,29 +111,23 @@
     const sortByScore = (a, b) => {
       return playerScore(b.scores) - playerScore(a.scores);
     };
+
+    const gotoViewHistory = () => {
+      $user.gameid = null;
+      $user.quiz = null;
+      $user.isHost = false;
+      $user.userDecided = false;
+
+      goto("/viewHistory");
+    };
   
     const _saveHistory = async () => {
-      //check if the user is host or player
-      //further check if its a dev account or not
-  
-      //if DEV:
-      //if host, save the scores in hostHistory in the local storage
-      //if player, save the scores in playerHistory in the local storage
-  
-      //if not DEV:
-      //save the scores on supabase
-  
-      //format :
-      //{email: , username : , gameHistory: [{quiz: quiz, scores: playerScores}]}
-  
-      //if a user has more than 5 games, delete the oldest game (last element in the array)
-  
-      //also check if user is logged in or not (has an email)
-      
+      savingHistoryToCloud = true;
   
       if ($user.email == null || $user.email == "") {
         alert("Must be logged in to save history");
-        return false;
+        savingHistoryToCloud = false;
+        return;
       }
   
       //FOLLOWING SHOULD BE DONE ONLY IF DEV ACCOUNT: aka emails ending with '@dev'
@@ -176,11 +171,12 @@
           let type = $user.isHost ? "host" : "player";
           let res = await saveHistory(userGame.email, userGame.gameHistory, type);
           console.log(res);
-  
-          return true;
+          savingHistoryToCloud = false;
+          gotoViewHistory();
+          return;
         } catch (error) {
           console.log(error);
-          return false;
+          return;
         }
       }
   
@@ -205,8 +201,10 @@
       } else {
         localStorage.setItem("playerGameHistory", JSON.stringify(localGames));
       }
+
+      savingHistoryToCloud = false;
+      gotoViewHistory();
   
-      return true;
     };
   
     const restartConnection = () => {
@@ -232,83 +230,44 @@
           </div>
           <p>Waiting for scores...</p>
         {:else}
-        <div class="min-h-screen {bgColor} text-white flex justify-center items-center">
-            <div   >
-            <div class="container mx-auto p-4 max-w-4xl">
+          {#if savingHistoryToCloud}
+            <div class="fixed inset-0 bg-purple-500 flex justify-center items-center">
+              <div class="loader"></div> <!-- Custom spinner -->
+            </div>
+            <p>Saving history...</p>
+          {:else}
 
-                <!-- <div class="podium-container flex justify-between items-center w-fit mx-auto">
-                    {#each calculateScore(playerScores) as player, index}
-                      <div class="podium {index === 1 ? 'first-place' : index === 2 ? 'second-place' : index === 3 ? 'third-place' : 'hidden'} bg-gradient-to-r from-gold-500 to-gold-700 rounded-lg shadow-lg p-4">
-                        <img src={`/avatars/${AVATARS[player.avatarIndex]}`} alt="avatar" class="w-12 h-12 rounded-full mx-auto mb-2">
-                        <div class="player-name text-lg font-bold">{player.name}</div>
-                        <div class="player-score text-lg font-medium">{player.scores} points</div>
-                      </div>
-                    {/each}
-                </div> -->
+          <div class="min-h-screen {bgColor} text-white flex justify-center items-center">
+              <div>
+              <div class="container mx-auto p-4 max-w-4xl">
 
-
-                <!-- <div class=" bg-purple-900 p-8 rounded-lg shadow-lg max-w-4xl"> -->
-                <div class="leaderboard bg-gradient-to-r from-purple-700 to-purple-900 p-8 rounded-lg shadow-lg max-w-4xl">
-                    <h3 class="text-2xl font-bold mb-6 text-yellow-300">End of Game Leaderboard</h3>
-                    <div class="space-y-4">
-                        {#each calculateScore(playerScores) as player, index}
-                        <!-- <div class="flex items-center justify-between bg-purple-800 p-4 rounded-lg animate-pulse"> -->
-                        <div class="flex items-center justify-between bg-gray-800 rounded-lg shadow-md animate-bounce">
-                            <!-- <div class="flex items-center"> -->
-                            <div class="flex items-center space-x-4">
-                                <img src={`/avatars/${AVATARS[player.avatarIndex]}`} alt="avatar" class="w-12 h-12 rounded-full mr-4">
-                                <div class="text-lg font-medium {index < 3 ? 'text-yellow-400' : 'text-gray-300'}">{player.name}</div>
-                                <!-- <div class="text-lg font-medium text-white">{player.name}</div> -->
+                  <!-- <div class=" bg-purple-900 p-8 rounded-lg shadow-lg max-w-4xl"> -->
+                  <div class="leaderboard bg-gradient-to-r from-purple-700 to-purple-900 p-8 rounded-lg shadow-lg max-w-4xl">
+                      <h3 class="text-2xl font-bold mb-6 text-yellow-300">End of Game Leaderboard</h3>
+                      <div class="space-y-4">
+                          {#each calculateScore(playerScores) as player, index}
+                            <!-- <div class="flex items-center justify-between bg-purple-800 p-4 rounded-lg animate-pulse"> -->
+                            <div class="flex items-center justify-between bg-gray-800 rounded-lg shadow-md animate-bounce">
+                                <!-- <div class="flex items-center"> -->
+                                <div class="flex items-center space-x-4">
+                                    <img src={`/avatars/${AVATARS[player.avatarIndex]}`} alt="avatar" class="w-12 h-12 rounded-full mr-4">
+                                    <div class="text-lg font-medium {index < 3 ? 'text-yellow-400' : 'text-gray-300'}">{player.name}</div>
+                                    <!-- <div class="text-lg font-medium text-white">{player.name}</div> -->
+                                </div>
+                                <div class="text-lg font-bold text-white">{player.scores} points</div>
                             </div>
-                            <!-- <div class="text-lg font-bold {index < 3 ? 'text-white' : 'text-gray-400'}">{player.scores} points</div> -->
-                            <div class="text-lg font-bold text-white">{player.scores} points</div>
-                        </div>
-                        {/each}
-                    </div>
-        
-                </div>
-        
-            <!-- <div class="flex justify-around mt-10"> -->
+                          {/each}
+                      </div>
+                  </div>
 
-                <div class="flex justify-center mt-4">  <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Save history</button>
-                    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 ml-4">Leave Room</button>
-                </div>
-                
-                <!-- <div class="flex flex-col space-y-2">  <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Save history</button>
-                    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">Leave Room</button>
-                </div> -->
-          
-                <!-- <button
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded"
-                    on:click={async () => {
-                    const result = await _saveHistory();
-                    if (result) {
-                        $user.gameid = null;
-                        $user.quiz = null;
-                        $user.isHost = false;
-                        $user.userDecided = false;
-                
-                        goto("/viewHistory");
-                    }else{
-                        alert("There was an error saving the history. Please try again!");
-                    }
-                    }}>Save history</button
-                > -->
-                <!-- <button
-                    class="btn btn-secondary btn-block"
-                    id="createQuiz"
-                    on:click={() => {
-                    restartConnection();
-                    }}>Leave Room</button
-                > -->
-
-                <!-- <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-6 rounded" on:click={() => {restartConnection();}}>
-                    Leave Room
-                </button> -->
-            <!-- </div> -->
-        </div>  
-        </div>
-        </div>
+                  <div class="flex justify-center mt-4">  <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" on:click={async()=>{_saveHistory()}}>Save history</button>
+                      <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 ml-4" on:click={()=>{restartConnection()}}>Leave Room</button>
+                  </div>
+                  
+          </div>  
+          </div>
+          </div>
+        {/if}
         {/if}
         
       <!-- </div>

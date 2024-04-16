@@ -66,9 +66,11 @@ async function saveHistory(email, gameHistory, type) {
 }
 
 // Get the game history from the database
-async function getHistory(email) {
+async function getHistory(email, page, pageSize, type) {
   try {
-    const response = await axios.get("/game/getHistory", { params: { email } });
+    const response = await axios.get("/game/getHistory", {
+      params: { email, page, pageSize, type },
+    });
     console.log("History fetched successfully", response.data);
     return response.data;
   } catch (error) {

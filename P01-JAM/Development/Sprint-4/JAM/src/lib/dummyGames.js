@@ -1,5 +1,3 @@
-import { quiz1, quiz2, quiz3 } from "./dummyQuiz";
-
 //NOTE THIS IS THE INPUT GIVEN BY SERVER AT THE END OF THE GAME
 
 //score corresponds to the index of the question and if the player got it right
@@ -84,7 +82,7 @@ export const gameHistHost = [
           ],
           otherDetails: {},
         },
-        score: [
+        scores: [
           {
             name: "John Doe",
             scores: [1, 1, 0, 1, 0],
@@ -141,7 +139,7 @@ export const gameHistHost = [
           ],
           otherDetails: {},
         },
-        score: [
+        scores: [
           {
             name: "John Jolly",
             scores: [0, 1, 0, 1, 0],
@@ -198,7 +196,7 @@ export const gameHistHost = [
           ],
           otherDetails: {},
         },
-        score: [
+        scores: [
           {
             name: "Adam Doe",
             scores: [1, 1, 1, 1, 1],
@@ -258,7 +256,7 @@ export const gameHistPlayer = [
           ],
           otherDetails: {},
         },
-        score: [
+        scores: [
           {
             name: "John Doe",
             scores: [1, 1, 0, 1, 0],
@@ -315,7 +313,7 @@ export const gameHistPlayer = [
           ],
           otherDetails: {},
         },
-        score: [
+        scores: [
           {
             name: "John Jolly",
             scores: [0, 1, 0, 1, 0],
@@ -372,7 +370,7 @@ export const gameHistPlayer = [
           ],
           otherDetails: {},
         },
-        score: [
+        scores: [
           {
             name: "Adam Doe",
             scores: [1, 1, 1, 1, 1],

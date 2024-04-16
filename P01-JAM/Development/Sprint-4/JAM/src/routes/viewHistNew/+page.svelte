@@ -1,4 +1,6 @@
 <script>
+// @ts-nocheck
+
   import { onMount } from 'svelte';
   import { gameHistory, gameHistHost, gameHistPlayer } from "$lib/dummyGames";
   import { writable } from "svelte/store";
@@ -28,7 +30,7 @@
   //   goto("/");
   // }
 
-  localPlayerHistory = JSON.parse(localStorage.getItem("playerGameHistory"));
+  //localPlayerHistory = JSON.parse(localStorage.getItem("playerGameHistory"));
   if (localPlayerHistory == null) {
     localPlayerHistory = [];
   }
@@ -37,7 +39,7 @@
       localPlayerHistory = gameHistPlayer;
     }
 
-  localHostHistory = JSON.parse(localStorage.getItem("hostGameHistory"));
+  //localHostHistory = JSON.parse(localStorage.getItem("hostGameHistory"));
   if (localHostHistory == null) {
     localHostHistory = [];
   }

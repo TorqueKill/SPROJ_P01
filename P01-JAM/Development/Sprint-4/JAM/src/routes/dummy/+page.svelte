@@ -7,9 +7,7 @@
     import DmyGame from '$lib/dummyPages/dmyGame/+page.svelte'
     import DmyQuizSelect from '$lib/dummyPages/dmyQuizSelect/+page.svelte'
     import DmyRoomCreate from '$lib/dummyPages/dmyCreateRoom/+page.svelte'
-  
-    // Export the components if you want them to be importable from 'index.svelte'
-    export { DmyBg, DmyBg2, DmyGame, DmyQuizSelect };
+    import DmyHistory from '$lib/dummyPages/dmyHistory/+page.svelte'
   
     // Or create some routing logic if needed
     let currentComponent = DmyBg;
@@ -22,11 +20,11 @@
   <!-- Some basic UI for switching between dummy pages -->
   <div class="flex flex-col md:flex-row justify-center space-x-4 bg-gray-500">
     <button class="border" on:click={() => showComponent(DmyBg)}>Background</button>
-    <button class="border" on:click={() => showComponent(DmyBg2)}>Background2</button>
-    <button class="border" on:click={() => showComponent(DmyBg3)}>Background3</button>
+    <button class="border" on:click={() => showComponent(DmyBg3)}>Background2</button>
     <button class="border" on:click={() => showComponent(DmyGame)}>Game</button>
     <button class="border" on:click={() => showComponent(DmyQuizSelect)}>QuizSelect</button>
     <button class="border" on:click={() => showComponent(DmyRoomCreate)}>RoomCreate</button>
+    <button class="border" on:click={() => showComponent(DmyHistory)}>History</button>
   </div>
   
   <div>
