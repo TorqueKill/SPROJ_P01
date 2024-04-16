@@ -1,24 +1,27 @@
 <script>
-    //@ts-nocheck
+  //@ts-nocheck
 
-    import {SCREENS, GAME_SETTINGS, AVATARS, DEFAULT_ROOM_SETTINGS, ROOM_SETTINGS} from "$lib/config.js"
-    import {user} from "$lib/userStore.js"
-    import { socket, roomEvents, gameEvents } from "$lib/socketStore.js";
-    import { onMount } from "svelte";
-    import { goto } from "$app/navigation";
-    import { tweened } from "svelte/motion";
-    
+  import {
+    SCREENS,
+    GAME_SETTINGS,
+    AVATARS,
+    DEFAULT_ROOM_SETTINGS,
+    ROOM_SETTINGS,
+  } from "$lib/config.js";
+  import { user } from "$lib/userStore.js";
+  import { socket, roomEvents, gameEvents } from "$lib/socketStore.js";
+  import { onMount } from "svelte";
+  import { goto } from "$app/navigation";
+  import { tweened } from "svelte/motion";
 
-    //game logic:
-    //client side will emit session loaded on mount
-    //server will emit next question event (with question index) to clients
-    //each question can follow up with either:
-    // 1. flash title -> show question
-    // 2. show score -> (wait for nextquestion event) -> flash title -> show question
+  //game logic:
+  //client side will emit session loaded on mount
+  //server will emit next question event (with question index) to clients
+  //each question can follow up with either:
+  // 1. flash title -> show question
+  // 2. show score -> (wait for nextquestion event) -> flash title -> show question
 
-
-
-    let quiz =   {
+  let quiz = {
     title: "General Knowledge 2",
     type: "4-choices",
     quiz: [
@@ -64,384 +67,378 @@
       },
     ],
     otherDetails: {},
+  };
+
+  //these will given by the server on the 'scoreboard' event
+  let dummyPlayers = [
+    {
+      name: "Sawyer",
+      scores: [1, 1, 1, 1, 1, 0, 1, 0, 0, 0],
+      responseTimes: [6, 22, 29, 30, 44, 50, 53, 56, 93, 97],
+      avatarIndex: 0,
+    },
+    {
+      name: "Reese",
+      scores: [1, 0, 1, 1, 0, 1, 1, 1, 0, 1],
+      responseTimes: [4, 7, 13, 42, 50, 52, 57, 62, 78, 93],
+      avatarIndex: 1,
+    },
+    {
+      name: "Taylor",
+      scores: [0, 0, 1, 1, 1, 1, 0, 0, 1, 1],
+      responseTimes: [3, 5, 12, 21, 38, 39, 40, 45, 79, 81],
+      avatarIndex: 2,
+    },
+    {
+      name: "Robin",
+      scores: [0, 1, 1, 1, 0, 1, 1, 1, 1, 0],
+      responseTimes: [1, 3, 7, 13, 27, 28, 29, 44, 58, 99],
+      avatarIndex: 3,
+    },
+    {
+      name: "Emerson",
+      scores: [0, 1, 1, 1, 1, 0, 1, 1, 0, 0],
+      responseTimes: [1, 22, 23, 33, 50, 66, 91, 92, 96, 97],
+      avatarIndex: 4,
+    },
+    {
+      name: "Quinn",
+      scores: [0, 1, 1, 1, 1, 0, 1, 0, 1, 1],
+      responseTimes: [1, 8, 48, 58, 67, 72, 73, 90, 91, 93],
+      avatarIndex: 5,
+    },
+  ];
+
+  let currentQuestion = -1; // -1 means no question is being displayed
+  let scoreDisplayCheck = false;
+  let isHost = true;
+  let showQuestionOnPlayerDisplay = false;
+  let playerDisplay = false;
+  let isQuestionTitleVisible = false;
+  let questionTimeOut = false;
+  let isPaused = false;
+  let isAsnwerSubmitted = false;
+  let answerSubmitted;
+  let sessionScores = dummyPlayers;
+
+  let audioRef;
+
+  let timerWidth = 100;
+  let questionTimerWidth = 100;
+  let scoreDisplayTimerWidth = 100;
+
+  let flashTitleInterval;
+  let questionTimeoutInterval;
+  let scoreDisplayInterval;
+
+  let scoreDisplayDuration = 5;
+
+  const timerDuration = 30;
+  const questionTitleFlashDuration = 5;
+  const LEADERBOARD_SIZE = GAME_SETTINGS.LEADERBOARD_SIZE;
+  let bgColor;
+  let bgMusic;
+
+  onMount(() => {
+    quiz = $user.quiz;
+    isHost = $user.isHost;
+    playerDisplay = !$user.isHost;
+    showQuestionOnPlayerDisplay = $user.displayQuestion;
+    currentQuestion = -1;
+    isAsnwerSubmitted = false;
+    answerSubmitted = "";
+
+    if ($user.bgColorIndex !== -1) {
+      bgColor = $user.bgColor;
+    } else {
+      bgColor = DEFAULT_ROOM_SETTINGS.BG_COLOR;
     }
-    
-    //these will given by the server on the 'scoreboard' event 
-    let dummyPlayers = [
-        {
-            name: "Sawyer",
-            scores: [1, 1, 1, 1, 1, 0, 1, 0, 0, 0],
-            responseTimes: [6, 22, 29, 30, 44, 50, 53, 56, 93, 97],
-            avatarIndex: 0,
-        },
-        {
-            name: "Reese",
-            scores: [1, 0, 1, 1, 0, 1, 1, 1, 0, 1],
-            responseTimes: [4, 7, 13, 42, 50, 52, 57, 62, 78, 93],
-            avatarIndex: 1,
-        },
-        {
-            name: "Taylor",
-            scores: [0, 0, 1, 1, 1, 1, 0, 0, 1, 1],
-            responseTimes: [3, 5, 12, 21, 38, 39, 40, 45, 79, 81],
-            avatarIndex: 2,
-        },
-        {
-            name: "Robin",
-            scores: [0, 1, 1, 1, 0, 1, 1, 1, 1, 0],
-            responseTimes: [1, 3, 7, 13, 27, 28, 29, 44, 58, 99],
-            avatarIndex: 3,
-        },
-        {
-            name: "Emerson",
-            scores: [0, 1, 1, 1, 1, 0, 1, 1, 0, 0],
-            responseTimes: [1, 22, 23, 33, 50, 66, 91, 92, 96, 97],
-            avatarIndex: 4,
-        },
-        {
-            name: "Quinn",
-            scores: [0, 1, 1, 1, 1, 0, 1, 0, 1, 1],
-            responseTimes: [1, 8, 48, 58, 67, 72, 73, 90, 91, 93],
-            avatarIndex: 5,
-        },
-    ];
 
+    if ($user.bgMusicIndex !== -1) {
+      bgMusic = $user.bgMusic;
+    } else {
+      bgMusic = DEFAULT_ROOM_SETTINGS.BG_MUSIC;
+    }
 
-    let currentQuestion = -1; // -1 means no question is being displayed
-    let scoreDisplayCheck = false;
-    let isHost = true;
-    let showQuestionOnPlayerDisplay = false;
-    let playerDisplay = false;
-    let isQuestionTitleVisible = false;
-    let questionTimeOut = false;
-    let isPaused = false;
-    let isAsnwerSubmitted = false;
-    let answerSubmitted;
-    let sessionScores = dummyPlayers;
+    console.log(bgColor, bgMusic);
 
-    let audioRef
+    if ($user.currentSession != SCREENS.GAME) {
+      $user.currentSession = SCREENS.GAME;
+      socket.emit("session-loaded", $user.gameid, SCREENS.GAME);
+    }
+  });
 
-    let timerWidth = 100;
-    let questionTimerWidth = 100;
-    let scoreDisplayTimerWidth = 100;
+  $: {
+    const events = $gameEvents;
+    console.log(events);
+    if (events.nextQuestion == 0 || events.nextQuestion) {
+      nextQuestion();
 
-    let flashTitleInterval;
-    let questionTimeoutInterval;
-    let scoreDisplayInterval;
+      events.nextQuestion = null;
+    }
 
+    if (events.timeout) {
+      questionTimeOut = true;
+      let _currentQuestion = currentQuestion;
+      currentQuestion = events.timeout;
 
-    let scoreDisplayDuration = 5;
-
-    const timerDuration = 30;
-    const questionTitleFlashDuration = 5;
-    const LEADERBOARD_SIZE = GAME_SETTINGS.LEADERBOARD_SIZE;
-    let bgColor;
-    let bgMusic;
-
-
-    onMount(() => {
-        quiz = $user.quiz;
-        isHost = $user.isHost;
-        playerDisplay = !$user.isHost;
-        showQuestionOnPlayerDisplay = $user.displayQuestion
-        currentQuestion = -1
-        isAsnwerSubmitted = false;
-        answerSubmitted = "";
-
-        if ($user.bgColorIndex !== -1) {
-            bgColor = $user.bgColor;
+      if (!isHost) {
+        if ($user.reconnected) {
+          sendAnswer(-1, currentQuestion);
+          $user.reconnected = false;
+        } else if ($user.lateConnected) {
+          sendAnswer(-1, currentQuestion);
+          $user.lateConnected = false;
         } else {
-            bgColor = DEFAULT_ROOM_SETTINGS.BG_COLOR;
+          sendAnswer(-1, _currentQuestion);
         }
+      }
 
-        if ($user.bgMusicIndex !== -1) {
-            bgMusic = $user.bgMusic;
-        } else {
-            bgMusic = DEFAULT_ROOM_SETTINGS.BG_MUSIC;
-        }
-
-        console.log(bgColor, bgMusic)
-
-        if ($user.currentSession != SCREENS.GAME) {
-            $user.currentSession = SCREENS.GAME;
-            socket.emit("session-loaded", $user.gameid, SCREENS.GAME);
-        }
-    });
-
-
-    $:{
-        const events = $gameEvents;
-        console.log(events);
-        if (events.nextQuestion == 0 || events.nextQuestion) {
-            nextQuestion();
-
-            events.nextQuestion = null
-        }
-
-        if (events.timeout) {
-            questionTimeOut = true;
-            let _currentQuestion = currentQuestion;
-            currentQuestion = events.timeout;
-
-            if (!isHost){
-                if ($user.reconnected){
-                    sendAnswer(-1, currentQuestion);
-                    $user.reconnected = false;
-                }else if($user.lateConnected){
-                    sendAnswer(-1, currentQuestion);
-                    $user.lateConnected = false;
-                }else {
-                    sendAnswer(-1, _currentQuestion);
-                }
-            }
-
-            events.timeout = null;
-        }
-
-        if (events.scoresTillQuestion) {
-            sessionScores = events.scoresTillQuestion;
-            scoreDisplayDuration = events.display_time;
-            displayScore();
-
-            events.scoresTillQuestion = null;
-            events.display_time = null;
-        }
-
-        if (events.pauseTimer) {
-            pauseQuestion();
-
-            events.pauseTimer = null;
-        }
-
-        if (events.resumeTimer) {
-            resumeQuestion();
-
-            events.resumeTimer = null;
-        }
-
-
+      events.timeout = null;
     }
 
-    $:{
-        const events = $roomEvents;
-        console.log(events);
+    if (events.scoresTillQuestion) {
+      sessionScores = events.scoresTillQuestion;
+      scoreDisplayDuration = events.display_time;
+      displayScore();
 
-        if (events.roomDeleted) {
-            socket.disconnect();
-            socket.connect();
-
-            $user.gameid = null;
-            $user.quiz = null;
-            $user.isHost = false;
-            $user.userDecided = false;
-
-            goto("/");
-        }
-
-        if (events.gameEnd) {
-            // goto("/gameEnd");
-            goto("/gameEnd_");
-        }
+      events.scoresTillQuestion = null;
+      events.display_time = null;
     }
 
+    if (events.pauseTimer) {
+      pauseQuestion();
 
-    const calculateScore =(scores) => {
-        let scoreList = [];
-        for (let i = 0; i < scores.length; i++) {
-        let score = 0;
-        for (let j = 0; j < scores[i].scores.length; j++) {
-            //make sure to convert the responseTimes to integer from float
-            score += scores[i].scores[j] * Math.floor(scores[i].responseTimes[j]);
-        }
-        scoreList.push({name: scores[i].name, scores: score, avatarIndex: scores[i].avatarIndex});
-        }
-        //sort the list by score
-        scoreList.sort((a, b) => b.scores - a.scores);
-        
-        //check if the list is greater than the leaderboard size
-        if (scoreList.length > LEADERBOARD_SIZE) {
-            scoreList = scoreList.slice(0, LEADERBOARD_SIZE);
-        }
-        return scoreList;
+      events.pauseTimer = null;
     }
 
-    function displayHost() {
-        isHost = true;
-        scoreDisplayCheck = false;
-        playerDisplay = false;
+    if (events.resumeTimer) {
+      resumeQuestion();
+
+      events.resumeTimer = null;
+    }
+  }
+
+  $: {
+    const events = $roomEvents;
+    console.log(events);
+
+    if (events.roomDeleted) {
+      socket.disconnect();
+      socket.connect();
+
+      $user.gameid = null;
+      $user.quiz = null;
+      $user.isHost = false;
+      $user.userDecided = false;
+
+      goto("/");
     }
 
-    function displayPlayer() {
-        isHost = false;
-        scoreDisplayCheck = false;
-        playerDisplay = true;
+    if (events.gameEnd) {
+      // goto("/gameEnd");
+      goto("/gameEnd_");
     }
+  }
 
-    function displayQuestionUI(){
-        isHost = $user.isHost;
-        playerDisplay = !$user.isHost;
-        showQuestionOnPlayerDisplay = $user.displayQuestion;
-        scoreDisplayCheck = false;
+  const calculateScore = (scores) => {
+    let scoreList = [];
+    for (let i = 0; i < scores.length; i++) {
+      let score = 0;
+      for (let j = 0; j < scores[i].scores.length; j++) {
+        //make sure to convert the responseTimes to integer from float
+        score += scores[i].scores[j] * Math.floor(scores[i].responseTimes[j]);
+      }
+      scoreList.push({
+        name: scores[i].name,
+        scores: score,
+        avatarIndex: scores[i].avatarIndex,
+      });
     }
+    //sort the list by score
+    scoreList.sort((a, b) => b.scores - a.scores);
 
-    function displayScore() {
-        //dev mode check
-        if(currentQuestion === -1) currentQuestion = 0;
-
-        isHost = false;
-        scoreDisplayCheck = true;
-        playerDisplay = false;
-        showScore();
+    //check if the list is greater than the leaderboard size
+    if (scoreList.length > LEADERBOARD_SIZE) {
+      scoreList = scoreList.slice(0, LEADERBOARD_SIZE);
     }
+    return scoreList;
+  };
 
-    function showQuestion() {
-        isQuestionTitleVisible = true;
-        timerWidth = 100; // Reset timer
-        let duration = questionTitleFlashDuration || 0; // Get the question's time limit
-        let elapsed = 0;
+  function displayHost() {
+    isHost = true;
+    scoreDisplayCheck = false;
+    playerDisplay = false;
+  }
 
-        flashTitleInterval = setInterval(() => {
-            elapsed++;
-            timerWidth = ((duration - elapsed) / duration) * 100;
+  function displayPlayer() {
+    isHost = false;
+    scoreDisplayCheck = false;
+    playerDisplay = true;
+  }
 
-            if (elapsed >= duration) {
-                clearInterval(flashTitleInterval);
-                isQuestionTitleVisible = false; // Hide the question after the duration
-                // Proceed to the next action after the question is hidden
-                questionTimeoutRoutine();
-                displayQuestionUI();
-            }
-        }, 1000); // Update every second
-    }
+  function displayQuestionUI() {
+    isHost = $user.isHost;
+    playerDisplay = !$user.isHost;
+    showQuestionOnPlayerDisplay = $user.displayQuestion;
+    scoreDisplayCheck = false;
+  }
 
-    function showScore() {
-        scoreDisplayCheck = true;
-        scoreDisplayTimerWidth = 100; // Reset timer
-        let duration = scoreDisplayDuration || 0; // Get the question's time limit
-        let elapsed = 0;
+  function displayScore() {
+    //dev mode check
+    if (currentQuestion === -1) currentQuestion = 0;
 
-        clearInterval(scoreDisplayInterval);
-        clearInterval(questionTimeoutInterval);
+    isHost = false;
+    scoreDisplayCheck = true;
+    playerDisplay = false;
+    showScore();
+  }
+
+  function showQuestion() {
+    isQuestionTitleVisible = true;
+    timerWidth = 100; // Reset timer
+    let duration = questionTitleFlashDuration || 0; // Get the question's time limit
+    let elapsed = 0;
+
+    flashTitleInterval = setInterval(() => {
+      elapsed++;
+      timerWidth = ((duration - elapsed) / duration) * 100;
+
+      if (elapsed >= duration) {
         clearInterval(flashTitleInterval);
+        isQuestionTitleVisible = false; // Hide the question after the duration
+        // Proceed to the next action after the question is hidden
+        questionTimeoutRoutine();
+        displayQuestionUI();
+      }
+    }, 1000); // Update every second
+  }
 
-        scoreDisplayInterval = setInterval(() => {
-            elapsed++;
-            scoreDisplayTimerWidth = ((duration - elapsed) / duration) * 100;
+  function showScore() {
+    scoreDisplayCheck = true;
+    scoreDisplayTimerWidth = 100; // Reset timer
+    let duration = scoreDisplayDuration || 0; // Get the question's time limit
+    let elapsed = 0;
 
-            if (elapsed >= duration) {
-                clearInterval(scoreDisplayInterval);
-                // Proceed to the next action after the question is hidden
-                //displayQuestionUI();
-                // showQuestion();
-            }
-        }, 1000); // Update every second
-    }
+    clearInterval(scoreDisplayInterval);
+    clearInterval(questionTimeoutInterval);
+    clearInterval(flashTitleInterval);
 
-    function questionTimeoutRoutine() {
-        questionTimeOut = false;
-        questionTimerWidth = 100; // Reset timer
-        let duration = quiz.quiz[currentQuestion].timeLimit || 0; // Get the question's time limit
-        let elapsed = 0;
+    scoreDisplayInterval = setInterval(() => {
+      elapsed++;
+      scoreDisplayTimerWidth = ((duration - elapsed) / duration) * 100;
 
-        questionTimeoutInterval = setInterval(() => {
-            elapsed++;
-            questionTimerWidth = ((duration - elapsed) / duration) * 100;
-
-            if (elapsed >= duration) {
-                clearInterval(questionTimeoutInterval);
-                questionTimeOut = true;
-                // Proceed to the next action after the question is hidden
-            }
-        }, 1000); // Update every second
-    }
-
-    function nextQuestion() {
-        console.log("Current Question: ", currentQuestion)
-        currentQuestion = (currentQuestion + 1)
-        if (currentQuestion >= quiz.quiz.length) {
-            currentQuestion = quiz.quiz.length - 1;
-            console.log("End of the quiz");
-            return;
-        }
-        //clear the previous interval
-        clearInterval(flashTitleInterval);
-        clearInterval(questionTimeoutInterval);
+      if (elapsed >= duration) {
         clearInterval(scoreDisplayInterval);
+        // Proceed to the next action after the question is hidden
+        //displayQuestionUI();
+        // showQuestion();
+      }
+    }, 1000); // Update every second
+  }
 
-        answerSubmitted = '';
-        isAsnwerSubmitted = false;
+  function questionTimeoutRoutine() {
+    questionTimeOut = false;
+    questionTimerWidth = 100; // Reset timer
+    let duration = quiz.quiz[currentQuestion].timeLimit || 0; // Get the question's time limit
+    let elapsed = 0;
 
-        showQuestion();
-    }
+    questionTimeoutInterval = setInterval(() => {
+      elapsed++;
+      questionTimerWidth = ((duration - elapsed) / duration) * 100;
 
-    function handleAnswer(answer, idx) {
-        if (isAsnwerSubmitted || questionTimeOut || isPaused ) return;
-        isAsnwerSubmitted = true;
-        answerSubmitted = answer;
+      if (elapsed >= duration) {
         clearInterval(questionTimeoutInterval);
-        // Send the answer to the server
-        sendAnswer(idx, currentQuestion);
-    }
+        questionTimeOut = true;
+        // Proceed to the next action after the question is hidden
+      }
+    }, 1000); // Update every second
+  }
 
-    function pauseQuestion() {
-        isPaused = true;
+  function nextQuestion() {
+    console.log("Current Question: ", currentQuestion);
+    currentQuestion = currentQuestion + 1;
+    if (currentQuestion >= quiz.quiz.length) {
+      currentQuestion = quiz.quiz.length - 1;
+      console.log("End of the quiz");
+      return;
+    }
+    //clear the previous interval
+    clearInterval(flashTitleInterval);
+    clearInterval(questionTimeoutInterval);
+    clearInterval(scoreDisplayInterval);
+
+    answerSubmitted = "";
+    isAsnwerSubmitted = false;
+
+    showQuestion();
+  }
+
+  function handleAnswer(answer, idx) {
+    if (isAsnwerSubmitted || questionTimeOut || isPaused) return;
+    isAsnwerSubmitted = true;
+    answerSubmitted = answer;
+    clearInterval(questionTimeoutInterval);
+    // Send the answer to the server
+    sendAnswer(idx, currentQuestion);
+  }
+
+  function pauseQuestion() {
+    isPaused = true;
+    clearInterval(questionTimeoutInterval);
+    console.log("width: ", questionTimerWidth);
+  }
+
+  function resumeQuestion() {
+    console.log("width: ", questionTimerWidth);
+    isPaused = false;
+    // Resume the timer, from where it was paused
+    let duration = quiz.quiz[currentQuestion].timeLimit || 0; // Get the question's time limit
+    //extrapolate the remaining time using the current width
+    let elapsed = (duration * (100 - questionTimerWidth)) / 100;
+    questionTimeoutInterval = setInterval(() => {
+      elapsed++;
+      questionTimerWidth = ((duration - elapsed) / duration) * 100;
+
+      if (elapsed >= duration) {
         clearInterval(questionTimeoutInterval);
-        console.log("width: ", questionTimerWidth)
+        questionTimeOut = true;
+        // Proceed to the next action after the question is hidden
+      }
+    }, 1000); // Update every second
+  }
+
+  function sendAnswer(ansIdx, questionIdx) {
+    // Send the answer to the server
+    socket.emit("handle-answer", $user.gameid, ansIdx, questionIdx);
+  }
+
+  function emitPause() {
+    socket.emit("pause-timer", $user.gameid, currentQuestion);
+  }
+
+  function emitResume() {
+    socket.emit("resume-timer", $user.gameid, currentQuestion);
+  }
+
+  //on page load, play audio
+  $: if (audioRef && bgMusic) {
+    //check if selectedBgMusic = '-1' then don't play music
+    if (bgMusic !== "-1") {
+      audioRef.src = bgMusic; // Update the source
+      audioRef.load(); // Load the new music source
+      audioRef.play(); // Play the music
+    } else {
+      //remove the audio
+      audioRef.src = "";
     }
-
-    function resumeQuestion() {
-        console.log("width: ", questionTimerWidth)
-        isPaused = false;
-        // Resume the timer, from where it was paused
-        let duration = quiz.quiz[currentQuestion].timeLimit || 0; // Get the question's time limit
-        //extrapolate the remaining time using the current width
-        let elapsed = (duration * (100 - questionTimerWidth)) / 100;
-        questionTimeoutInterval = setInterval(() => {
-            elapsed++;
-            questionTimerWidth = ((duration - elapsed) / duration) * 100;
-
-            if (elapsed >= duration) {
-                clearInterval(questionTimeoutInterval);
-                questionTimeOut = true;
-                // Proceed to the next action after the question is hidden
-            }
-        }, 1000); // Update every second
-    }
-
-    function sendAnswer(ansIdx, questionIdx) {
-        // Send the answer to the server
-        socket.emit("handle-answer", $user.gameid, ansIdx, questionIdx);
-
-    }
-
-    function emitPause() {
-        socket.emit("pause-timer", $user.gameid, currentQuestion);
-    }
-
-    function emitResume() {
-        socket.emit("resume-timer", $user.gameid, currentQuestion);
-    }
-
-        //on page load, play audio
-    $: if (audioRef && bgMusic) {
-        //check if selectedBgMusic = '-1' then don't play music
-        if (bgMusic !== "-1") {
-            audioRef.src = bgMusic; // Update the source
-            audioRef.load(); // Load the new music source
-            audioRef.play(); // Play the music
-        }else{
-            //remove the audio
-            audioRef.src = "";
-        }
-    }
-
+  }
 </script>
 
 <!--uses tailwind css for all below-->
 
 <!--Dev command pannel (not included in final build) to test page-->
 <!--Dev panel: increment current question, score display event, is Host-->
-
 
 <!-- <div class="flex justify-center space-x-4">
     <button on:click={() => {nextQuestion()}}>Next Question</button>
@@ -452,142 +449,219 @@
 </div> -->
 
 {#if currentQuestion === -1}
-    <div class="fixed inset-0 bg-purple-500 flex justify-center items-center">
-        <div class="loader"></div> <!-- Custom spinner -->
-    </div>
+  <div
+    class="fixed inset-0 bg-purple-500 flex justify-center items-center font-garamond"
+  >
+    <div class="loader" />
+    <!-- Custom spinner -->
+  </div>
 {:else}
-    <!--Game session page-->
-    <div class="min-h-screen {bgColor} text-white flex justify-center items-center">
-        <!-- Question Title Flash -->
-        {#if isQuestionTitleVisible}
-            <div class="flex flex-col items-center w-full px-4 py-8">
-                <div class="bg-indigo-900 p-6 rounded-lg shadow-lg w-full max-w-4xl">
-                    <h2 class="text-3xl font-bold mb-4 text-center">{quiz.quiz[currentQuestion].question}</h2>
-                    <div class="w-full bg-gray-700 rounded-full h-2.5 dark:bg-gray-700 overflow-hidden mb-2 mt-2">
-                        <div class="bg-green-500 h-full" style="transition: width 0.5s ease; width: {timerWidth}%"></div>
-                    </div>
+  <!--Game session page-->
+  <div
+    class="min-h-screen bg-purple-800 text-white flex justify-center items-center"
+  >
+    <!-- Question Title Flash -->
+    {#if isQuestionTitleVisible}
+      <div class="flex flex-col items-center w-full px-4 py-8">
+        <div class="bg-indigo-900 p-6 rounded-lg shadow-lg w-full max-w-4xl">
+          <h2 class="text-3xl font-bold mb-4 text-center">
+            {quiz.quiz[currentQuestion].question}
+          </h2>
+          <div
+            class="w-full bg-gray-700 rounded-full h-2.5 dark:bg-gray-700 overflow-hidden mb-2 mt-2"
+          >
+            <div
+              class="bg-green-500 h-full"
+              style="transition: width 0.5s ease; width: {timerWidth}%"
+            />
+          </div>
+        </div>
+      </div>
+    {:else}
+      <!-- Host Display -->
+      {#if isHost}
+        <div class="container mx-auto p-4 max-w-4xl">
+          <div class="flex flex-col items-center space-y-8 w-full max-w-4xl">
+            {#if currentQuestion >= 0}
+              <div class="bg-purple-900 p-6 rounded-lg shadow-lg w-full">
+                <h2 class="text-3xl font-bold mb-4 text-center">
+                  {quiz.quiz[currentQuestion].question}
+                </h2>
+                {#if quiz.quiz[currentQuestion].imageUrl}
+                  <img
+                    src={quiz.quiz[currentQuestion].imageUrl}
+                    alt="img"
+                    class="mx-auto h-60 rounded-md mb-4"
+                  />
+                {/if}
+                <!-- Choices (Display only) GRID -->
+                <div class="grid grid-cols-2 gap-4">
+                  {#each quiz.quiz[currentQuestion].choices as choice}
+                    <div class="bg-purple-700 p-4 rounded-lg">{choice}</div>
+                  {/each}
                 </div>
+
+                <div class="flex justify-around mt-10">
+                  <button
+                    class="px-4 py-2 font-bold text-white bg-purple-600 rounded-full hover:bg-purple-700 focus:outline-none focus:shadow-outline transition duration-300 transform hover:scale-105 shadow-lg"
+                    on:click={() => {
+                      isPaused ? emitResume() : emitPause();
+                    }}
+                  >
+                    {isPaused ? "Resume" : "Pause"}
+                  </button>
+                  <button
+                    on:click={() => goto("/hostOrPlayer")}
+                    class="px-4 py-2 font-bold text-white bg-gray-500 rounded-full hover:bg-gray-600 focus:outline-none focus:shadow-outline transition duration-300 transform hover:scale-105 shadow-lg"
+                  >
+                    Leave Room
+                  </button>
+                </div>
+              </div>
+            {/if}
+          </div>
+        </div>
+      {/if}
+
+      <!-- Player Display -->
+      {#if playerDisplay && !isHost}
+        <div class="container mx-auto p-4 max-w-4xl">
+          <div class="flex flex-col items-center space-y-4">
+            {#if currentQuestion >= 0}
+              <div
+                class="bg-purple-900 p-6 rounded-lg shadow-lg max-w-2xl w-full"
+              >
+                {#if showQuestionOnPlayerDisplay}
+                  <h2 class="text-2xl font-bold mb-4 text-center">
+                    {quiz.quiz[currentQuestion].question}
+                  </h2>
+                  {#if quiz.quiz[currentQuestion].imageUrl}
+                    <img
+                      src={quiz.quiz[currentQuestion].imageUrl}
+                      alt="img"
+                      class="mx-auto h-40 rounded-md mb-4"
+                    />
+                  {/if}
+                {/if}
+                <div class="space-y-2 mt-4">
+                  {#each quiz.quiz[currentQuestion].choices as choice, idx}
+                    <button
+                      class="text-left w-full bg-purple-700 hover:bg-purple-600 rounded p-3"
+                      on:click={() => handleAnswer(choice, idx)}
+                    >
+                      {choice}
+                    </button>
+                  {/each}
+                </div>
+                <div
+                  class="w-full bg-purple-700 rounded-full h-2.5 dark:bg-purple-700 overflow-hidden mb-2 mt-2"
+                >
+                  <div
+                    class="bg-green-500 h-full"
+                    style="transition: width 0.5s ease; width: {questionTimerWidth}%"
+                  />
+                </div>
+                {#if !questionTimeOut}
+                  <!-- condition for timeout -->
+                  <div
+                    class="mt-4 {isAsnwerSubmitted
+                      ? 'bg-indigo-500'
+                      : 'bg-purple-700'}  p-3 rounded text-center"
+                  >
+                    {isAsnwerSubmitted ? answerSubmitted : "Select an Answer"}
+                  </div>
+                {:else}
+                  <div class="mt-4 bg-red-500 p-3 rounded text-center">
+                    Time Out!
+                  </div>
+                {/if}
+              </div>
+            {/if}
+          </div>
+        </div>
+      {/if}
+
+      <!-- Score Display -->
+      {#if scoreDisplayCheck}
+        <div class="container mx-auto p-4 max-w-4xl">
+          <div class=" bg-purple-900 p-8 rounded-lg shadow-lg max-w-4xl">
+            <h3 class="text-2xl font-bold mb-6 text-yellow-300">Leaderboard</h3>
+            <div class="space-y-4">
+              {#each calculateScore(sessionScores) as player, index}
+                <div
+                  class="flex items-center justify-between bg-purple-800 p-4 rounded-lg"
+                >
+                  <div class="flex items-center">
+                    <img
+                      src={`/avatars/${AVATARS[player.avatarIndex]}`}
+                      alt="avatar"
+                      class="w-12 h-12 rounded-full mr-4"
+                    />
+                    <div
+                      class="text-lg font-medium {index < 3
+                        ? 'text-yellow-400'
+                        : 'text-gray-300'}"
+                    >
+                      {player.name}
+                    </div>
+                  </div>
+                  <div
+                    class="text-lg font-bold {index < 3
+                      ? 'text-white'
+                      : 'text-gray-400'}"
+                  >
+                    {player.scores} points
+                  </div>
+                </div>
+              {/each}
             </div>
-        {:else}
-            <!-- Host Display -->
-            {#if isHost}
-                <div class="container mx-auto p-4 max-w-4xl">
-                    <div class="flex flex-col items-center space-y-8 w-full max-w-4xl">
-                        {#if currentQuestion >= 0}
-                            <div class="bg-purple-900 p-6 rounded-lg shadow-lg w-full">
-                                <h2 class="text-3xl font-bold mb-4 text-center">{quiz.quiz[currentQuestion].question}</h2>
-                                {#if quiz.quiz[currentQuestion].imageUrl}
-                                    <img src={quiz.quiz[currentQuestion].imageUrl} alt="img" class="mx-auto h-60 rounded-md mb-4" />
-                                {/if}
-                                <!-- Choices (Display only) GRID -->
-                                <div class="grid grid-cols-2 gap-4">
-                                    {#each quiz.quiz[currentQuestion].choices as choice}
-                                        <div class="bg-purple-700 p-4 rounded-lg">{choice}</div>
-                                    {/each}
-                                </div>
+            <div
+              class="w-full bg-purple-700 rounded-full h-2.5 dark:bg-gray-700 overflow-hidden mb-2 mt-2"
+            >
+              <div
+                class="bg-green-500 h-full"
+                style="transition: width 0.5s ease; width: {scoreDisplayTimerWidth}%"
+              />
+            </div>
+          </div>
+        </div>
+      {/if}
+    {/if}
+  </div>
 
-
-                                <div class="flex justify-around mt-10">
-                                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded" on:click={() => {isPaused ? emitResume() : emitPause()}}>
-                                        {isPaused ? "Resume" : "Pause"}
-                                    </button>
-                                    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-6 rounded">
-                                        Leave Room
-                                    </button>
-                                </div>
-                            </div>
-                        {/if}
-                    </div>
-                </div>
-            {/if}
-
-            <!-- Player Display -->
-            {#if playerDisplay && !isHost}
-                <div class="container mx-auto p-4 max-w-4xl">
-                    <div class="flex flex-col items-center space-y-4">
-                        {#if currentQuestion >= 0}
-                            <div class="bg-purple-900 p-6 rounded-lg shadow-lg max-w-2xl w-full">
-                                {#if showQuestionOnPlayerDisplay}
-                                    <h2 class="text-2xl font-bold mb-4 text-center">{quiz.quiz[currentQuestion].question}</h2>
-                                    {#if quiz.quiz[currentQuestion].imageUrl}
-                                        <img src={quiz.quiz[currentQuestion].imageUrl} alt="img" class="mx-auto h-40 rounded-md mb-4" />
-                                    {/if}
-                                {/if}
-                                <div class="space-y-2 mt-4">
-                                    {#each quiz.quiz[currentQuestion].choices as choice, idx}
-                                        <button class="text-left w-full bg-purple-700 hover:bg-purple-600 rounded p-3" on:click={() => handleAnswer(choice,idx)}>
-                                            {choice}
-                                        </button>
-                                    {/each}
-                                </div>
-                                <div class="w-full bg-purple-700 rounded-full h-2.5 dark:bg-purple-700 overflow-hidden mb-2 mt-2">
-                                    <div class="bg-green-500 h-full" style="transition: width 0.5s ease; width: {questionTimerWidth}%"></div>
-                                </div>
-                                {#if !questionTimeOut} <!-- condition for timeout -->
-                                    <div class="mt-4 {isAsnwerSubmitted ? "bg-indigo-500" :"bg-purple-700" }  p-3 rounded text-center">
-                                        {isAsnwerSubmitted ? answerSubmitted : 'Select an Answer'}
-                                    </div>
-                                {:else}
-                                    <div class="mt-4 bg-red-500 p-3 rounded text-center">
-                                        Time Out!
-                                    </div>
-                                {/if}
-                            </div>
-                        {/if}
-                    </div>
-                </div>
-            {/if}
-
-            <!-- Score Display -->
-            {#if scoreDisplayCheck}
-                <div class="container mx-auto p-4 max-w-4xl">
-                    <div class=" bg-purple-900 p-8 rounded-lg shadow-lg max-w-4xl">
-                        <h3 class="text-2xl font-bold mb-6 text-yellow-300">Leaderboard</h3>
-                        <div class="space-y-4">
-                            {#each calculateScore(sessionScores) as player, index}
-                            <div class="flex items-center justify-between bg-purple-800 p-4 rounded-lg">
-                                <div class="flex items-center">
-                                    <img src={`/avatars/${AVATARS[player.avatarIndex]}`} alt="avatar" class="w-12 h-12 rounded-full mr-4">
-                                    <div class="text-lg font-medium {index < 3 ? 'text-yellow-400' : 'text-gray-300'}">{player.name}</div>
-                                </div>
-                                <div class="text-lg font-bold {index < 3 ? 'text-white' : 'text-gray-400'}">{player.scores} points</div>
-                            </div>
-                            {/each}
-                        </div>
-                        <div class="w-full bg-purple-700 rounded-full h-2.5 dark:bg-gray-700 overflow-hidden mb-2 mt-2">
-                            <div class="bg-green-500 h-full" style="transition: width 0.5s ease; width: {scoreDisplayTimerWidth}%"></div>
-                        </div>
-                    </div>
-                </div>
-            {/if}
-            
-        {/if}
-    </div>
-
-    <audio bind:this={audioRef} loop={true} preload="auto">
-        Your browser does not support the audio element.
-    </audio>
+  <audio bind:this={audioRef} loop={true} preload="auto">
+    Your browser does not support the audio element.
+  </audio>
 {/if}
 
-
 <style>
-    /* Simple CSS spinner animation */
-    .loader {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #600e74; /* You can change the color to match your brand */
-      border-radius: 50%;
-      width: 64px; /* You can adjust the size */
-      height: 64px; /* You can adjust the size */
-      animation: spin 2s linear infinite;
-    }
+  /* Simple CSS spinner animation */
+  .loader {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #600e74; /* You can change the color to match your brand */
+    border-radius: 50%;
+    width: 64px; /* You can adjust the size */
+    height: 64px; /* You can adjust the size */
+    animation: spin 2s linear infinite;
+  }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
     }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
 
-    @keyframes podium-rise {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+  @keyframes podium-rise {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
     }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
 </style>
