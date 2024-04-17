@@ -228,7 +228,7 @@
     </div>
   {/if}
 
-  <div class="fixed bottom-12 left-20 flex items-center space-x-4">
+  <div class="hidden md:block fixed bottom-12 left-20 items-center space-x-4">
     <div class="flex space-x-1">
       <div class="w-8 h-8 bg-yellow-700 rounded-full" />
       <div class="w-8 h-8 bg-purple-300 rounded-full" />
