@@ -207,7 +207,7 @@
   </ul>
 </nav> -->
 
-<nav
+<!-- <nav
   class="flex justify-center items-center space-x-2 overflow-auto py-4 bg-gradient-to-r from-purple-900 via-purple-700 to-purple-500 fixed top-0 w-full z-20 shadow-lg font-garamond text-s"
 >
   <div class="container mx-auto flex justify-between items-center">
@@ -239,7 +239,7 @@
       </li>
     </ul>
   </div>
-</nav>
+</nav> -->
 
 <main
   class="flex flex-col lg:flex-row bg-gradient-to-r from-purple-900 via-purple-700 to-purple-500 text-white min-h-screen pt-16 font-garamond"
@@ -356,7 +356,7 @@
     {#if isQuizSelected}
       <button
         class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105 shadow-lg mt-4"
-        on:click={() => goto("/createRoom")}
+        on:click={() => goto("/createRoom_")}
       >
         Proceed
       </button>
