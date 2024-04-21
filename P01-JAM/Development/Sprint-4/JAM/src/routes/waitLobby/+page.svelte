@@ -8,9 +8,11 @@
   import { user } from "$lib/userStore.js";
   import { SCREENS, AVATARS } from "$lib/config.js";
   import { goto } from "$app/navigation";
+  import { qr } from '@svelte-put/qr/svg';
 
   let playersReady = 0;
   let players = [];
+  let testNum = 1;
 
   $: {
     const events = $roomEvents;
@@ -223,6 +225,14 @@
       </button>
     </div>
   </div>
+
+  <svg
+  use:qr={{
+    data: `https://p01-jam.vercel.app/docs/${$user.gameid}`,
+    // logo: 'https://svelte-put.vnphanquang.com/images/svelte-put-logo.svg',
+    shape: 'square',
+  }}
+/>
 </main>
 
 <style>
@@ -255,5 +265,10 @@
     .player-list {
       flex-direction: row; /* Grow players horizontally */
     }
+  }
+
+  svg {
+    height: 300px;
+    /* width: 100px; */
   }
 </style>
