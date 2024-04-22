@@ -6,7 +6,7 @@
 
   import { socket, roomEvents } from "$lib/socketStore.js";
   import { user } from "$lib/userStore.js";
-  import { SCREENS, AVATARS } from "$lib/config.js";
+  import { SCREENS, AVATARS,DEPLOYED_URL_LOCAL,DEPLOYED_URL } from "$lib/config.js";
   import { goto } from "$app/navigation";
   import { qr } from '@svelte-put/qr/svg';
 
@@ -174,8 +174,21 @@
 <!-- </main> -->
 
 <main class="flex justify-center items-center min-h-screen bg-purple-500">
+
+
   <div class="w-full max-w-md p-4 bg-purple-800 rounded-lg shadow-lg">
-    <h1 class="text-3xl font-bold text-white text-center mb-8">Loading...</h1>
+    <h1 class="text-3xl font-bold text-white text-center mb-8">Waiting Room</h1>
+      {#if $user.isHost}
+      <div class="flex justify-center">
+        <svg class="w-48 h-48"
+        use:qr={{
+          data: `${DEPLOYED_URL}/docs/${$user.gameid}`,
+          // logo: 'https://svelte-put.vnphanquang.com/images/svelte-put-logo.svg',
+          shape: 'square',
+        }}
+        />
+      </div>
+      {/if}
     <div class="space-y-4">
       <div class="bg-purple-600 rounded-lg p-4 text-center">
         <p class="text-sm font-semibold text-white">Players Ready</p>
@@ -195,7 +208,7 @@
         >
           {#each players as { name, avatarIndex }}
             <div class="player-item mx-2 mb-2">
-              <p class="player-name text-white">{name}</p>
+              <p class="player-name text-white">{name.length > 8 ? name.slice(0, 8) + '...' : name}</p>
               <img
                 class="player-avatar w-12 h-12 rounded-full"
                 src={`/avatars/${AVATARS[avatarIndex]}`}
@@ -226,13 +239,6 @@
     </div>
   </div>
 
-  <svg
-  use:qr={{
-    data: `https://p01-jam.vercel.app/docs/${$user.gameid}`,
-    // logo: 'https://svelte-put.vnphanquang.com/images/svelte-put-logo.svg',
-    shape: 'square',
-  }}
-/>
 </main>
 
 <style>

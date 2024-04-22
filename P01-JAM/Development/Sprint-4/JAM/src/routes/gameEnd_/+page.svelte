@@ -408,7 +408,7 @@
     }
 
     .leaderboard-entries .flex.animate-bounce .text-white:nth-child(2) { /* Target name element */
-      animation: text-glow 1.5s ease-in-out infinite alternate;
+      animation: text-glow 3.5s ease-in-out infinite alternate;
     }
 
     @keyframes text-glow {
@@ -417,7 +417,7 @@
     }
 
     .leaderboard {
-      animation: slide-in 0.5s ease-in forwards;
+      animation: slide-in 2.5s ease-in forwards;
     }
 
     @keyframes slide-in {
