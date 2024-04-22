@@ -285,26 +285,28 @@
 
                 <!-- <div class=" bg-purple-900 p-8 rounded-lg shadow-lg max-w-4xl"> -->
                 <div class="leaderboard bg-gradient-to-r from-purple-700 to-purple-900 p-32 rounded-lg shadow-lg max-w-4xl">
-                    <h3 class="text-2xl font-bold mb-6 text-yellow-300">Podium</h3>
+                    <h3 class="text-2xl font-bold mb-6 text-yellow-300 absolute top-10 ">Podium</h3>
                     <div class="space-x-4 flex justify-center items-center">
 
                         <div class="podium">
                             <div>
                                 
-                                <div class="flex-row items-center justify-between bg-gray-800 rounded-lg shadow-md animate-bounce w-100 h-500">
-                                    <img src={`/avatars/${AVATARS[calculateSecondPosition(playerScores).avatarIndex]}`} alt="avatar" class="w-12 h-12 rounded-full mr-4">
-                                    <div class="text-lg font-medium ">{calculateSecondPosition(playerScores).name}</div>
-                                    <div class="text-lg font-bold text-white">{calculateSecondPosition(playerScores).scores} points</div>
-                                </div>
+                                {#if playerScores.length > 1 }
+                                  <div class="flex-row items-center justify-between bg-gray-800 rounded-lg shadow-md animate-bounce w-100 h-500 mx-6">
+                                      <img src={`/avatars/${AVATARS[calculateSecondPosition(playerScores).avatarIndex]}`} alt="avatar" class="w-12 h-12 rounded-full mr-4">
+                                      <div class="text-lg font-medium ">{calculateSecondPosition(playerScores).name}</div>
+                                      <div class="text-lg font-bold text-white">{calculateSecondPosition(playerScores).scores} points</div>
+                                  </div>
+                                
                                 
                                 <div class="podium-place second">2nd Place</div>
-                                
+                                {/if}
 
                             </div>
 
                             <div>
                                 
-                                <div class="flex-row items-center justify-between bg-gray-800 rounded-lg shadow-md animate-bounce w-100 h-500 my-12">
+                                <div class="flex-row items-center justify-between bg-gray-800 rounded-lg shadow-md animate-bounce w-100 h-500 mx-6">
                                     <img src={`/avatars/${AVATARS[calculateFirstPosition(playerScores).avatarIndex]}`} alt="avatar" class="w-12 h-12 rounded-full mr-4">
                                     <div class="text-lg font-medium ">{calculateFirstPosition(playerScores).name}</div>
                                     <div class="text-lg font-bold text-white">{calculateFirstPosition(playerScores).scores} points</div>
@@ -316,13 +318,17 @@
                             
                             <div>
                                 
-                                <div class="flex-row items-center justify-between bg-gray-800 rounded-lg shadow-md animate-bounce w-100 h-500">
+                                {#if playerScores.length > 2}
+                                <div class="flex-row items-center justify-between bg-gray-800 rounded-lg shadow-md animate-bounce w-100 h-500 mx-6">
                                     <img src={`/avatars/${AVATARS[calculateThirdPosition(playerScores).avatarIndex]}`} alt="avatar" class="w-12 h-12 rounded-full mr-4">
                                     <div class="text-lg font-medium ">{calculateThirdPosition(playerScores).name}</div>
                                     <div class="text-lg font-bold text-white">{calculateThirdPosition(playerScores).scores} points</div>
                                 </div>
+                                
 
                                 <div class="podium-place third">3rd Place</div>
+                                {/if}
+
                             </div>
                         
                         </div>
@@ -441,19 +447,22 @@
 }
 
 .podium-place.first {
-  background-color: gold;
-  transform: scaleY(1.5);
-  transform-origin:bottom;
+  background-color: rgba(255, 217, 0, 0.777);
+  /* transform: scaleY(1.5);
+  transform-origin:bottom; */
   margin-right: 10px;
   margin-left: 10px;
+  height: 150px;
 }
 
 .podium-place.second {
-  background-color: silver;
+  background-color: rgba(192, 192, 192, 0.852);
 }
 
 .podium-place.third {
-  background-color:peru;
+  background-color:rgba(205, 134, 63, 0.878);
+  height: 65px;
+  margin-bottom: 0px;
 }
 
     /* .podium-container {
