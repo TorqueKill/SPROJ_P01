@@ -194,16 +194,29 @@
     <!-- host history display -->
     <div class = "mr-6 mt-[-550px] flex flex-col items-center min-h-screen">
       {#if showHostHistory}
-        <div class="flex flex-wrap">
-            {#each $hostHistory as quiz}
-                <div class="bg-purple-100 p-4 rounded shadow-md">
-                <h2 class="text-2xl font-bold mb-6">{quiz.quiz} Quiz Scores</h2>
-                    <div class="mt-8">
-                    {#each quiz.players as player}
-                        <div class = "mb-6">
-                            {player.name}: {player.score}</div>
-                    {/each}
+        <div class="flex flex-col space-y-4">
+          {#each $hostHistory as quiz}
+            <div class="relative">
+              <div class="absolute top-0 left-0 w-full h-8"></div>
+                <div class="bg-purple-800 text-white p-4 rounded shadow-md relative">
+                  <h2 class="text-2xl font-bold mb-6">{quiz.quiz} Quiz Scores</h2>
+                </div>
+                <div class="bg-white p-4 rounded-b shadow-md relative z-10">
+                    <div class="grid grid-cols-2 gap-4">
+                      <div>
+                        <h3 class="text-lg font-semibold mb-4">Players</h3>
+                        {#each quiz.players as player}
+                          <div class="mb-2">{player.name}</div>
+                        {/each}
+                      </div>
+                      <div>
+                        <h3 class="text-lg font-semibold mb-4">Scores</h3>
+                        {#each quiz.players as player}
+                          <div class="mb-2">{player.score}</div>
+                        {/each}
+                      </div>
                     </div>
+                  </div>
                 </div>
             {/each}
         </div>
