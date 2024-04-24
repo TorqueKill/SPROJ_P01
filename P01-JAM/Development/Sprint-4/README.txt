@@ -43,6 +43,7 @@ SignIn/Sign Up Screen Revamped				(Bisma)
 Waiting Room Screen Revamped				(Waleed)
 Viewhistory Screen Revamped (frontend only at '/dummy')	(Hafsa)
 GameEnd Screen Revamped 				(Rafae)
+QR Code enabled Join             (Rafae)
 
 
 
