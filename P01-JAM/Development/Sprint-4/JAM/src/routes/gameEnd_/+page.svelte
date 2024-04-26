@@ -1,6 +1,6 @@
 <script>
     // @ts-nocheck
-    import { SCREENS, AVATARS } from "$lib/config.js";
+    import { SCREENS, AVATARS, GAME_SETTINGS } from "$lib/config.js";
     import { user } from "$lib/userStore.js";
     import { socket, roomEvents } from "$lib/socketStore.js";
     import { goto } from "$app/navigation";
@@ -11,6 +11,7 @@
     // let playerScores = [];
     let totalQuestions = 0;
     let bgColor;
+    const LEADERBOARD_SIZE = GAME_SETTINGS.LEADERBOARD_SIZE;
 
     let dummyPlayers = [
         {
@@ -97,15 +98,35 @@
       return score;
     };
 
-    const calculateScore = (scores) => {
-      return scores.map((score, index) => {
-        return {
-          name: score.name,
-          scores: playerScore(score.scores),
-          avatarIndex: score.avatarIndex
-        };
-      });
-    };
+    // const calculateScore = (scores) => {
+    //   return scores.map((score, index) => {
+    //     return {
+    //       name: score.name,
+    //       scores: playerScore(score.scores),
+    //       avatarIndex: score.avatarIndex
+    //     };
+    //   });
+    // };
+
+    const calculateScore =(scores) => {
+        let scoreList = [];
+        for (let i = 0; i < scores.length; i++) {
+        let score = 0;
+        for (let j = 0; j < scores[i].scores.length; j++) {
+            //make sure to convert the responseTimes to integer from float
+            score += scores[i].scores[j] * Math.floor(scores[i].responseTimes[j]);
+        }
+        scoreList.push({name: scores[i].name, scores: score, avatarIndex: scores[i].avatarIndex});
+        }
+        //sort the list by score
+        scoreList.sort((a, b) => b.scores - a.scores);
+        
+        //check if the list is greater than the leaderboard size
+        if (scoreList.length > LEADERBOARD_SIZE) {
+            scoreList = scoreList.slice(0, LEADERBOARD_SIZE);
+        }
+        return scoreList;
+    }
 
     const calculateFirstPosition = (scores) => {
 
@@ -269,8 +290,8 @@
           <p>Waiting for scores...</p>
         {:else}
         <div class="min-h-screen {bgColor} text-white flex justify-center items-center">
-            <div   >
-            <div class="container mx-auto p-4 max-w-4xl">
+            <div>
+            <div class="container mx-auto p-4 max-w-8xl">
 
                 <!-- <div class="podium-container flex justify-between items-center w-fit mx-auto">
                     {#each calculateScore(playerScores) as player, index}
@@ -283,8 +304,29 @@
                 </div> -->
 
 
+                <!-- <div class="container mx-auto p-4 max-w-8xl"> -->
+                <div class=" bg-purple-900 p-16 rounded-lg shadow-lg max-w-16xl">
+                  <h3 class="text-2xl font-bold mb-6 text-yellow-300">Leaderboard</h3>
+                  <div class="space-y-4">
+                      {#each calculateScore(playerScores) as player, index}
+                      <div class="flex items-center justify-between bg-purple-800 p-2 rounded-lg">
+                          <div class="flex items-center p-2">
+                              <img src={`/avatars/${AVATARS[player.avatarIndex]}`} alt="avatar" class="w-12 h-12 rounded-full mr-4">
+                              <div class="text-lg font-medium {index < 3 ? 'text-yellow-400' : 'text-gray-300'}">{player.name}</div>
+                          </div>
+                          <div class="text-lg font-bold  {index < 3 ? 'text-white' : 'text-gray-400'}">{player.scores} points</div>
+                      </div>
+                      {/each}
+                  </div>
+                  <!-- <div class="w-full bg-purple-700 rounded-full h-2.5 dark:bg-gray-700 overflow-hidden mb-2 mt-2">
+                      <div class="bg-green-500 h-full" style="transition: width 0.5s ease; width: {scoreDisplayTimerWidth}%"></div>
+                  </div> -->
+              </div>
+              <!-- </div> -->
+
+
                 <!-- <div class=" bg-purple-900 p-8 rounded-lg shadow-lg max-w-4xl"> -->
-                <div class="leaderboard bg-gradient-to-r from-purple-700 to-purple-900 p-32 rounded-lg shadow-lg max-w-4xl">
+                <!-- <div class="leaderboard bg-gradient-to-r from-purple-700 to-purple-900 p-32 rounded-lg shadow-lg max-w-4xl">
                     <h3 class="text-2xl font-bold mb-6 text-yellow-300 absolute top-10 ">Podium</h3>
                     <div class="space-x-4 flex justify-center items-center">
 
@@ -334,14 +376,28 @@
                         </div>
                         
                         
-                    </div>
+                    </div> -->
                 <!-- </div> -->
-                </div>
+                <!-- </div> -->
         
             <!-- <div class="flex justify-around mt-10"> -->
 
-                <div class="flex justify-center mt-4">  <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Save history</button>
-                    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 ml-4">Leave Room</button>
+                <div class="flex justify-center mt-4">  <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" on:click={async () => {
+                  const result = await _saveHistory();
+                  if (result) {
+                      $user.gameid = null;
+                      $user.quiz = null;
+                      $user.isHost = false;
+                      $user.userDecided = false;
+              
+                      goto("/viewHistory");
+                  }else{
+                      alert("There was an error saving the history. Please try again!");
+                  }
+                  }}>Save history</button>
+                    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 ml-4" on:click={() => {
+                      restartConnection();
+                      }}>Leave Room</button>
                 </div>
                 
                 <!-- <div class="flex flex-col space-y-2">  <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Save history</button>
