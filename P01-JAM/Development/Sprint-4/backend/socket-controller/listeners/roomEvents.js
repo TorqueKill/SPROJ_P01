@@ -219,8 +219,11 @@ module.exports = (socket, io, gameManager, config, rooms, users) => {
     if (room) {
       rooms[gameManager.getRoomIndex(roomid, rooms)].gameStarted = true;
       rooms[gameManager.getRoomIndex(roomid, rooms)].ROOM_LAG_BIAS = Date.now();
+      let musicAndColor = gameManager.getRoomMusicAndBgColor(roomid, rooms);
       roomSettings = {
         displayQuestion: gameManager.getRoom(roomid, rooms).displayQuestion,
+        bgColor: musicAndColor.bgColor,
+        bgMusic: musicAndColor.bgMusic,
       };
 
       remainingPlayers =
