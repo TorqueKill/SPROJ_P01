@@ -50,6 +50,19 @@ export const AVATARS = [
   "woman5.png",
 ];
 
+export const VALIDATION_CHECKS_AUTH = {
+  email_AllowedCharacters: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+  email_LengthLimit: 254,
+  password_AllowedCharacters: "^[a-zA-Z0-9!@#$%^&*()_+=-]{6,20}$",
+  password_LengthLimit: 20,
+  password_MinLength: 8,
+  password_SpecialCharacterRequired: false,
+  password_UppercaseRequired: false,
+  password_NumberRequired: false,
+  username_AllowedCharacters: "^[a-zA-Z0-9._-]{3,20}$",
+  username_LengthLimit: 20,
+};
+
 export const QUIZ_DISPLAY_PAGINATION = 13;
 
 //1 week
