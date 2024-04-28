@@ -15,7 +15,7 @@
   const MAX_PLAYERS = ROOM_SETTINGS.MAX_PLAYERS;
   const MAX_REPORT_SCORES = ROOM_SETTINGS.MAX_QUESTIONS_PER_REPORT;
 
-  let roomid;
+  let roomid = $user.gameid;
   let isRoomFull = false;
 
   let maxPlayers;

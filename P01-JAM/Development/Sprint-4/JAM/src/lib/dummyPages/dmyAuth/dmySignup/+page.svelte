@@ -1,9 +1,8 @@
 <script>
-  //@ts-nocheck
-  import { goto } from "$app/navigation";
-  import { signup } from "$lib/API/userAPI.js";
-
-  let email = "";
+    //@ts-nocheck
+    import { signup } from "$lib/API/userAPI.js";
+  
+    let email = "";
     let password = "";
     let errors = {}; // Use an object to store errors for each field
     let signupLoading = false;
@@ -29,7 +28,7 @@
       try {
         const response = await signup(userName, email, password);
         console.log(response);
-        goto("/");
+        // If successful, proceed to next steps (e.g., redirect or show a success message)
       } catch (e) {
         console.log("Error: ", e);
         if (e.errors) {
@@ -80,7 +79,7 @@
         Sign Up
       </button>
       <div class="mt-4 text-center">
-        <button class="text-purple-200 hover:text-purple-100 underline transition duration-300" on:click={()=>{goto("/signIn")}}>
+        <button class="text-purple-200 hover:text-purple-100 underline transition duration-300">
           Already have an account? Sign In
         </button>
       </div>

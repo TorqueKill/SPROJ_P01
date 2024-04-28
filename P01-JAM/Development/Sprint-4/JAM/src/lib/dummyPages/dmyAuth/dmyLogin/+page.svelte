@@ -1,11 +1,8 @@
 <script>
-  // @ts-nocheck
-  import { goto } from "$app/navigation";
-  // importing userStore.js
-  import { user } from "$lib/userStore.js";
-  import { signin } from "$lib/API/userAPI.js";
-
-  let email = "";
+    // @ts-nocheck
+    import { signin } from "$lib/API/userAPI.js";
+  
+    let email = "";
     let password = "";
     let errors = {};
     let signInLoading = false;
@@ -19,8 +16,7 @@
       try {
         const response = await signin(email, password);
         console.log(response);
-        $user.email = email;
-        goto("/hostOrPlayer");
+        // If successful, handle redirection or post-login actions here
       } catch (e) {
         console.log("Error: ", e);
         if (e.errors) {

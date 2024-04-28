@@ -50,13 +50,30 @@ export const AVATARS = [
   "woman5.png",
 ];
 
+export const VALIDATION_CHECKS_AUTH = {
+  email_AllowedCharacters: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+  email_LengthLimit: 254,
+  password_AllowedCharacters: "^[a-zA-Z0-9!@#$%^&*()_+=-]{6,20}$",
+  password_LengthLimit: 20,
+  password_MinLength: 8,
+  password_SpecialCharacterRequired: false,
+  password_UppercaseRequired: false,
+  password_NumberRequired: false,
+  username_AllowedCharacters: "^[a-zA-Z0-9._-]{3,20}$",
+  username_LengthLimit: 20,
+};
+
 export const QUIZ_DISPLAY_PAGINATION = 13;
 
 //1 week
 export const SESSION_TIMEOUT = 604800000;
 
-export const BACKEND_URL = "https://mysterious-retreat-98397-8a74f4ba2e1e.herokuapp.com"; // || process.env.BACKEND_URL;
+export const BACKEND_URL = "http://localhost:3001"; // || process.env.BACKEND_URL;
 
-//https://boiling-beyond-93888-265de2b70712.herokuapp.com
+export const DEPLOYED_URL_LOCAL = "http://localhost:5173";
 
-//https://mysterious-retreat-98397-8a74f4ba2e1e.herokuapp.com
+export const DEPLOYED_URL = "https://p1-jam.vercel.app";
+
+//https://boiling-beyond-93888-265de2b70712.herokuapp.com/
+
+//https://mysterious-retreat-98397-8a74f4ba2e1e.herokuapp.com/

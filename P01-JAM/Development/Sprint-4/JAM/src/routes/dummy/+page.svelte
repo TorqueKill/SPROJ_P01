@@ -8,7 +8,9 @@
     import DmyQuizSelect from '$lib/dummyPages/dmyQuizSelect/+page.svelte'
     import DmyRoomCreate from '$lib/dummyPages/dmyCreateRoom/+page.svelte'
     import DmyHistory from '$lib/dummyPages/dmyHistory/+page.svelte'
-  
+    import DmyLogin from '$lib/dummyPages/dmyAuth/dmyLogin/+page.svelte'
+    import DmySignup from '$lib/dummyPages/dmyAuth/dmySignup/+page.svelte'  
+
     // Or create some routing logic if needed
     let currentComponent = DmyBg;
   
@@ -25,6 +27,9 @@
     <button class="border" on:click={() => showComponent(DmyQuizSelect)}>QuizSelect</button>
     <button class="border" on:click={() => showComponent(DmyRoomCreate)}>RoomCreate</button>
     <button class="border" on:click={() => showComponent(DmyHistory)}>History</button>
+    <button class="border" on:click={() => showComponent(DmyLogin)}>Login</button>
+    <button class="border" on:click={() => showComponent(DmySignup)}>Signup</button>
+
   </div>
   
   <div>
