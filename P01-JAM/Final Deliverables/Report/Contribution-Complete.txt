@@ -1,0 +1,110 @@
+Project: JAM - P01
+
+Team: 
+24100175    ABDUL MUIZ
+24100277    BISMA NAWAZ
+24100127    ABDUR RAFAE HAROON
+24100282    WALEED NADEEM
+24100308    HAFSA AHMED
+
+
+
+------------------------------------------------------------------------------------------------
+
+					CONTRIBUTION LIST
+
+------------------------------------------------------------------------------------------------
+
+
+Prototype:
+
+Backend/Frontend Event Sockets 				(Muiz)
+Creating Rooms for Players 				(Muiz) 
+Creating Quiz 						(Muiz, Bisma)				   
+Quiz Timers Functionality 				(Muiz, Rafae)
+Waiting Lobby for Host and Players 			(Muiz)
+Game Session (Question, Answering, Syncing, Timeouts) 	(Muiz)
+Styling Frontend Screens (ALL SCREENS)			(Bisma)
+
+Integrating & Deployment				(Muiz)
+
+------------------------------------------------------------------------------------------------
+
+Sprint 1:
+Anonymous user implementation 					(Muiz)
+Mid game score reports 						(Muiz)
+Saving and loading past games played (Host and Player)  	(Muiz)
+View History of past games 					(Bisma, Muiz)
+User sign up/ sign in options (Rafae, Waleed, Muiz)
+UI validation checks (Settings, View History, Menu checks) 	(Muiz)
+Responsive UI, adjusts to different screen sizes 		(Bisma)
+Better styling on ui 						(Bisma, Hafsa, Waleed)
+
+Persistence added, Logged on players can rejoin games 		(Muiz)
+Server oriented timeout logic					(Muiz)
+Server tracks time per question					(Muiz)
+Mid session Leaderboards					(Muiz)
+Server disconnection and Leaving room are different now 	(Muiz)
+Server-Client validation checks 				(Muiz)
+User authentication with supabase 				(Bisma, Rafae, Waleed, Hafsa)
+
+------------------------------------------------------------------------------------------------
+
+Sprint 2:
+
+Questions with images 						(Muiz) 
+Questions on player Screens option 				(Muiz)
+Exporting Quiz in .CSV format 					(Bisma)
+Importing Quiz from .CSV format 				(Bisma)
+Avatar Pop-up Screen 						(Hafsa)
+Avatar in waiting room + Backend 				(Muiz)
+Avatar leaderboard/score display + Backend 			(Muiz)
+
+------------------------------------------------------------------------------------------------
+
+Sprint 3:
+Whitelisted developer accounts		(Muiz)
+Auto sign in with accounts		(Muiz)
+Host can start quizzes early 		(Rafae)
+Host can pause the timer 		(Rafae)
+Nav Bar implementation 			(Waleed)
+Complete overhaul for creating quiz UI	(Bisma)
+UI Adjustments				(Bisma, Muiz)
+Recording & Saving Response times	(Rafae, Muiz)
+Response Time Based Scoring 		(Muiz)
+
+Integrating & Deployment 		(Muiz)
+Complete backend file/code refactor	(Muiz)
+
+
+------------------------------------------------------------------------------------------------
+
+Sprint 4
+Contribution to code can be tracked at : sprint4_dev_muiz
+
+Things added:
+
+Quiz format revamped completely				(Muiz)
+Database shifted to MongoDb + APIs added		(Muiz)
+Quiz are saved to database (if logged in)		(Muiz)
+Pagination APIs added for getQuiz and getHistory	(Muiz)
+Simulated pages added to '/dummy' route			(Muiz)
+
+API testing 						(Muiz, Waleed, Hafsa)
+
+PAGES REWORKED:
+
+CreateRoom Screen Revamped				(Muiz)
+GameSession Screen Revamped				(Muiz)
+ChooseQuiz Screen Revamped 				(Muiz)
+HostOrPlayer Screen Revamped				(Bisma)
+Landing Page Revamped					(Bisma)
+CreateQuestion Screen Revamped				(Bisma)
+SignIn/Sign Up Screen Revamped				(Bisma)
+Waiting Room Screen Revamped				(Waleed)
+Viewhistory Screen Revamped (frontend only at '/dummy')	(Hafsa)
+GameEnd Screen Revamped 				(Rafae)
+
+
+
+------------------------------------------------------------------------------------------------
