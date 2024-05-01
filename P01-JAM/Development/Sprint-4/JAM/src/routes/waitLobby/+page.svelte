@@ -42,7 +42,7 @@
 
     if (events.roomLeft) {
       playersReady = events.roomLeft.num;
-      players = events.roomLeft.names;
+      players = events.roomLeft.users;
 
       //set the event to null
       events.roomLeft = null;

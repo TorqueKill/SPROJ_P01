@@ -285,8 +285,8 @@
       <div class="mr-6 mt-[-170px] flex flex-col items-center min-h-screen">
         {#if showPlayerHistory}
           {#each detailedPlayerHistory as quiz}
-            <div class="w-full md:w-1/2 mb-8">
-              <div class="bg-purple-100 p-4 rounded shadow-md">
+            <div class="w-full md:w-1/2 mb-8 ">
+              <div class="bg-purple-300 p-4 rounded shadow-md">
                 <h3 class="text-2xl font-bold mb-6">{quiz.quiz} Quiz</h3>
                 <span>You Scored: <span class="font-bold">{quiz.quizScore}</span></span>
                 <ul ol class="mt-8 list-decimal pl-4">
@@ -309,9 +309,9 @@
         {#if !loadedDefault_Player && showPlayerHistory}
           <!--Pagination-->
           <div class="flex justify-center items-center mt-8">
-            <button class="bg-purple-900 hover:bg-purple-700 text-white font-bold py-2 px-4 text-lg rounded transition duration-150 ease-in-out" on:click={PrevPage_Player}>Previous</button>
+            <button class="bg-purple-900 hover:bg-purple-700 text-white font-bold py-2 px-4 text-lg rounded transition duration-150 ease-in-out w-50" on:click={PrevPage_Player}>Previous</button>
             <span class="mx-4 text-lg">Page {currentpage_Player} of {totalpage_Player}</span>
-            <button class="bg-purple-900 hover:bg-purple-700 text-white font-bold py-2 px-4 text-lg rounded transition duration-150 ease-in-out" on:click={NextPage_Player}>Next</button>
+            <button class="bg-purple-900 hover:bg-purple-700 text-white font-bold py-2 px-4 text-lg rounded transition duration-150 ease-in-out w-50" on:click={NextPage_Player}>Next</button>
           </div>
         {/if}
 
