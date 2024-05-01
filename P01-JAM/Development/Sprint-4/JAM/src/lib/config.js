@@ -64,6 +64,8 @@ export const VALIDATION_CHECKS_AUTH = {
 };
 
 export const QUIZ_DISPLAY_PAGINATION = 13;
+export const HISTORY_DISPLAY_PAGINATION_HOST = 5;
+export const HISTORY_DISPLAY_PAGINATION_PLAYER = 5;
 
 //1 week
 export const SESSION_TIMEOUT = 604800000;
