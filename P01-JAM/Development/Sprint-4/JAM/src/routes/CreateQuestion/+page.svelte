@@ -3,6 +3,7 @@
 
   import { goto } from "$app/navigation";
   import { user } from "$lib/userStore.js";
+  import {saveQuiz} from "$lib/API/gameAPI.js"
 
   const MAX_TIME_LIMIT = 60;
   let showHostSettingsModal = false;
@@ -24,6 +25,7 @@
   let quizIdx;
   let isQuizSelected = false;
   let selectedQuestionIndex = 0;
+  let savingQuizLoading = false;
 
   function selectQuestion(index) {
     selectedQuestionIndex = index;
@@ -159,16 +161,22 @@
     }
   }
 
-  function saveQuiz() {
+  async function _saveQuiz() {
+    savingQuizLoading = true;
     let saveingQuiz = quiz1;
     populateIfBlank(saveingQuiz);
     let quizObj = quizWrapper(saveingQuiz);
     console.log(quizObj);
-    localStorage.setItem("Quiz", JSON.stringify([quizObj]));
-    // goto("/createRoom");
+
+    if ($user.email !== null && $user.email !== ""){
+      let response = await saveQuiz($user.email, quizObj);
+      console.log(response);
+    }
+
     $user.hostQuiz = quizObj;
     quizChosen = true;
     isQuizSelected = true;
+    savingQuizLoading = false;
   }
 
   const logout = async () => {
@@ -347,11 +355,19 @@
   <aside
     class="bg-black bg-opacity-80 p-4 rounded-lg shadow-xl w-full lg:w-1/5 mt-4 lg:mt-0"
   >
+    <!--disable when savingQuizLoading is true-->
     <button
-      class="w-full bg-gradient-to-r from-purple-400 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105 shadow-lg"
-      on:click={() => saveQuiz()}
+      class="w-full bg-gradient-to-r from-purple-400 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105 shadow-lg mb-4" 
+      disabled={savingQuizLoading}
+      on:click={_saveQuiz}
     >
       Save/Choose
+    </button>
+    <button
+      class="w-full bg-gradient-to-r from-purple-400 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105 shadow-lg" 
+      on:click={()=>goto("/chooseQuiz_")}
+    >
+      Quizzes Preview
     </button>
     {#if isQuizSelected}
       <button

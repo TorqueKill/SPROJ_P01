@@ -90,7 +90,7 @@ Quiz are saved to database (if logged in)		(Muiz)
 Pagination APIs added for getQuiz and getHistory	(Muiz)
 Simulated pages added to '/dummy' route			(Muiz)
 
-API testing 						(Muiz, Waleed, Hafsa)
+API testing 						(Muiz, Waleed)
 
 PAGES REWORKED:
 
@@ -102,7 +102,7 @@ Landing Page Revamped					(Bisma)
 CreateQuestion Screen Revamped				(Bisma)
 SignIn/Sign Up Screen Revamped				(Bisma)
 Waiting Room Screen Revamped				(Waleed)
-Viewhistory Screen Revamped (frontend only at '/dummy')	(Hafsa)
+Viewhistory Screen Revamped 				(Hafsa, Muiz)
 GameEnd Screen Revamped 				(Rafae)
 
 

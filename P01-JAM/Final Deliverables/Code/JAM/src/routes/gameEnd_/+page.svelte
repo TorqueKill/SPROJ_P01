@@ -316,7 +316,7 @@
                       $user.isHost = false;
                       $user.userDecided = false;
               
-                      goto("/viewHistory");
+                      goto("/viewHistNew");
                   }else{
                       alert("There was an error saving the history. Please try again!");
                   }
