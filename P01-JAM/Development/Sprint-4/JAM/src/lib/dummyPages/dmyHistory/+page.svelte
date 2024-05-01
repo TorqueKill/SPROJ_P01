@@ -15,10 +15,16 @@
   let totalpage_Host = 0;
   let totalpage_Player = 0;
 
+  let playerPageLoading = false
+
 
   let pageLoading = [false,false,false]; // whole page loading, player history loading, host history loading
   let loadedDefault_Host = false;
   let loadedDefault_Player = false;
+
+  let statsPage = [false,false] //one for player stats, one for host stats
+  let statsPageLoading = [false,false] //one for player stats, one for host stats
+
   
 
 
@@ -88,39 +94,66 @@
   });
 
   async function NextPage_Host() {
-    pageLoading[2] = true;
-    //checks on the total number
-    if (currentpage_Host < totalpage_Host) {
-      currentpage_Host++;
-    }
-    localHostHistory = await getHistory(playerEmail, currentpage_Host, pagesize_Host, "host").history;
-    pageLoading[2] = false;
+      pageLoading[2] = true;
+      if (currentpage_Host < totalpage_Host) {
+          currentpage_Host++;
+          let response = await getHistory(playerEmail, currentpage_Host, pagesize_Host, "host");
+          if (response && response.history) {
+              localHostHistory = response.history;
+              detailedPlayerHistory = getDetailedPlayerHistory(playerEmail);
+              console.log("Host history:", response.history);
+          } else {
+              console.error("Failed to fetch host history or history is undefined");
+          }
+      }
+      pageLoading[2] = false;
   }
 
   async function PrevPage_Host() {
-    pageLoading[2] = true;
-    if (currentpage_Host > 1) {
-      currentpage_Host--;
-    }
-    localHostHistory = await getHistory(playerEmail, currentpage_Host, pagesize_Host, "host").history;
-    pageLoading[2] = false;
+      pageLoading[2] = true;
+      if (currentpage_Host > 1) {
+          currentpage_Host--;
+          let response = await getHistory(playerEmail, currentpage_Host, pagesize_Host, "host");
+          if (response && response.history) {
+              localHostHistory = response.history;
+              detailedPlayerHistory = getDetailedPlayerHistory(playerEmail);
+              console.log("Host history:", response.history);
+          } else {
+              console.error("Failed to fetch host history or history is undefined");
+          }
+      }
+      pageLoading[2] = false;
   }
 
   async function NextPage_Player() {
-    pageLoading[1] = true;
-    if (currentpage_Player < totalpage_Player) {
-      currentpage_Player++;
-    }
-    localPlayerHistory = await getHistory(playerEmail, currentpage_Player, pagesize_Player, "player").history;
-    pageLoading[1] = false;
+      pageLoading[1] = true;
+      if (currentpage_Player < totalpage_Player) {
+          currentpage_Player++;
+          let response = await getHistory(playerEmail, currentpage_Player, pagesize_Player, "player");
+          if (response && response.history) {
+              localPlayerHistory = response.history;
+              detailedPlayerHistory = getDetailedPlayerHistory(playerEmail);
+              console.log("res:", response.history);
+          } else {
+              console.error("Failed to fetch history or history is undefined");
+          }
+      }
+      pageLoading[1] = false;
   }
 
   async function PrevPage_Player() {
     pageLoading[1] = true;
     if (currentpage_Player > 1) {
       currentpage_Player--;
+      let response = await getHistory(playerEmail, currentpage_Player, pagesize_Player, "player");
+      if (response && response.history) {
+          localPlayerHistory = response.history;
+          detailedPlayerHistory = getDetailedPlayerHistory(playerEmail);
+          console.log("res:", response.history);
+      } else {
+          console.error("Failed to fetch history or history is undefined");
+      }
     }
-    localPlayerHistory = await getHistory(playerEmail, currentpage_Player, pagesize_Player, "player").history;
     pageLoading[1] = false;
   }
 
@@ -146,7 +179,7 @@
         quizScore: game.scores.find(score => score.name === email).scores.reduce((acc, cur) => acc + cur, 0),
         details: game.quiz.quiz.map((question, index) => ({
           question: question.question,
-          providedAnswer: game.scores.find(score => score.name === email).scores[index] ? game.quiz.quiz[index].choices[game.scores.find(score => score.name === email).scores[index]] : 'No answer provided',
+          providedAnswer: game.scores.find(score => score.name === email).scores[index] ? game.quiz.quiz[index].choices[game.scores.find(score => score.name === email).scores[index]] : 'Wrong Answer',
           correctAnswer: game.quiz.quiz[index].answer,
           wasCorrect: game.scores.find(score => score.name === email).scores[index] === 1
         }))

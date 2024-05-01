@@ -47,5 +47,5 @@ function testSaveHistory(email, gameHistory, type) {
     });
 }
 
-//testSaveHistory(email2, gameHistory_, type);
+testSaveHistory(email2, gameHistory_, type);
 testGetHistory(email2, page, pagesize, type);
