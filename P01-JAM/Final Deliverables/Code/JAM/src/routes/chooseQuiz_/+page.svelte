@@ -82,6 +82,7 @@
     async function fetchQuizzes(page) {
       paginationloading.set(true);
       //call API, return promise
+      if (!$user.email) return loadDefaultPagination(page);
       let res = await getQuiz(user.email, page, quizzesPerPage);
       if (res.quizzes.length === 0) {
         return loadDefaultPagination(page);

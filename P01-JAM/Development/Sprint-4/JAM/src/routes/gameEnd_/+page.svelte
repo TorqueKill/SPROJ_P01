@@ -289,98 +289,24 @@
           </div>
           <p>Waiting for scores...</p>
         {:else}
-        <div class="min-h-screen {bgColor} text-white flex justify-center items-center">
-            <div>
-            <div class="container mx-auto p-4 max-w-8xl">
+        <div class=" min-h-screen {bgColor} text-white flex justify-center items-center">
 
-                <!-- <div class="podium-container flex justify-between items-center w-fit mx-auto">
-                    {#each calculateScore(playerScores) as player, index}
-                      <div class="podium {index === 1 ? 'first-place' : index === 2 ? 'second-place' : index === 3 ? 'third-place' : 'hidden'} bg-gradient-to-r from-gold-500 to-gold-700 rounded-lg shadow-lg p-4">
-                        <img src={`/avatars/${AVATARS[player.avatarIndex]}`} alt="avatar" class="w-12 h-12 rounded-full mx-auto mb-2">
-                        <div class="player-name text-lg font-bold">{player.name}</div>
-                        <div class="player-score text-lg font-medium">{player.scores} points</div>
-                      </div>
-                    {/each}
-                </div> -->
-
-
-                <!-- <div class="container mx-auto p-4 max-w-8xl"> -->
-                <div class=" bg-purple-900 p-16 rounded-lg shadow-lg max-w-16xl">
-                  <h3 class="text-2xl font-bold mb-6 text-yellow-300">Leaderboard</h3>
-                  <div class="space-y-4">
-                      {#each calculateScore(playerScores) as player, index}
-                      <div class="flex items-center justify-between bg-purple-800 p-2 rounded-lg">
-                          <div class="flex items-center p-2">
-                              <img src={`/avatars/${AVATARS[player.avatarIndex]}`} alt="avatar" class="w-12 h-12 rounded-full mr-4">
-                              <div class="text-lg font-medium {index < 3 ? 'text-yellow-400' : 'text-gray-300'}">{player.name}</div>
-                          </div>
-                          <div class="text-lg font-bold  {index < 3 ? 'text-white' : 'text-gray-400'}">{player.scores} points</div>
-                      </div>
-                      {/each}
+            <div class="container mx-auto p-8 max-w-6xl">
+              <div class="bg-purple-900 py-20 px-16 rounded-lg shadow-lg"> <!-- Increased padding -->
+                <h3 class="text-3xl font-bold mb-8 text-yellow-300">Leaderboard</h3> <!-- Increased font size -->
+                <div class="space-y-6"> <!-- Increased space between entries -->
+                  {#each calculateScore(playerScores) as player, index}
+                  <div class="flex items-center justify-between bg-purple-800 py-4 px-3 rounded-lg"> <!-- Increased padding -->
+                    <div class="flex items-center">
+                      <img src={`/avatars/${AVATARS[player.avatarIndex]}`} alt="avatar" class="hidden sm:block w-16 h-16 rounded-full mr-6"> <!-- Increased avatar size -->
+                      <div class="text-l font-medium {index < 3 ? 'text-yellow-400' : 'text-gray-300'}">{player.name}</div> <!-- Increased font size -->
+                    </div>
+                    <div class="text-l font-bold  {index < 3 ? 'text-white' : 'text-gray-400'}">{player.scores} points</div> <!-- Increased font size -->
                   </div>
-                  <!-- <div class="w-full bg-purple-700 rounded-full h-2.5 dark:bg-gray-700 overflow-hidden mb-2 mt-2">
-                      <div class="bg-green-500 h-full" style="transition: width 0.5s ease; width: {scoreDisplayTimerWidth}%"></div>
-                  </div> -->
+                  {/each}
+                </div>
               </div>
-              <!-- </div> -->
 
-
-                <!-- <div class=" bg-purple-900 p-8 rounded-lg shadow-lg max-w-4xl"> -->
-                <!-- <div class="leaderboard bg-gradient-to-r from-purple-700 to-purple-900 p-32 rounded-lg shadow-lg max-w-4xl">
-                    <h3 class="text-2xl font-bold mb-6 text-yellow-300 absolute top-10 ">Podium</h3>
-                    <div class="space-x-4 flex justify-center items-center">
-
-                        <div class="podium">
-                            <div>
-                                
-                                {#if playerScores.length > 1 }
-                                  <div class="flex-row items-center justify-between bg-gray-800 rounded-lg shadow-md animate-bounce w-100 h-500 mx-6">
-                                      <img src={`/avatars/${AVATARS[calculateSecondPosition(playerScores).avatarIndex]}`} alt="avatar" class="w-12 h-12 rounded-full mr-4">
-                                      <div class="text-lg font-medium ">{calculateSecondPosition(playerScores).name}</div>
-                                      <div class="text-lg font-bold text-white">{calculateSecondPosition(playerScores).scores} points</div>
-                                  </div>
-                                
-                                
-                                <div class="podium-place second">2nd Place</div>
-                                {/if}
-
-                            </div>
-
-                            <div>
-                                
-                                <div class="flex-row items-center justify-between bg-gray-800 rounded-lg shadow-md animate-bounce w-100 h-500 mx-6">
-                                    <img src={`/avatars/${AVATARS[calculateFirstPosition(playerScores).avatarIndex]}`} alt="avatar" class="w-12 h-12 rounded-full mr-4">
-                                    <div class="text-lg font-medium ">{calculateFirstPosition(playerScores).name}</div>
-                                    <div class="text-lg font-bold text-white">{calculateFirstPosition(playerScores).scores} points</div>
-                                </div>
-                                
-                                <div class="podium-place first">1st Place</div>
-
-                            </div>
-                            
-                            <div>
-                                
-                                {#if playerScores.length > 2}
-                                <div class="flex-row items-center justify-between bg-gray-800 rounded-lg shadow-md animate-bounce w-100 h-500 mx-6">
-                                    <img src={`/avatars/${AVATARS[calculateThirdPosition(playerScores).avatarIndex]}`} alt="avatar" class="w-12 h-12 rounded-full mr-4">
-                                    <div class="text-lg font-medium ">{calculateThirdPosition(playerScores).name}</div>
-                                    <div class="text-lg font-bold text-white">{calculateThirdPosition(playerScores).scores} points</div>
-                                </div>
-                                
-
-                                <div class="podium-place third">3rd Place</div>
-                                {/if}
-
-                            </div>
-                        
-                        </div>
-                        
-                        
-                    </div> -->
-                <!-- </div> -->
-                <!-- </div> -->
-        
-            <!-- <div class="flex justify-around mt-10"> -->
 
                 <div class="flex justify-center mt-4">  <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" on:click={async () => {
                   const result = await _saveHistory();
@@ -398,41 +324,8 @@
                     <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 ml-4" on:click={() => {
                       restartConnection();
                       }}>Leave Room</button>
-                </div>
-                
-                <!-- <div class="flex flex-col space-y-2">  <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Save history</button>
-                    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">Leave Room</button>
-                </div> -->
-          
-                <!-- <button
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded"
-                    on:click={async () => {
-                    const result = await _saveHistory();
-                    if (result) {
-                        $user.gameid = null;
-                        $user.quiz = null;
-                        $user.isHost = false;
-                        $user.userDecided = false;
-                
-                        goto("/viewHistory");
-                    }else{
-                        alert("There was an error saving the history. Please try again!");
-                    }
-                    }}>Save history</button
-                > -->
-                <!-- <button
-                    class="btn btn-secondary btn-block"
-                    id="createQuiz"
-                    on:click={() => {
-                    restartConnection();
-                    }}>Leave Room</button
-                > -->
+            </div>
 
-                <!-- <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-6 rounded" on:click={() => {restartConnection();}}>
-                    Leave Room
-                </button> -->
-            <!-- </div> -->
-        </div>  
         </div>
         </div>
         {/if}
@@ -519,6 +412,10 @@
   background-color:rgba(205, 134, 63, 0.878);
   height: 65px;
   margin-bottom: 0px;
+}
+
+.container {
+    max-width: 60%; /* Making the leaderboard wider */
 }
 
     /* .podium-container {
