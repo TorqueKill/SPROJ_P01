@@ -89,7 +89,7 @@ Database shifted to MongoDb + APIs added		(Muiz)
 Quiz are saved to database (if logged in)		(Muiz)
 Pagination APIs added for getQuiz and getHistory	(Muiz)
 Simulated pages added to '/dummy' route			(Muiz)
-
+QR Code enabled Join                                    (Rafae)
 API testing 						(Muiz, Waleed)
 
 PAGES REWORKED:
